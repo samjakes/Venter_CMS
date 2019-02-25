@@ -10,6 +10,11 @@ Styling for index.html
     background-color:white;
 }
 
+.content-index{
+    display: table-row;
+    width: 100vw;
+}
+
 /*
 Styling for base.html
 */

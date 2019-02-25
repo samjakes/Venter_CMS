@@ -1,0 +1,9 @@
+/*
+Styling for dashboard_user.html
+*/
+
+.nav li.dashboard-item .nav-link{
+    color: #FFFFFF;
+    opacity: 1;
+    background: rgba(255, 255, 255, 0.23);
+  }

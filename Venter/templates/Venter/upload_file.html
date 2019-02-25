@@ -2,6 +2,20 @@
 {% block title %}Upload File {% endblock %}
 {% block content %}
 
+<!-- LINEARICONS -->
+<link rel="stylesheet" href="../../static/assets/fonts/linearicons/style.css">
+<script src="../../static/assets/js/jquery-3.3.1.min.js"></script>
+<script src="../../static/assets/js/main.js"></script>
+<link rel="stylesheet" href="../../static/assets/css/upload_file.css">
+
+{% if successful_submit %}
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("#uploadFileModal").modal('show');
+    });
+</script>
+{% endif %} 
+
 <form method="post"  action="{% url 'upload_csv' %}" enctype="multipart/form-data">
     {% csrf_token %}
     <label>Organisation: </label>&nbsp;&nbsp;{{ request.user.profile.organisation_name }}<br>
@@ -21,5 +35,46 @@
         {% endfor %}
     {% endfor %}
 {% endif %}
+
+ <!--Modal -->
+<div class="modal fade" id="uploadFileModal" tabindex="-1" role="dialog" aria-labelledby="uploadFileModalTitle"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-body">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <div class="text-center">
+                    <img src="../../static/assets/img/file_logo.png" alt="" class="file_logo-upload">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div class="footer-center">
+                    <p class="p1-upload">File uploaded successfully.</p><br>
+                    {% if user.is_staff %}
+                        <a href="{% url 'dashboard_staff' %}">
+                            <button type="button" class="btn btn-warning rounded-4">
+                                Go To Dashboard &nbsp;&nbsp; <span class="lnr lnr-arrow-right"></span>
+                            </button>
+                        </a>
+                    {% else %}
+                        <a href="{% url 'dashboard_user' request.user.pk %}">
+                            <button type="button" class="btn btn-warning rounded-4">
+                                Go To Dashboard &nbsp;&nbsp; <span class="lnr lnr-arrow-right"></span>
+                            </button>
+                        </a>
+                    {% endif %}
+                    
+                    <a href="{% url 'upload_csv' %}">
+                        <button type="button" class="btn btn-info rounded-4">
+                            Upload new file &nbsp;&nbsp; <span class="lnr lnr-plus-circle"></span>
+                        </button>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
 {% endblock %}

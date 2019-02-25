@@ -2,22 +2,78 @@
 {% block title %}Contact Us{% endblock %}
 {% block content %}
 
-<form method="post"  action="{% url 'contact_us' %}" enctype="multipart/form-data">
+<!-- LINEARICONS -->
+<link rel="stylesheet" href="../../static/assets/fonts/linearicons/style.css">
+<script src="../../static/assets/js/jquery-3.3.1.min.js"></script>
+<script src="../../static/assets/js/main.js"></script>
+<link rel="stylesheet" href="../../static/assets/css/contact_us.css">
+
+{% if successful_submit %}
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("#contactUsModal").modal('show');
+    });
+</script>
+{% endif %} 
+
+<form method="post"  action="{% url 'contact_us' %}">
     {% csrf_token %}
-    
-    <label style="font-weight: normal; font-family: Georgia">Company Name</label>
-    <input id="company_name" type="text" class="form-control" name="company_name" value="" required>
-    <label style="font-weight: normal; font-family: Georgia">Contact No.</label>
-    <input id="contact_no" type="text" class="form-control" name="contact_no" value="" maxlength="10">
-    <label style="font-weight: normal; font-family: Georgia">Email</label>
-    <input id="email" type="text" class="form-control" name="email" value="">
-    <label style="font-weight: normal; font-family: Georgia">Requirement Details</label>
-    <textarea id="requirement_details" class="form-control rounded-0" name="requirement_details" value="" rows="10" required ></textarea>
-    <input type="submit" value="Submit">
+        <div class="form-holder">
+            <span class="lnr lnr-apartment"></span>
+            {{ contact_form.company_name }}
+        </div>
+        <div class="form-holder">
+                <span class="lnr lnr-envelope"></span>
+                {{ contact_form.email_address }}
+        </div>
+        <div class="form-holder">
+            <span class="lnr lnr-phone-handset"></span>
+            {{ contact_form.contact_no }}
+        </div>
+        <div class="form-holder">
+            <span class="lnr lnr-pencil"></span>
+            {{ contact_form.requirement_details }}
+        </div>
+        <input type="submit" value="Submit" class="submit-contact">
 </form>
 
-{% if error_message %}
-  <p style="color:red;">{{ error_message }}</p>
+{% if contact_form.errors %}
+    {% for field in contact_form %}
+        {% for error in field.errors %}
+        <br>
+        <div class="alert alert-danger">
+            <strong>{{ error|escape }}</strong>
+        </div>
+        {% endfor %}
+    {% endfor %}
 {% endif %}
+
+<!--Modal -->
+<div class="modal fade" id="contactUsModal" tabindex="-1" role="dialog" aria-labelledby="contactUsModalTitle"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-body">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <div class="text-center">
+                    <img src="../../static/assets/img/phone_logo.png" alt="" class="phone_logo-contact">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div class="footer-center">
+                    <p class="p1-contact">Thank you for contacting us!</p>
+                        <p class="p2-contact">Your inquiry was submitted and will be responded to as soon as possible.</p><br>
+                    <a href="{% url 'home' %}">
+                        <button type="button" class="btn btn-warning rounded-4">
+                            Explore more &nbsp;&nbsp; <span class="lnr lnr-home"></span>
+                        </button>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
 {% endblock %}

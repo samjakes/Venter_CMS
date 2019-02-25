@@ -1,0 +1,37 @@
+/*
+Styling for upload_file.html
+*/
+  .modal-body{
+    height: 180px;
+    background-color: #32bc65;
+  }   
+
+  .file_logo-upload{
+    width:150px;
+    height:140px;
+  }
+
+  .modal-footer{
+    height: 200px;
+    background-color: white;
+  }
+
+  .nav li.upload-file-item .nav-link{
+    color: #FFFFFF;
+    opacity: 1;
+    background: rgba(255, 255, 255, 0.23);
+  }
+
+  .footer-center{
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .p1-upload{
+    color: grey;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    font-size: 20px;
+  }
+
+  /*# sourceMappingURL=style.css.map */

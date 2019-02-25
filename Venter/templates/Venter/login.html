@@ -2,71 +2,50 @@
 {% block title %}Login {% endblock %}
 {% block content %}
 
-    <div class="w3ls-login">
+<link rel="stylesheet" href="../../static/assets/css/login.css">
+
+<script>
+    function myFunction() {
+        var x = document.getElementById("id_password");
+        if (x.type === "password") {
+            x.type = "text";
+        } else {
+            x.type = "password";
+        }
+    }
+</script>
+
+<div class="out">
+    <div class="main_container">
         <form method="post">
-            <div class="agile-field-txt">
-                {% csrf_token %}
-                <label for="id_username">
-                    <i class="fa fa-user" aria-hidden="true"></i>Username :</label>
-                <input type="text" name="username" value=""
-                       autofocus=""
-                       maxlength="254" required="" id="id_username">
-            </div>
-            <div class="agile-field-txt">
-                <label for="id_password">
-                    <i class="fa fa-lock" aria-hidden="true"></i>Password :</label>
-                <input type="password" name="password" required=""
-                       id="id_password">
-                <div class="agile_label">
-                    <input id="check3" name="check3" type="checkbox" value="show password" onclick="myFunction()">
-                    <label class="check" for="check3">Show password</label>
+            {% csrf_token %}
+            <div class="container">
+                <div class="image_container">
+                    <img src="../../static/assets/img/login_logo.png" class="login-image">
+                </div>
+                <div class="field_container">
+                    <label for="id_username"><b>Username</b></label>
+                    <input type="text" placeholder="Enter Username" name="username" id="id_username" value="" required>
+
+                    <label for="id_password"><b>Password</b></label>
+                    <input type="password" placeholder="Enter Password" name="password" id="id_password" required>
+
+                    <label>
+                        <input type="checkbox" name="remember" onclick="myFunction()"> Show Password
+                    </label>
+                </div>
+                <div class="bottom_container">
+                    <input type="submit" value="Login" class="submit-login">
                 </div>
             </div>
-            <script>
-                function myFunction() {
-                    var x = document.getElementById("id_password");
-                    if (x.type === "password") {
-                        x.type = "text";
-                    } else {
-                        x.type = "password";
-                    }
-                }
-            </script>
-            <style>
-                h2{
-                    text-align: center;
-                    color:#78A05A;
-                    font-size:40px;
-                }
-                .landingtext {
-                    background: rgba(143, 143, 143, 0.80);
-                    padding: 15px;
-                    width: 65%;
-                    text-align: left;
-                    border-radius: 25px;
-                    font-size: 20px;
-                 }
-                .font{
-                    font-family: 'Montserrat', sans-serif;
-                    text-shadow:
-                    -1px -1px 0 #000,
-                    1px -1px 0 #000,
-                    -1px 1px 0 #000,
-                    1px 1px 0 #000;
-                }
-            </style>
-            <!-- //script for show password -->
-            <div class="w3ls-login  w3l-sub">
-                <input type="submit" value="Login">
-            </div>
         </form>
+        {% if form.errors %}
+        <div class="alert alert-danger">
+            <p>Please enter a correct username and password.</p>
+        </div>
+        {% endif %}
     </div>
 
-    {% if form.errors %}
-        <div class="alert alert-danger">
-            <p>Please enter a correct username and password. Note that both fields may be
-                case-sensitive.</p>
-        </div>
-    {% endif %}
+</div>
 
 {% endblock %}

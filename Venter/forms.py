@@ -1,5 +1,8 @@
+import re
+
 from django import forms
 from django.contrib.auth.models import User
+from django.core.validators import validate_email
 
 from Backend import settings
 from Venter.models import File, Profile
@@ -121,3 +124,34 @@ class ProfileForm(forms.ModelForm):
     class Meta:
         model = Profile
         fields = ('phone_number', 'profile_picture')
+
+
+class ContactForm(forms.Form):
+    company_name = forms.CharField(widget=forms.TextInput(
+        attrs={'class': 'form-control', 'placeholder': 'Company Name'}), required=True)
+    email_address = forms.EmailField(widget=forms.EmailInput(
+        attrs={'class': 'form-control', 'placeholder': 'Email'}), required=True)
+    contact_no = forms.CharField(widget=forms.TextInput(
+        attrs={'class': 'form-control', 'placeholder': 'Contact Number'}), required=True, max_length=10)
+    requirement_details = forms.CharField(widget=forms.Textarea(
+        attrs={'class': 'form-control', 'placeholder': 'Requirement'}), required=True)
+
+    def clean(self):
+        """
+        It validates specific attributes of 'contact_form' field: email, contact_no.
+        """
+        # (ContactForm, self).clean()
+        email_address = self.cleaned_data.get('email_address')
+        contact_no = self.cleaned_data.get('contact_no')
+
+        if validate_email(email_address):
+            pattern = re.compile(r'^[6-9]\d{9}$')
+            if bool(pattern.match(contact_no)):
+                return self.cleaned_data
+            else:
+                raise forms.ValidationError(
+                    "Please enter a valid phone number")
+        # else:
+        #     raise forms.ValidationError(
+        #         "Please enter a valid email address")
+        # return self.cleaned_data

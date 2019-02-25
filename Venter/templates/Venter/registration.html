@@ -10,7 +10,7 @@
 {% if successful_submit %}
 <script type="text/javascript">
     $(document).ready(function () {
-        $("#exampleModalCenter").modal('show');
+        $("#registerModal").modal('show');
     });
 </script>
 {% endif %}
@@ -41,7 +41,6 @@
                 {{ user_form.last_name }}
             </div>
             <input type="submit" value="Register" class="submit-register">
-            <img src="../../static/assets/img/image-2.png" alt="" class="image-2">
         </form>
         {% if user_form.errors %}
         {% for field in user_form %}
@@ -53,29 +52,30 @@
         {% endfor %}
         {% endfor %}
         {% endif %}
-
     </div>
     <!-- Modal -->
-    <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog"
-        aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal fade" id="registerModal" tabindex="-1" role="dialog"
+        aria-labelledby="registerModalTitle" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
                 <div class="modal-body">
-                    <div class="div-tick-mark">
-                        <img src="../../static/assets/img/tick_mark.png" alt="" class="tick_mark-register">
-                        <h4>Registration successfull.</h4>
-                    </div>
-
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
+                    <div class="text-center">
+                        <img src="../../static/assets/img/tick_mark.png" alt="" class="tick_mark-register">
+                    </div>
                 </div>
                 <div class="modal-footer">
-                    <a href="{% url 'dashboard_staff' %}">
-                        <button type="button" class="btn btn-warning">
-                            Go To Dashboard &nbsp;&nbsp; <span class="lnr lnr-arrow-right"></span>
-                        </button>
-                    </a>
+                    <div class="footer-center">
+                        <p class="p1-register">Great!</p>
+                        <p class="p2-register">Registration successful.</p><br>
+                        <a href="{% url 'dashboard_staff' %}">
+                            <button type="button" class="btn btn-warning rounded-4">
+                                Go To Dashboard &nbsp;&nbsp; <span class="lnr lnr-arrow-right"></span>
+                            </button>
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>

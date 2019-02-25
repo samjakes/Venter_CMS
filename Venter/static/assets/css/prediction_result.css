@@ -1,0 +1,32 @@
+/*
+Styling for prediction_result.html
+*/
+
+.outer-pr{
+    background-color: whitesmoke;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.content-domain{
+    width: 80vw;
+}
+
+.content-navigator{
+    width: 80vw;
+    display: inline-block;
+}
+
+.content-cardview{
+    width: 80vw;
+}
+
+.content-graph{
+    width: 80vw;
+}
+
+#navigator_tab{
+    border: 2px solid black;
+}

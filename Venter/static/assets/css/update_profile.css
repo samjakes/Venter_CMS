@@ -1,0 +1,37 @@
+/*
+Styling for update_profile.html
+*/
+.modal-body{
+    height: 180px;
+    background-color: #32bc65;
+  }   
+
+  .user_logo-update{
+    width:150px;
+    height:140px;
+  }
+
+  .modal-footer{
+    height: 150px;
+    background-color: white;
+  }
+
+  .nav li.user-profile-item .nav-link{
+    color: #FFFFFF;
+    opacity: 1;
+    background: rgba(255, 255, 255, 0.23);
+  }
+
+  .footer-center{
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .p1-update{
+    color: grey;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    font-size: 20px;
+  }
+
+  /*# sourceMappingURL=style.css.map */

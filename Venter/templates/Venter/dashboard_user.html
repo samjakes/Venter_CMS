@@ -1,8 +1,12 @@
 {% extends 'Venter/base.html' %}
 {% block title %}Dashboard{% endblock %}
 {% block content %}
+
+<link rel="stylesheet" href="../../static/assets/css/dashboard_staff.css">
+
+
 {% if file_list %}
-<br><br>
+
 <a href="{% url 'upload_csv' %}"><button type="button" class="btn btn-primary" style="float: right"><span class="glyphicon glyphicon-plus"></span>&nbsp;&nbsp;Upload
         CSV File</button></a>
 <br>

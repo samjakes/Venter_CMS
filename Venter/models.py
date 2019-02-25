@@ -146,6 +146,8 @@ class File(models.Model):
     Permissions------
         1) view_organisation_files: Grants permission only to staff members to access 'dashboard_staff.html' template
         2) view_self_files: Grants permission only to authenticated users to access 'dashboard_user.html' template
+        2) delete_organisation_files: Grants permission only to staff members to delete files
+            uploaded by user(s)/staff member(s) of the organisation
     """
     uploaded_by = models.ForeignKey(
         User,
@@ -170,4 +172,5 @@ class File(models.Model):
         permissions = (
             ("view_organisation_files", "Can view organisation files"),
             ("view_self_files", "Can view files uploaded by self"),
+            ("delete_organisation_files", "Can delete organisation files"),
         )
