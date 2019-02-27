@@ -2,20 +2,20 @@
 Styling for login.html
 */
 
-input[type=text], input[type=password] {
+input {
     width: 100%;
     padding: 12px 20px;
-    margin: 8px 0;
-    display: inline-block;
+    margin: 10px 0;
+    display: inline-block; 
     border: 1px solid #ccc;
     box-sizing: border-box;
-    border-radius: 10px;
+    border-radius: 2px; 
   }
+
   .out{
-      background-color: #58b0e0;
       height: 88vh;
       width: 100vw;
-      /* background-color: #accffe; */
+      background-color: #accffe;
   }
   .submit-login {
     background-color: #58b0e0;
@@ -26,7 +26,7 @@ input[type=text], input[type=password] {
     width: 100px;
     height: 50px;
     cursor: pointer;
-    border-radius: 10px;
+    border-radius: 6px;
   }
   
   .submit-login:hover {
@@ -37,7 +37,7 @@ input[type=text], input[type=password] {
       width: 450px;
       height: 600px;
       background-color: white;
-      border-radius: 50px;
+      border-radius: 40px;
       height: auto;
       margin: 0 auto;
       top: 10%;
@@ -53,7 +53,7 @@ input[type=text], input[type=password] {
   }
 
   .login-image{
-      width: 400px;
+      width: 300px;
   }
   .container {
     padding: 16px;
@@ -63,6 +63,26 @@ input[type=text], input[type=password] {
     float: right;
     padding-top: 16px;
   }
+
+  .field_container label{
+    font-family: 'Times New Roman', Times, serif;
+  }
+
+  .icon{
+    font-size: 25px;
+  }
+
+  .input-group-addon{
+    background-color: lightgray;
+    width: 20%;
+    padding: 12px 20px;
+    margin: 10px 0;
+    display: inline-block; 
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+    border-radius: 2px; 
+  }
+
   
   /* Change styles for span and cancel button on extra small screens */
   @media screen and (max-width: 300px) {

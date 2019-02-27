@@ -1,4 +1,5 @@
 import datetime
+import json
 import operator
 import os
 from functools import reduce
@@ -13,7 +14,7 @@ from django.core.exceptions import ValidationError
 from django.core.mail import mail_admins
 from django.db.models import Q
 from django.http import HttpResponse
-from django.shortcuts import get_object_or_404, redirect, render
+from django.shortcuts import redirect, render
 from django.urls import reverse_lazy
 from django.views import generic
 from django.views.decorators.cache import never_cache
@@ -25,6 +26,8 @@ from Venter.forms import ContactForm, CSVForm, ProfileForm, UserForm
 from Venter.models import Category, File, Profile
 
 from .manipulate_csv import EditCsv
+from .ML_model.Civis.modeldriver import SimilarityMapping
+from django.views.decorators.http import require_http_methods
 
 @login_required
 @never_cache
@@ -40,6 +43,7 @@ def upload_csv_file(request):
     For GET request-------
         The csv_form is rendered in the template
     """
+    csv_form = CSVForm(request=request)
     if request.method == 'POST':
         csv_form = CSVForm(request.POST, request.FILES, request=request)
         if csv_form.is_valid():
@@ -49,10 +53,8 @@ def upload_csv_file(request):
             csv_form = CSVForm(request=request)
             return render(request, './Venter/upload_file.html', {
                 'csv_form': csv_form, 'successful_submit': True})
-    elif request.method == 'GET':
-        csv_form = CSVForm(request=request)
-        return render(request, './Venter/upload_file.html', {
-            'csv_form': csv_form})
+    return render(request, './Venter/upload_file.html', {
+        'csv_form': csv_form})
 
 # def handle_user_selected_data(request):
 #     """This function is used to handle the selected categories by the user"""
@@ -140,6 +142,7 @@ def upload_csv_file(request):
 #     with open(path, 'wb+') as destination:
 #         for chunk in f.chunks():
 #             destination.write(chunk)
+
 
 class CategoryListView(LoginRequiredMixin, ListView):
     """
@@ -302,7 +305,8 @@ def contact_us(request):
             company_name = contact_form.cleaned_data.get('company_name')
             contact_no = contact_form.cleaned_data.get('contact_no')
             email_address = contact_form.cleaned_data.get('email_address')
-            requirement_details = contact_form.cleaned_data.get('requirement_details')
+            requirement_details = contact_form.cleaned_data.get(
+                'requirement_details')
 
             # get current date and time
             now = datetime.datetime.now()
@@ -322,6 +326,7 @@ def contact_us(request):
         'contact_form': contact_form,
     })
 
+
 class FileDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
     """
     Arguments------
@@ -340,15 +345,6 @@ class FileDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
     def get(self, request, *args, **kwargs):
         return self.post(request, *args, **kwargs)
 
-def predict_result(request, pk):
-    if request.method == 'GET':
-        # file_instance = get_object_or_404(File, pk=pk)
-        # make api call
-        # retrieve domain names
-        # for each domain retrieve category names
-        # for each category retrieve responses names
-        return render(request, './Venter/prediction_result.html')
-
 
 class CategorySearchView(CategoryListView):
     paginate_by = 3
@@ -365,6 +361,7 @@ class CategorySearchView(CategoryListView):
             )
         return result
 
+
 class FileSearchView(FilesByOrganisationListView):
     paginate_by = 3
 
@@ -379,3 +376,33 @@ class FileSearchView(FilesByOrganisationListView):
                        (Q(csv_file__icontains=q) for q in query_list))
             )
         return result
+
+
+@require_http_methods(["GET",])
+def predict_result(request, pk):
+        # pass xlsx file instance to SimilarityMapping instead of the file path
+
+        path_to_file = os.path.join(settings.MEDIA_ROOT, 'Responses_All About the RMP2031.xlsx')
+        sm = SimilarityMapping(path_to_file)
+        sm.driver()
+
+        path = os.path.join(settings.MEDIA_ROOT, 'out_test1.json')
+        # path = os.path.join(settings.MEDIA_ROOT, 'Output Result Files', 'SpeakUp', 'test_admin_speakup', '2019-02-26', 'result.json')
+        json_data = open(path)
+        dict_data = json.load(json_data)  # deserialises it
+
+        dict_keys = dict_data.keys()  # retrieve keys
+        domain_list = list(dict_keys)
+
+        traffic_data = dict_data['Traffic']
+
+        for category in traffic_data.keys():
+            print("-----CAT-----")
+            print(category)
+            for response in traffic_data[category]:
+                print("======RES=======")
+                print (response)
+
+        return render(request, './Venter/prediction_result.html', {
+            'domain_list': domain_list, 'dict_data': dict_data
+        })

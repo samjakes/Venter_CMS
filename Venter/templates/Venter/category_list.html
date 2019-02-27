@@ -13,16 +13,16 @@
   <div class="container-category">
     {% if category_list %}
     <div class="search-form-category">
-    <form action="{% url 'search_category' %}" method="get">
+      <form action="{% url 'search_category' %}" method="get">
         <div class="form-group row">
             <div class="col-lg-3">
-            <input type="submit" value="Search" class="btn btn-primary active">
+              <input type="submit" value="Search" class="btn btn-primary active">
             </div>
             <div class="col-lg-7">
-                <input type="text" name="q" class="form-control" placeholder="Search category">
+              <input type="text" name="q" class="form-control" placeholder="Search category">
             </div>
         </div>
-    </form>
+      </form>
     </div><br>
 
     <table class="table table-hover">

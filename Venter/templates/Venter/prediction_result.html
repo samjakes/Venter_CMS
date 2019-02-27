@@ -2,68 +2,109 @@
 {% block title %}Prediction Results{% endblock %}
 {% block content %}
 
+<link rel="stylesheet" href="../../static/assets/css/prediction_result.css">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+
+
 <script>
-    $(function () {
-      $('#navigator_tab li:last-child a').tab('show')
-    })
+  //   $('#content-domain').on('click','.tablink,#domain_tab a',function (e) {
+  //     e.preventDefault();
+  //     var domain = $(this).attr("data-domain");
+  //     // $('#content-graph').div('show');
+
+  // });
+  // $(document).ready(function () {
+  //   $('.nav-pills > li > a').click(function (event) {
+      //...... logic to hide and show tab content
+      //  event.preventDefault();//stop browser to take action for clicked anchor
+
+      // 	//get displaying tab content jQuery selector
+      // 	var active_tab_selector = $('.nav-tabs > li.active > a').attr('href');					
+
+      // 	//find actived navigation and remove 'active' css
+      // 	var actived_nav = $('.nav-tabs > li.active');
+      // 	actived_nav.removeClass('active');
+
+      // 	//add 'active' css into clicked navigation
+      // 	$(this).parents('li').addClass('active');
+
+      // 	//hide displaying tab content
+      // 	$(active_tab_selector).removeClass('active');
+      // 	$(active_tab_selector).addClass('hide');
+
+      // 	//show target tab content
+      // 	var target_tab_selector = $(this).attr('href');
+      // 	$(target_tab_selector).removeClass('hide');
+      // 	$(target_tab_selector).addClass('active');
+  //   });
+  // });
 </script>
 
-<link rel="stylesheet" href="../../static/assets/css/prediction_result.css">
-  <div class="outer-pr row">
-    <div class="content-domain">
-        <ul class="nav nav-tabs nav-fill" id="domain_tab" role="tablist">
-            <li class="nav-item">
-              <a class="nav-link active" id="home-tab" data-toggle="tab" href="#home" role="tab" aria-controls="home" aria-selected="true">Home</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" id="profile-tab" data-toggle="tab" href="#profile" role="tab" aria-controls="profile" aria-selected="false">Profile</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link active" id="home-tab" data-toggle="tab" href="#home" role="tab" aria-controls="home" aria-selected="true">Home</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" id="profile-tab" data-toggle="tab" href="#profile" role="tab" aria-controls="profile" aria-selected="false">Profile</a>
-              </li>
-              <li class="nav-item">
-                  <a class="nav-link active" id="home-tab" data-toggle="tab" href="#home" role="tab" aria-controls="home" aria-selected="true">Home</a>
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link" id="profile-tab" data-toggle="tab" href="#profile" role="tab" aria-controls="profile" aria-selected="false">Profile</a>
-                </li>
-        </ul>
-          <div class="tab-content" id="myTabContent">
-            <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">home</div>
-            <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">profile</div>
-            <div class="tab-pane fade" id="contact" role="tabpanel" aria-labelledby="contact-tab">contact</div>
+<div class="outer-pr row">
+  <div class="content-domain">
+    <ul class="nav nav-tabs nav-fill" id="domain_tab" role="tablist">
+      {% for domain in domain_list %}
+      <li class="nav-item">
+        <a href="#{{domain}}" class="nav-link" data-domain="{{domain}}" data-toggle="tab" role="tab" aria-selected="true">
+          {{domain}}
+        </a>
+      </li>
+      {% endfor %}
+    </ul>
+  </div>
+  <div class="content-navigator">
+    <ul class="nav nav-pills navigator_tab justify-content-center" role="tablist">
+      <li class="nav-item">
+        <a class="nav-link active" data-toggle="pill" href="#cardview">
+          CardView &nbsp; <i class="fa fa-list-alt list-fa" aria-hidden="true"></i>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" data-toggle="pill" href="#graph">
+          Graph &nbsp; <i class="fa fa-area-chart chart-fa" aria-hidden="true"></i>
+        </a>
+      </li>
+    </ul>
+  </div>
+  <div class="tab-content">
+    <div id="cardview" class="tab-pane active content-cardview">
+      <!-- <div class="card-container">
+        {% for category in dict_data.object.keys %}
+          <div class="card">
+            <div class="card-header">
+              <label class="label-category">{{category}}</label>
+              <hr>
+            </div>  
           </div>
-    </div>
-    <div class="content-navigator">
-        <!-- <div class="row"> -->
-            <!-- <div class="col-sm-1"> -->
-            <ul class="nav nav-pills" id="navigator_tab" role="tablist">
-                <li class="nav-item">
-                  <a class="nav-link active" data-toggle="pill" href="#cardview">CardView</a>
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link" data-toggle="pill" href="#graph">Graph</a>
-                </li>
+          {% for response in dict_data.object.category %}
+            <ul class="list-group list-group-flush">
+              <li class="list-group-item">{{responses}}</li>
             </ul>
-            <!-- </div> -->
-            <!-- <div class="col-sm-1"> -->
-              <a href="{% url 'upload_csv' %}">
-                <button type="button" class="btn btn-primary">
-                  Download File &nbsp;<i class="fa fa-plus plus-fa" aria-hidden="true"></i>
-                </button>
-              </a>
-            <!-- </div> -->
-        <!-- </div> -->
+          {% endfor %}
+        {% endfor %}  
+      </div>  -->
+      <div class="card-container">
+        {% for domain in domain_list %}
+        <div class="card">
+          <div class="card-header">
+            <label class="label-category">category name</label>
+            <hr>
+          </div>
+          <ul class="list-group list-group-flush">
+            <li class="list-group-item">
+              Response list: {{domain}}
+            </li>
+          </ul>
+        </div>
+        {% endfor %}
+      </div>
     </div>
-    <div class="content-cardview">
-        <h3>cardview</h3>
-    </div>
-    <div class="content-graph">
-        <h3>graph</h3>
+
+    <div id="graph" class="tab-pane content-graph">
+      <h3>graph</h3>
     </div>
   </div>
+
+</div>
 
 {% endblock %}

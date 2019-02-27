@@ -75,3 +75,47 @@ Styling for dashboard_staff.html
 .plus-fa{
     font-size: 20px;
 }
+
+.trash-fa:hover:before{
+    color: red;
+    font-size: 30px;
+    display: block;
+    margin: auto;
+}
+
+.trash-fa{
+    color:darkgrey;
+    font-size: 30px;
+    display: block;
+    margin: auto;
+}
+
+.download-fa{
+    font-size: 30px;
+    display: block;
+    margin: auto;
+}
+
+table, th, td{
+    font-family: 'Times New Roman', Times, serif;
+}
+
+.table .thead-dark th {
+    font-weight: bold;
+    font-size: small;
+    text-align: center;
+}
+
+.upload-button{
+    width: 140px !important;
+}
+
+.predict-button{
+    display: block;
+    margin: auto;
+}
+
+.search-form-file{
+    position: absolute;
+    margin-top: -4%
+}

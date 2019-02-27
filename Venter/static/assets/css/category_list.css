@@ -3,7 +3,6 @@ Styling for category_list.html
 */
   
 .outer-category{
-    /* background-color: #accffe; */
     height: 100vh;
     display: flex;
     align-items: center;
@@ -11,7 +10,6 @@ Styling for category_list.html
 }
 
 .container-category {
-    /* background-color: yellow; */
     position: relative;
     width: 1100px;
 }

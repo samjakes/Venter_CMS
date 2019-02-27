@@ -15,7 +15,7 @@
                 <div class="col-sm-1">
                   <input type="submit" value="Search" class="btn btn-primary active">
                 </div>&nbsp;&nbsp;
-                <div class="col-sm-8">
+                <div class="col-sm-9">
                     <input type="text" name="q" class="form-control" placeholder="Search file">
                 </div>
             </div>
@@ -23,38 +23,44 @@
       </div>
       <div class="col-sm-1">
         <a href="{% url 'upload_csv' %}">
-          <button type="button" class="btn btn-primary">
+          <button type="button" class="btn btn-primary upload-button">
             Upload File &nbsp;<i class="fa fa-plus plus-fa" aria-hidden="true"></i>
           </button>
         </a>
       </div>
-    </div>
+    </div><br>
     <table class="table table-hover">
       <thead class="thead-dark">
-        <tr>
-          <th scope="col" style="font-family: 'Times New Roman'">File</th>
-          <th scope="col" style="font-family: 'Times New Roman'">Upload Date</th>
-          <th scope="col" style="font-family: 'Times New Roman'">Upload Time</th>
-          <th scope="col" style="font-family: 'Times New Roman'">Prediction results</th>
-          <th scope="col" style="font-family: 'Times New Roman'">Uploaded By</th>
-          <th scope="col" style="font-family: 'Times New Roman'">Delete</th>
+        <tr> 
+          <th>File</th>
+          <th>Uploaded By</th>
+          <th>Upload Date</th>
+          <th>Upload Time</th>
+          <th>Prediction results</th>
+          <th>Download Results</th>
+          <th>Delete</th>
         </tr>
       </thead>
       <tbody>
         {% for file in file_list %}
         <tr>
-          <td style="font-family: 'Times New Roman'">{{ file.filename }}</td>
-          <td style="font-family: 'Times New Roman'">{{ file.uploaded_date.date }}</td>
-          <td style="font-family: 'Times New Roman'">{{ file.uploaded_date.astimezone.time }}</td>
-          <td style="font-family: 'Times New Roman'">
+          <td>{{ file.filename }}</td>
+          <td>{{ file.uploaded_by}}</td>
+          <td>{{ file.uploaded_date.date }}</td>
+          <td>{{ file.uploaded_date.astimezone.time }}</td>
+          <td>
             <a href="{% url 'predict_result' file.pk %}">
-              <button class="btn btn-success">Predict</button>
+              <button class="btn btn-success predict-button">Predict</button>
             </a>
           </td>
-          <td style="font-family: 'Times New Roman'">{{ file.uploaded_by}}</td>
-          <td style="font-family: 'Times New Roman'">
+          <td>
+              <a href="{% url 'upload_csv' %}">
+                  <i class="fa fa-download download-fa" aria-hidden="true"></i>
+              </a>
+          </td>
+          <td>
             <a href="{% url 'delete_file' file.pk %}">
-              <button class="btn btn-danger">Delete</button>
+                <i class="fa fa-trash-o trash-fa" aria-hidden="true"></i>
             </a>
           </td>
         </tr>

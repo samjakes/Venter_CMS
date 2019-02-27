@@ -5,28 +5,117 @@ Styling for prediction_result.html
 .outer-pr{
     background-color: whitesmoke;
     height: 100vh;
-    display: flex;
-    align-items: center;
     justify-content: center;
 }
 
 .content-domain{
+    margin-top: 20px;
     width: 80vw;
+    height: 10vh;
 }
 
 .content-navigator{
-    width: 80vw;
-    display: inline-block;
+    width: 80vw;   
+    height: 5vh;
 }
 
 .content-cardview{
     width: 80vw;
+    height: 80vh;
+    background-color: white;
 }
 
 .content-graph{
     width: 80vw;
+    height: 80vh;
+    background-color: blueviolet;
 }
 
-#navigator_tab{
+.navigator_tab{
+    box-sizing:border-box;
+}
+
+.domain_tab{
+    background-color: white;
+}
+
+.chart-fa, .list-fa{
+    color: darkblue;
+}
+
+.nav-tabs .nav-item{
+    list-style-position:inside;
+    /* border: 1px solid lightgray; */
+}
+
+.content-domain > .nav-tabs > li > a {
+    color: #737373;
+}
+
+.content-domain > .nav-tabs > li > a > i{
+    color: #a6a6a6;
+}
+
+.content-domain > .nav-tabs > li.open, .content-domain > .nav-tabs > li:hover {
+    border-bottom: 4px solid #fbcdcf;
+}
+
+.content-domain > .nav-tabs > li.open > a, .content-domain > .nav-tabs > li:hover > a {
+    border: 0;
+    background: none !important;
+    color: #333333;
+  }
+
+.content-domain > .nav-tabs > li.open > a > i, .content-domain > .nav-tabs > li:hover > a > i {
+    color: #a6a6a6;
+}  
+
+.content-domain > .nav-tabs > li.active {
+    border-bottom: 4px solid #f3565d;
+    position: relative;
+  }
+  .content-domain > .nav-tabs > li.active > a {
+    border: 0;
+    color: #333333;
+  }
+  .content-domain > .nav-tabs > li.active > a > i {
+    color: #404040;
+  }
+
+  .content-domain.tabs-below > .nav-tabs > li {
+    border-top: 4px solid transparent;
+  }
+  .content-domain.tabs-below > .nav-tabs > li > a {
+    margin-top: 0;
+  }
+  .content-domain.tabs-below > .nav-tabs > li:hover {
+    border-bottom: 0;
+    border-top: 4px solid #fbcdcf;
+  }
+  .content-domain.tabs-below > .nav-tabs > li.active {
+    margin-bottom: -2px;
+    border-bottom: 0;
+    border-top: 4px solid #700208;
+  }  
+
+.card-container .card{
+    height: 400px;
+    width: 600px;
     border: 2px solid black;
+    margin: 0 auto;
+    margin-bottom: 20px;
+    margin-top: 20px;
+}
+
+.card-container{
+    width: 80vw;
+    height: 80vh;
+    overflow-x: scroll;
+    /* overflow-y: scroll; */
+}
+
+.card .card-header .label-category{
+    font-weight: bold;
+    font-size: medium;
+    color: black;
 }
