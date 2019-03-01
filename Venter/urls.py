@@ -18,8 +18,8 @@ urlpatterns = [
     path('register_employee/', views.RegisterEmployeeView.as_view(), name='register_employee'),
     # ex: /venter/login/
     path('login/', auth.views.LoginView.as_view(template_name="Venter/login.html"), name='login'),
-    # ex: /venter/upload_csv/
-    path('upload_csv/', views.upload_csv_file, name='upload_csv'),
+    # ex: /venter/upload_file/
+    path('upload_file/', views.upload_file, name='upload_file'),
     # ex: /venter/delete_file/5/
     path('delete_file/<int:pk>', views.FileDeleteView.as_view(), name='delete_file'),
     # ex: /venter/category_list/civis/

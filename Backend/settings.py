@@ -115,7 +115,7 @@ MEDIA_URL = '/media/'
 
 MEDIA_ROOT = os.path.join(BASE_DIR, "MEDIA/")
 
-LOGIN_REDIRECT_URL = 'upload_csv'
+LOGIN_REDIRECT_URL = 'upload_file'
 LOGIN_URL = 'login'
 
 LOGOUT_REDIRECT_URL = 'login'

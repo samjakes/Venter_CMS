@@ -24,7 +24,8 @@ from django.views.generic.list import ListView
 
 import jsonpickle
 from Venter import upload_to_google_drive
-from Venter.forms import ContactForm, CSVForm, ProfileForm, UserForm
+from Venter.forms import ContactForm, CSVForm, ProfileForm, UserForm, ExcelForm
+from Venter.helpers import get_result_file_path
 from Venter.models import Category, File, Profile
 
 from .manipulate_csv import EditCsv
@@ -33,30 +34,47 @@ from .ML_model.Civis.modeldriver import SimilarityMapping
 
 @login_required
 @never_cache
-def upload_csv_file(request):
+@require_http_methods(["GET","POST"])
+def upload_file(request):
     """
     View logic for uploading CSV file by a logged in user.
 
     For POST request-------
         1) The POST data, uploaded csv file and a request parameter are being sent to CSVForm as arguments
         2) If form.is_valid() returns true, the user is assigned to the uploaded_by field
-        3) csv_form is saved and Form instance is initialized again (csv_form = CSVForm(request=request)),
+        3) file_form is saved and Form instance is initialized again (file_form = CSVForm(request=request)),
            for user to upload another file after successfully uploading the previous file
     For GET request-------
-        The csv_form is rendered in the template
+        The file_form is rendered in the template
     """
-    csv_form = CSVForm(request=request)
-    if request.method == 'POST':
-        csv_form = CSVForm(request.POST, request.FILES, request=request)
-        if csv_form.is_valid():
-            file_uploaded = csv_form.save(commit=False)
-            file_uploaded.uploaded_by = request.user
-            file_uploaded.save()
-            csv_form = CSVForm(request=request)
-            return render(request, './Venter/upload_file.html', {
-                'csv_form': csv_form, 'successful_submit': True})
-    return render(request, './Venter/upload_file.html', {
-        'csv_form': csv_form})
+
+    if str(request.user.profile.organisation_name) == 'CIVIS':
+        excel_form = ExcelForm(request=request)
+        if request.method == 'POST':
+            excel_form = ExcelForm(request.POST, request.FILES, request=request)
+            if excel_form.is_valid():
+                file_uploaded = excel_form.save(commit=False)
+                file_uploaded.uploaded_by = request.user
+                file_uploaded.save()
+                excel_form = ExcelForm(request=request)
+                return render(request, './Venter/upload_file.html', {
+                    'file_form': excel_form, 'successful_submit': True})
+        return render(request, './Venter/upload_file.html', {
+            'file_form': excel_form})
+    else:
+        file_form = CSVForm(request=request)
+        if request.method == 'POST':
+            file_form = CSVForm(request.POST, request.FILES, request=request)
+            if file_form.is_valid():
+                file_uploaded = file_form.save(commit=False)
+                file_uploaded.uploaded_by = request.user
+                file_uploaded.save()
+                file_form = CSVForm(request=request)
+                return render(request, './Venter/upload_file.html', {
+                    'file_form': file_form, 'successful_submit': True})
+
+        return render(request, './Venter/upload_file.html', {
+            'file_form': file_form})
 
 
 def handle_user_selected_data(request):
@@ -222,7 +240,7 @@ class RegisterEmployeeView(LoginRequiredMixin, CreateView):
         return render(request, './Venter/registration.html', {'user_form': user_form})
 
 
-class FilesByUserListView(LoginRequiredMixin, PermissionRequiredMixin, generic.ListView):
+class FilesByUserListView(LoginRequiredMixin, generic.ListView):
     """
     Arguments------
         1) LoginRequiredMixin: View to redirect non-authenticated users to show HTTP 403 error
@@ -235,13 +253,12 @@ class FilesByUserListView(LoginRequiredMixin, PermissionRequiredMixin, generic.L
     model = File
     template_name = './Venter/dashboard_user.html'
     context_object_name = 'file_list'
-    permission_required = 'Venter.view_self_files'
 
     def get_queryset(self):
-        return File.objects.filter(uploaded_by=self.request.user)
+        return File.objects.filter(uploaded_by=self.request.user.profile)
 
 
-class FilesByOrganisationListView(LoginRequiredMixin, PermissionRequiredMixin, generic.ListView):
+class FilesByOrganisationListView(LoginRequiredMixin, generic.ListView):
     """
     Arguments------
         1) LoginRequiredMixin: View to redirect non-authenticated users to show HTTP 403 error
@@ -255,7 +272,6 @@ class FilesByOrganisationListView(LoginRequiredMixin, PermissionRequiredMixin, g
     model = File
     template_name = './Venter/dashboard_staff.html'
     context_object_name = 'file_list'
-    permission_required = 'Venter.view_organisation_files'
     paginate_by = 10
 
     def get_queryset(self):
@@ -265,7 +281,7 @@ class FilesByOrganisationListView(LoginRequiredMixin, PermissionRequiredMixin, g
             2) get the profile of all the users belonging to that organisation
             3) get the csv files of all those users in a list[]
         """
-        org_name = self.request.user.profile.organisation_name
+        org_name = self.request.profile.organisation_name
         org_profiles = Profile.objects.filter(organisation_name=org_name)
         files_list = []
         for x in org_profiles:
@@ -314,7 +330,7 @@ def contact_us(request):
     })
 
 
-class FileDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
+class FileDeleteView(LoginRequiredMixin, DeleteView):
     """
     Arguments------
         1) LoginRequiredMixin: View to redirect non-authenticated users to show HTTP 403 error
@@ -325,7 +341,6 @@ class FileDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
     Functions------
         1) get_queryset(): Returns a new QuerySet filtering files uploaded by the logged-in user
     """
-    permission_required = 'Venter.delete_organisation_files'
     model = File
     success_url = reverse_lazy('dashboard_staff')
 
@@ -360,7 +375,7 @@ class OrganisationFileSearchView(FilesByOrganisationListView):
             query_list = query.split()
             result = result.filter(
                 reduce(operator.and_,
-                       (Q(csv_file__icontains=q) for q in query_list))
+                       (Q(input_file__icontains=q) for q in query_list))
             )
         return result
 
@@ -376,7 +391,7 @@ class UserFileSearchView(FilesByUserListView):
             query_list = query.split()
             result = result.filter(
                 reduce(operator.and_,
-                       (Q(csv_file__icontains=q) for q in query_list))
+                       (Q(input_file__icontains=q) for q in query_list))
             )
         return result
         
@@ -384,28 +399,52 @@ class UserFileSearchView(FilesByUserListView):
 dict_data = {}
 domain_list = []
 
-@require_http_methods(["GET",])
+@require_http_methods(["GET"])
 def predict_result(request, pk):
         global dict_data, domain_list
-        # pass xlsx file instance to SimilarityMapping instead of the file path
 
-        # path_to_file = os.path.join(settings.MEDIA_ROOT, 'Responses_All About the RMP2031.xlsx')
-        # sm = SimilarityMapping(path_to_file)
-        # sm.driver()
+        input_file = File.objects.get(pk=pk)
+        filename_no_extension = os.path.splitext(input_file.filename())[0]
+        output_file_name = 'result_of_' + str(filename_no_extension) + '.json'
 
-        path = os.path.join(settings.MEDIA_ROOT, 'out.json')
-        json_data = open(path)
-        dict_data = json.load(json_data)
+        print(output_file_name)
+
+        if not input_file.has_prediction:
+            output_file_path = get_result_file_path(input_file, output_file_name)
+            print(f'Output file path is: {output_file_path}')
+
+            path_to_input_file = str(input_file.input_file.path)
+            print(f'Input file path is: {path_to_input_file}')
+
+            sm = SimilarityMapping(path_to_input_file)
+            output_dict = sm.driver()
+            print(f'sm.driver result is output_dict. output_dict type is: {type(output_dict)}.')
+
+            if not output_dict:
+                error_message = "Something went wrong while categorizing..."
+            elif output_dict:
+                input_file.has_prediction = True    
+                with open(output_file_path, 'w') as temp:
+                    json.dump(output_dict, temp)
+
+        else:
+            if os.path.exists(output_file_name):
+                with open(output_file_name, 'r') as f:
+                    dict_data = json.load(f)
+            else:
+                error_message = "Error in loading file"
+    
+        print("using dictionary data")
         print(type(dict_data))
         dict_keys = dict_data.keys()
         domain_list = list(dict_keys)
 
         return render(request, './Venter/prediction_result.html', {
-            'domain_list': domain_list, 'dict_data': dict_data
+            'domain_list': domain_list, 'dict_data': dict_data, 'error_message': error_message
         })
 
 
-@require_http_methods(["GET", ])
+@require_http_methods(["GET"])
 def domain_contents(request):
     global domain_list
     domain_stats = [['Category', 'Number of Responses']]

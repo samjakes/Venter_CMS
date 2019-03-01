@@ -11,4 +11,4 @@ class SimilarityMapping:
 
         #parsing the input file for having sampled input to the model
         csvparser.parse(self.filepath)
-        sentencemodel.categorizer()
+        return sentencemodel.categorizer()

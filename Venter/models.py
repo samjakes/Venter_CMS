@@ -5,7 +5,7 @@ from django.contrib.auth.models import User
 from django.core.validators import RegexValidator
 from django.db import models
 
-from .helpers import get_file_upload_path, get_organisation_logo_path, get_user_profile_picture_path
+from .helpers import get_file_upload_path, get_organisation_logo_path, get_user_profile_picture_path, get_result_file_path
 
 
 class Organisation(models.Model):
@@ -116,7 +116,7 @@ class File(models.Model):
     Eg: user_1 may upload a .csv file on 12/12/12
 
     # Create a file instance
-    >>> File.objects.create(uploaded_by=user_1, csv_file="file1.csv", uploaded_date = "Jan. 29, 2019, 7:59 p.m.")
+    >>> File.objects.create(uploaded_by=user_1, input_file="file1.csv", uploaded_date = "Jan. 29, 2019, 7:59 p.m.")
 
     Meta class------
         1) declares a plural name for the 'File' object
@@ -128,14 +128,18 @@ class File(models.Model):
             uploaded by user(s)/staff member(s) of the organisation
     """
     uploaded_by = models.ForeignKey(
-        User,
+        Profile,
         on_delete=models.CASCADE,
+        related_name='file',
     )
-    csv_file = models.FileField(
+    input_file = models.FileField(
         upload_to=get_file_upload_path
     )
     uploaded_date = models.DateTimeField(
         default=datetime.now,
+    )
+    has_prediction = models.BooleanField(
+        default=False,
     )
 
     def filename(self):
@@ -143,12 +147,10 @@ class File(models.Model):
         Returns the name of the csv file uploaded.
         Usage: dashboard_user.html template
         """
-        return os.path.basename(self.csv_file.name)  # pylint: disable = E1101
+        return os.path.basename(self.input_file.name)  # pylint: disable = E1101
+
+    def abs_path(self):
+        return os.path(self.input_file)
 
     class Meta:
         verbose_name_plural = 'File'
-        permissions = (
-            ("view_organisation_files", "Can view organisation files"),
-            ("view_self_files", "Can view files uploaded by self"),
-            ("delete_organisation_files", "Can delete organisation files"),
-        )

@@ -4,19 +4,19 @@ This script performs validation of several form fields that require substantial 
 
 This python file can be imported and contains the following
 functions:
-    1) csv_file_header_validation - returns boolean result from csv file header validation
+    1) input_file_header_validation - returns boolean result from csv file header validation
 """
 
 from Venter.models import Header
 
-def csv_file_header_validation(uploaded_csv_file, request):
+def input_file_header_validation(uploaded_input_file, request):
     """
     Validation of the header list extracted from the csv file's first row
     against the header list of the logged-in user's organisation
     """
 
     # extracting and converting the header from bytes to string format
-    csv_header = uploaded_csv_file.readline()
+    csv_header = uploaded_input_file.readline()
     csv_str = str(csv_header, encoding='utf-8')
 
     # converting the headers from string to list using comma separated delimiters

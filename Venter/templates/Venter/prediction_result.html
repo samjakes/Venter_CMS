@@ -22,6 +22,7 @@
         $('.nav-pills li:eq(0) a').tab('show');
         // console.log("graph pill is active")
       }
+      
 
     $('.nav-tabs > li > a').click(function(event){
       // event.preventDefault();
@@ -29,20 +30,29 @@
       actived_nav.removeClass('active');
             
       $(this).parents('li').addClass('active');
-	  }); 
+    }); 
+    
+    // $('a[data-toggle="tab"]').on('shown.bs.tab', function(e){
+    //   // event.preventDefault();
+    //   var actived_nav = $('.nav-tabs > li.active');
+    //   actived_nav.removeClass('active');
+            
+    //   $(this).parents('li').addClass('active');
+	  // }); 
   });
 </script>
 
 
 <script>
-      google.charts.load('current', {'packages':['corechart']});
+    google.charts.load('current', {'packages':['corechart']});
       google.charts.setOnLoadCallback(drawStuff);
 
       function drawStuff() {
       var stats = '{{ domain_stats|escapejs }}';
       stats = jQuery.parseJSON(stats);
       var data = new google.visualization.arrayToDataTable(stats);
-      var options = {
+
+     var options = {
         width: '1100',
         height: '600',
         legend: {
@@ -54,7 +64,7 @@
             'fontSize': 23, 
             color: 'black', 
             bold: true, 
-            fontName: 'Times-Roman'
+            italic: false,
           },
           'textStyle': {
             'fontSize': 15, 
@@ -70,21 +80,20 @@
             'fontSize': 23, 
             color: 'black', 
             bold: true, 
-            fontName: 'Times-Roman'
+            italic: false,
           },
           'textStyle': {
             'fontSize': 15, 
-            color: 'blue',
+            color: 'black',
             bold:true,
           },
         },
         bar: {
           groupWidth: "90%" 
         },
-        colors: ['blue','green'],
+        colors: ['#0080ff'],
         is3D:true
       };
-
       var chart = new google.visualization.ColumnChart(document.getElementById('chart_div'));
       chart.draw(data, options);
     };
@@ -95,7 +104,7 @@
   <div class="content-domain">
     <ul class="nav nav-tabs nav-fill" id="domain_tab" role="tablist">
       {% for domain in domain_list %}
-        {% if domain == domain_list.0 %}
+        <!-- {% if domain == domain_list.0 %}
         <li class="nav-item active">
           <a href="{% url 'domain_contents' %}?domain={{domain}}" class="nav-link" data-target="#graph" role="tab"
             aria-selected="true">
@@ -109,7 +118,14 @@
             {{domain}}
           </a>
         </li>
-        {% endif %}
+        {% endif %} -->
+      
+        <li class="nav-item">
+          <a href="{% url 'domain_contents' %}?domain={{domain}}" class="nav-link" data-target="#graph" role="tab"
+            aria-selected="true">
+            {{domain}}
+          </a>
+       </li>
       {% endfor %}
     </ul>
   </div>

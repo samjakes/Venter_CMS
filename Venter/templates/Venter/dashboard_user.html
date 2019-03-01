@@ -22,7 +22,7 @@
         </form>
       </div>
       <div class="col-sm-1">
-        <a href="{% url 'upload_csv' %}">
+        <a href="{% url 'upload_file' %}">
           <button type="button" class="btn btn-primary upload-button">
             Upload File &nbsp;<i class="fa fa-plus plus-fa" aria-hidden="true"></i>
           </button>
@@ -51,7 +51,7 @@
             </a>
           </td>
           <td>
-              <a href="{% url 'upload_csv' %}">
+              <a href="{% url 'upload_file' %}">
                   <i class="fa fa-download download-fa" aria-hidden="true"></i>
               </a>
           </td>
@@ -105,7 +105,7 @@
   <div class="inner-db-no-file">
     <div class="uploadtext">Upload File</div>
     <div class="file-upload">
-      <a href="{% url 'upload_csv' %}">
+      <a href="{% url 'upload_file' %}">
         <i class="fa fa-arrow-up"></i>
       </a>
     </div>

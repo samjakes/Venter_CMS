@@ -132,15 +132,6 @@ def categorizer():
                 max_sim_index = np.array(score_row).argmax()
             results[domain][categories[max_sim_index]].append(response)
         print('Completed.\n')
-
-    print("==========================")
-    print(type(results))        
-    path = os.path.join(settings.MEDIA_ROOT, 'out_test1.json')
-
-    # path = get_result_file_path('result.json')
-    with open(path, 'w') as temp:
-        json.dump(results, temp)
-
-
-    print('JSON output saved.')
-    print('done.')
+    print("----------")
+    print(type(results))
+    return results
