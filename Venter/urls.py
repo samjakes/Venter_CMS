@@ -23,10 +23,11 @@ urlpatterns = [
     # ex: /venter/delete_file/5/
     path('delete_file/<int:pk>', views.FileDeleteView.as_view(), name='delete_file'),
     # ex: /venter/download/
-    path('download/', views.file_download, name='download_file'),
+    # path('download/', views.file_download, name='download_file'),
     # ex: /venter/category_list/civis/
     path('category_list/<organisation_name>', views.CategoryListView.as_view(), name='category_list'),
     # ex: /venter/dashboard_user/5/
+    path('dashboard/', views.FilesListView.as_view(), name='dashboard'),
     path('dashboard_user/<int:pk>', views.FilesByUserListView.as_view(), name='dashboard_user'),
     # ex: /venter/dashboard_staff/
     path('dashboard_staff/', views.FilesByOrganisationListView.as_view(), name='dashboard_staff'),
@@ -38,5 +39,5 @@ urlpatterns = [
     path('search_file/', views.FileSearchView.as_view(), name='search_file'),
     # ex: /venter/predict_result/
     path('predict_result/<int:pk>', views.predict_result, name='predict_result'),
-    path('predict/checkOutput/', views.handle_user_selected_data, name='checkOutput'),
+    # path('predict/checkOutput/', views.handle_user_selected_data, name='checkOutput'),
 ]

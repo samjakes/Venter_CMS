@@ -15,7 +15,7 @@
                 <div class="col-sm-1">
                   <input type="submit" value="Search" class="btn btn-primary active">
                 </div>&nbsp;&nbsp;
-                <div class="col-sm-9" id=>
+                <div class="col-sm-9">
                     <input type="text" name="q" class="form-control" placeholder="Search file">
                 </div>
             </div>
@@ -38,7 +38,9 @@
           <th>Upload Time</th>
           <th>Prediction results</th>
           <th>Download Results</th>
+          {% if user.is_staff %}
           <th>Delete</th>
+          {% endif %}
         </tr>
       </thead>
       <tbody>
@@ -54,15 +56,17 @@
             </a>
           </td>
           <td>
-              <a href="{% url 'upload_csv' %}">
+              <a download='dummy' href="https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf">
                   <i class="fa fa-download download-fa" aria-hidden="true"></i>
               </a>
           </td>
+          {% if user.is_staff == True %}
           <td>
             <a href="{% url 'delete_file' file.pk %}">
                 <i class="fa fa-trash-o trash-fa" aria-hidden="true"></i>
             </a>
           </td>
+          {% endif %}
         </tr>
         {% endfor %}
       </tbody>

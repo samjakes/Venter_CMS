@@ -38,14 +38,14 @@
 </form>
 
 {% if contact_form.errors %}
-    {% for field in contact_form %}
+    <!-- {% for field in contact_form %} -->
         {% for error in field.errors %}
         <br>
         <div class="alert alert-danger">
             <strong>{{ error|escape }}</strong>
         </div>
         {% endfor %}
-    {% endfor %}
+    <!-- {% endfor %} -->
 {% endif %}
 
 <!--Modal -->

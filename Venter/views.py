@@ -18,19 +18,21 @@ from django.shortcuts import redirect, render
 from django.urls import reverse_lazy
 from django.views import generic
 from django.views.decorators.cache import never_cache
+from django.views.decorators.http import require_http_methods
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
 from django.views.generic.list import ListView
 
 from Venter import upload_to_google_drive
-from Venter.forms import ContactForm, CSVForm, ProfileForm, UserForm
+from Venter.forms import ContactForm, CSVForm, ExcelForm, ProfileForm, UserForm
 from Venter.models import Category, File, Profile
 
 from .manipulate_csv import EditCsv
 from .ML_model.Civis.modeldriver import SimilarityMapping
-from django.views.decorators.http import require_http_methods
+
 
 @login_required
 @never_cache
+@require_http_methods(["GET", "POST"])
 def upload_csv_file(request):
     """
     View logic for uploading CSV file by a logged in user.
@@ -43,18 +45,33 @@ def upload_csv_file(request):
     For GET request-------
         The csv_form is rendered in the template
     """
-    csv_form = CSVForm(request=request)
-    if request.method == 'POST':
-        csv_form = CSVForm(request.POST, request.FILES, request=request)
-        if csv_form.is_valid():
-            file_uploaded = csv_form.save(commit=False)
-            file_uploaded.uploaded_by = request.user
-            file_uploaded.save()
-            csv_form = CSVForm(request=request)
-            return render(request, './Venter/upload_file.html', {
-                'csv_form': csv_form, 'successful_submit': True})
-    return render(request, './Venter/upload_file.html', {
-        'csv_form': csv_form})
+    if str(request.user.profile.organisation_name) == 'CIVIS':
+        excel_form = ExcelForm(request=request)
+        if request.method == 'POST':
+            excel_form = ExcelForm(request.POST, request.FILES, request=request)
+            if excel_form.is_valid():
+                file_uploaded = excel_form.save(commit=False)
+                file_uploaded.uploaded_by = request.user.profile
+                file_uploaded.save()
+                excel_form = ExcelForm(request=request)
+                return render(request, './Venter/upload_file.html', {
+                    'csv_form': excel_form, 'successful_submit': True})
+        return render(request, './Venter/upload_file.html', {
+            'csv_form': excel_form})
+    else:
+        csv_form = CSVForm(request=request)
+        if request.method == 'POST':
+            csv_form = CSVForm(request.POST, request.FILES, request=request)
+            if csv_form.is_valid():
+                file_uploaded = csv_form.save(commit=False)
+                file_uploaded.uploaded_by = request.user.profile
+                file_uploaded.save()
+                csv_form = CSVForm(request=request)
+                return render(request, './Venter/upload_file.html', {
+                    'csv_form': csv_form, 'successful_submit': True})
+
+        return render(request, './Venter/upload_file.html', {
+            'csv_form': csv_form})
 
 # def handle_user_selected_data(request):
 #     """This function is used to handle the selected categories by the user"""
@@ -274,17 +291,25 @@ class FilesByOrganisationListView(LoginRequiredMixin, PermissionRequiredMixin, g
     def get_queryset(self):
         """
         This function performs the following tasks in sequence:
-            1) get the organisation name of the logged-in satff member
-            2) get the profile of all the users belonging to that organisation
+            1) get the organisation name of the logged-in staff member
+            2) get the profiles of all the users belonging to that organisation
             3) get the csv files of all those users in a list[]
         """
         org_name = self.request.user.profile.organisation_name
         org_profiles = Profile.objects.filter(organisation_name=org_name)
-        files_list = []
-        for x in org_profiles:
-            files_list += File.objects.filter(uploaded_by=x.user)
-        return files_list
 
+        return File.objects.filter(uploaded_by__organisation_name=org_name)
+
+class FilesListView(LoginRequiredMixin, ListView):
+    model = File
+    template_name = './Venter/dashboard.html'
+    context_object_name='file_list'
+
+    def get_queryset(self):
+        if self.request.user.is_staff:
+            return File.objects.filter(uploaded_by__organisation_name=self.request.user.profile.organisation_name)
+        elif not self.request.user.is_staff and self.request.user.is_active:
+            return File.objects.filter(uploaded_by=self.request.user.profile)
 
 def contact_us(request):
     """
@@ -340,7 +365,7 @@ class FileDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
     """
     permission_required = 'Venter.delete_organisation_files'
     model = File
-    success_url = reverse_lazy('dashboard_staff')
+    success_url = reverse_lazy('dashboard')
 
     def get(self, request, *args, **kwargs):
         return self.post(request, *args, **kwargs)
@@ -355,27 +380,26 @@ class CategorySearchView(CategoryListView):
         query = self.request.GET.get('q')
         if query:
             query_list = query.split()
-            result = result.filter(
+            result = query.filter(
                 reduce(operator.and_,
                        (Q(category__icontains=q) for q in query_list))
             )
         return result
 
 
-class FileSearchView(FilesByOrganisationListView):
+class FileSearchView(FilesListView):
     paginate_by = 3
 
     def get_queryset(self):
-        result = super(FilesByOrganisationListView, self).get_queryset()
+        if self.request.user.is_staff:
+            result = File.objects.filter(uploaded_by__organisation_name=self.request.user.profile.organisation_name)
+        elif not self.request.user.is_staff and self.request.user.is_active:
+            result = File.objects.filter(uploaded_by=self.request.user.profile)
 
         query = self.request.GET.get('q')
-        if query:
-            query_list = query.split()
-            result = result.filter(
-                reduce(operator.and_,
-                       (Q(csv_file__icontains=q) for q in query_list))
-            )
-        return result
+
+        search_result = [file_obj for file_obj in result if query in file_obj.filename]
+        return search_result
 
 
 @require_http_methods(["GET",])

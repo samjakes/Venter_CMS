@@ -43,27 +43,28 @@
                     </div>
 
                     <ul class="nav navbar-nav">
-                        {% if user.is_staff %}
+
                         <li class="dashboard-item">
-                            <a class="nav-link" href="{% url 'dashboard_staff' %}">
+                            <a class="nav-link" href="{% url 'dashboard' %}">
                                 <i class="nc-icon nc-grid-45"></i>
                                 <p>Dashboard</p>
                             </a>
                         </li>
+                        {% if user.is_staff %}
                         <li class="register-employee-item">
                             <a class="nav-link" href="{% url 'register_employee' %}">
                                 <i class="nc-icon nc-notes"></i>
                                 <p>Register Employee</p>
                             </a>
                         </li>
-                        {% else %}
-                        <li class="dashboard-item">
-                            <a class="nav-link" href="{% url 'dashboard_user' request.user.pk %}">
+                        {% endif %}
+                        <!-- <li class="dashboard-item">
+                            <a class="nav-link" href="{% url 'dashboard' %}">
                                 <i class="nc-icon nc-grid-45"></i>
                                 <p>Dashboard</p>
                             </a>
-                        </li>
-                        {% endif %}
+                        </li> -->
+
 
                         <li class="upload-file-item">
                             <a class="nav-link" href="{% url 'upload_csv' %}">
