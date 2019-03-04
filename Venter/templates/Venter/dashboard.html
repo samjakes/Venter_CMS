@@ -3,7 +3,7 @@
 {% block content %}
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-<link rel="stylesheet" href="../../static/assets/css/dashboard_staff.css">
+<link rel="stylesheet" href="../../static/assets/css/dashboard.css">
 
 
 <div class="outer-db">
@@ -11,7 +11,7 @@
   <div class="inner-db-file">
     <div class="row">
       <div class="col-sm-9">
-        <form action="{% url 'search_organisation_files' %}" method="get">
+        <form action="{% url 'search_file' %}" method="get">
             <div class="form-group row">
                 <div class="col-sm-1">
                   <input type="submit" value="Search" class="btn btn-primary active">
@@ -39,7 +39,9 @@
           <th>Upload Time</th>
           <th>Prediction results</th>
           <th>Download Results</th>
+          {% if user.is_staff %}
           <th>Delete</th>
+          {% endif %}
         </tr>
       </thead>
       <tbody>
@@ -55,15 +57,17 @@
             </a>
           </td>
           <td>
-              <a href="{% url 'upload_file' %}">
+              <a href="https://www.google.com/url?q=https://drive.google.com/file/d/1MxKVU-SoYRAQ69ZAscLnfIruBDY2OZeq/view?usp%3Ddrivesdk&sa=D&source=hangouts&ust=1551784106292000&usg=AFQjCNHkYlm1NKsZbuSoc113nrCq_ElreQ", download="results.xlsx">
                   <i class="fa fa-download download-fa" aria-hidden="true"></i>
               </a>
           </td>
+          {% if user.is_staff == True %}
           <td>
             <a href="{% url 'delete_file' file.pk %}">
                 <i class="fa fa-trash-o trash-fa" aria-hidden="true"></i>
             </a>
           </td>
+          {% endif %}
         </tr>
         {% endfor %}
       </tbody>
@@ -108,7 +112,6 @@
         {% endif %}
         {% endblock %}
       </div>
-
   </div>
   {% else %}
   <div class="inner-db-no-file">

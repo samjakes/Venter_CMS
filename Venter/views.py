@@ -34,7 +34,7 @@ from .ML_model.Civis.modeldriver import SimilarityMapping
 
 @login_required
 @never_cache
-@require_http_methods(["GET","POST"])
+@require_http_methods(["GET", "POST"])
 def upload_file(request):
     """
     View logic for uploading CSV file by a logged in user.
@@ -51,10 +51,11 @@ def upload_file(request):
     if str(request.user.profile.organisation_name) == 'CIVIS':
         excel_form = ExcelForm(request=request)
         if request.method == 'POST':
-            excel_form = ExcelForm(request.POST, request.FILES, request=request)
+            excel_form = ExcelForm(
+                request.POST, request.FILES, request=request)
             if excel_form.is_valid():
                 file_uploaded = excel_form.save(commit=False)
-                file_uploaded.uploaded_by = request.user
+                file_uploaded.uploaded_by = request.user.profile
                 file_uploaded.save()
                 excel_form = ExcelForm(request=request)
                 return render(request, './Venter/upload_file.html', {
@@ -67,7 +68,7 @@ def upload_file(request):
             file_form = CSVForm(request.POST, request.FILES, request=request)
             if file_form.is_valid():
                 file_uploaded = file_form.save(commit=False)
-                file_uploaded.uploaded_by = request.user
+                file_uploaded.uploaded_by = request.user.profile
                 file_uploaded.save()
                 file_form = CSVForm(request=request)
                 return render(request, './Venter/upload_file.html', {
@@ -204,7 +205,7 @@ class RegisterEmployeeView(LoginRequiredMixin, CreateView):
         2) The profile.save() returns an instance of Profile that has been saved to the database.
             This occurs only after the profile is created for a new user with the 'profile.user = user'
         3) The validate_password() is an in-built password validator in Django
-            #module-django.contrib.auth.password_validation
+            # module-django.contrib.auth.password_validation
         Ref: https://docs.djangoproject.com/en/2.1/topics/auth/passwords/
         4) The user_form instance is initialized again (user_form = UserForm()), for staff member
             to register another employee after successful submission of previous form
@@ -240,55 +241,6 @@ class RegisterEmployeeView(LoginRequiredMixin, CreateView):
         return render(request, './Venter/registration.html', {'user_form': user_form})
 
 
-class FilesByUserListView(LoginRequiredMixin, generic.ListView):
-    """
-    Arguments------
-        1) LoginRequiredMixin: View to redirect non-authenticated users to show HTTP 403 error
-        2) PermissionRequiredMixin: View to check whether the user has permission to access files uploaded by self
-        3) ListView: View to display the files uploaded by the logged-in user
-
-    Functions------
-        1) get_queryset(): Returns a new QuerySet filtering files uploaded by the logged-in user
-    """
-    model = File
-    template_name = './Venter/dashboard_user.html'
-    context_object_name = 'file_list'
-
-    def get_queryset(self):
-        return File.objects.filter(uploaded_by=self.request.user.profile)
-
-
-class FilesByOrganisationListView(LoginRequiredMixin, generic.ListView):
-    """
-    Arguments------
-        1) LoginRequiredMixin: View to redirect non-authenticated users to show HTTP 403 error
-        2) PermissionRequiredMixin: View to check whether the user is a staff
-        having permission to access organisation files
-        3) ListView: View to display the files uploaded by all the users of an organisation
-
-    Functions------
-        1) get_queryset(): Returns a new QuerySet filtering files uploaded by all the users of a particular organisation
-    """
-    model = File
-    template_name = './Venter/dashboard_staff.html'
-    context_object_name = 'file_list'
-    paginate_by = 10
-
-    def get_queryset(self):
-        """
-        This function performs the following tasks in sequence:
-            1) get the organisation name of the logged-in satff member
-            2) get the profile of all the users belonging to that organisation
-            3) get the csv files of all those users in a list[]
-        """
-        org_name = self.request.profile.organisation_name
-        org_profiles = Profile.objects.filter(organisation_name=org_name)
-        files_list = []
-        for x in org_profiles:
-            files_list += File.objects.filter(uploaded_by=x.user)
-        return files_list
-
-
 def contact_us(request):
     """
     View logic to email the administrator the contact details submitted by an organisation.
@@ -314,7 +266,7 @@ def contact_us(request):
             # get current date and time
             now = datetime.datetime.now()
             date_time = now.strftime("%Y-%m-%d %H:%M")
-    
+
             # prepare email body
             email_body = "Dear Admin,\n\n Following are the inquiry details:\n\n " + \
                 "Inquiry Date and Time: "+date_time+"\n Company Name: " + \
@@ -342,7 +294,7 @@ class FileDeleteView(LoginRequiredMixin, DeleteView):
         1) get_queryset(): Returns a new QuerySet filtering files uploaded by the logged-in user
     """
     model = File
-    success_url = reverse_lazy('dashboard_staff')
+    success_url = reverse_lazy('dashboard')
 
     def get(self, request, *args, **kwargs):
         return self.post(request, *args, **kwargs)
@@ -357,102 +309,107 @@ class CategorySearchView(CategoryListView):
         query = self.request.GET.get('q')
         if query:
             query_list = query.split()
-            result = result.filter(
+            result = query.filter(
                 reduce(operator.and_,
                        (Q(category__icontains=q) for q in query_list))
             )
         return result
 
 
-class OrganisationFileSearchView(FilesByOrganisationListView):
+class FilesListView(LoginRequiredMixin, ListView):
+    model = File
+    template_name = './Venter/dashboard.html'
+    context_object_name = 'file_list'
+    paginate_by = 8
+
+    def get_queryset(self):
+        if self.request.user.is_staff:
+            return File.objects.filter(
+                uploaded_by__organisation_name=self.request.user.profile.organisation_name)
+        elif not self.request.user.is_staff and self.request.user.is_active:
+            return File.objects.filter(uploaded_by=self.request.user.profile)
+
+
+class FileSearchView(FilesListView):
     paginate_by = 5
 
     def get_queryset(self):
-        result = super(FilesByOrganisationListView, self).get_queryset()
+        if self.request.user.is_staff:
+            result = File.objects.filter(
+                uploaded_by__organisation_name=self.request.user.profile.organisation_name)
+        elif not self.request.user.is_staff and self.request.user.is_active:
+            result = File.objects.filter(uploaded_by=self.request.user.profile)
 
         query = self.request.GET.get('q')
-        if query:
-            query_list = query.split()
-            result = result.filter(
-                reduce(operator.and_,
-                       (Q(input_file__icontains=q) for q in query_list))
-            )
-        return result
+        search_result = [
+            file_obj for file_obj in result if query in file_obj.filename]
+        return search_result
 
-
-class UserFileSearchView(FilesByUserListView):
-    paginate_by = 3
-
-    def get_queryset(self):
-        result = super(FilesByUserListView, self).get_queryset()
-
-        query = self.request.GET.get('q')
-        if query:
-            query_list = query.split()
-            result = result.filter(
-                reduce(operator.and_,
-                       (Q(input_file__icontains=q) for q in query_list))
-            )
-        return result
-        
 
 dict_data = {}
 domain_list = []
 
+
 @require_http_methods(["GET"])
 def predict_result(request, pk):
-        global dict_data, domain_list
+    global dict_data, domain_list
 
-        input_file = File.objects.get(pk=pk)
-        filename_no_extension = os.path.splitext(input_file.filename())[0]
-        output_file_name = 'result_of_' + str(filename_no_extension) + '.json'
+    # input_file = File.objects.get(pk=pk)
+    # filename_no_extension = os.path.splitext(input_file.filename)[0]
+    # output_file_name = 'result_of_' + str(filename_no_extension) + '.json'
+    # print(output_file_name)
 
-        print(output_file_name)
+    # if not input_file.has_prediction:
+    #     output_file_path = get_result_file_path(input_file, output_file_name)
+    #     with open(output_file_path, 'x'):
+    #         pass
+    #     print(f'Output file path is: {output_file_path}')
 
-        if not input_file.has_prediction:
-            output_file_path = get_result_file_path(input_file, output_file_name)
-            print(f'Output file path is: {output_file_path}')
+    #     path_to_input_file = str(input_file.input_file.path)
+    #     print(f'Input file path is: {path_to_input_file}')
 
-            path_to_input_file = str(input_file.input_file.path)
-            print(f'Input file path is: {path_to_input_file}')
+    #     sm = SimilarityMapping(path_to_input_file)
+    #     output_dict = sm.driver()
+    #     print(
+    #         f'sm.driver result is output_dict. output_dict type is: {type(output_dict)}.')
 
-            sm = SimilarityMapping(path_to_input_file)
-            output_dict = sm.driver()
-            print(f'sm.driver result is output_dict. output_dict type is: {type(output_dict)}.')
+    #     if not output_dict:
+    #         error_message = "Something went wrong while categorizing..."
+    #     elif output_dict:
+    #         input_file.has_prediction = True
+    #         with open(output_file_path, 'w') as temp:
+    #             json.dump(output_dict, temp)
 
-            if not output_dict:
-                error_message = "Something went wrong while categorizing..."
-            elif output_dict:
-                input_file.has_prediction = True    
-                with open(output_file_path, 'w') as temp:
-                    json.dump(output_dict, temp)
+    # else:
+    #     if os.path.exists(output_file_name):
+    #         with open(output_file_name, 'r') as f:
+    #             dict_data = json.load(f)
+    #     else:
+    #         error_message = "Error in loading file"
 
-        else:
-            if os.path.exists(output_file_name):
-                with open(output_file_name, 'r') as f:
-                    dict_data = json.load(f)
-            else:
-                error_message = "Error in loading file"
-    
-        print("using dictionary data")
-        print(type(dict_data))
-        dict_keys = dict_data.keys()
-        domain_list = list(dict_keys)
+    path = os.path.join(settings.MEDIA_ROOT, 'out.json')
+    json_data = open(path)
+    dict_data = json.load(json_data)  # deserialises it
 
-        return render(request, './Venter/prediction_result.html', {
-            'domain_list': domain_list, 'dict_data': dict_data, 'error_message': error_message
-        })
+    print("using dictionary data")
+    print(type(dict_data))
+    dict_keys = dict_data.keys()
+    domain_list = list(dict_keys)
+
+    return render(request, './Venter/prediction_result.html', {
+        'domain_list': domain_list, 'dict_data': dict_data
+    })
 
 
 @require_http_methods(["GET"])
 def domain_contents(request):
     global domain_list
-    domain_stats = [['Category', 'Number of Responses']]
+    domain_stats = [['Category', 'Number of Responses', {'role':'style'}]]
     domain_name = request.GET.get('domain')
     domain_data = dict_data[domain_name]
 
     for category, responselist in domain_data.items():
-            domain_stats.append([category, len(responselist)])
+        domain_stats.append([category, len(responselist), ''])
 
     return render(request, './Venter/prediction_result.html', {
         'domain_data': domain_data, 'domain_list': domain_list, 'domain_stats': jsonpickle.encode(domain_stats)
@@ -464,4 +421,3 @@ def domain_contents(request):
 # book_instance = get_object_or_404(BookInstance, pk=pk)
 #     book_instance.status = STATUS_AVAILABLE
 #     book_instance.save()
-    

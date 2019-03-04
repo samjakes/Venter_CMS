@@ -141,7 +141,8 @@ class File(models.Model):
     has_prediction = models.BooleanField(
         default=False,
     )
-
+    
+    @property
     def filename(self):
         """
         Returns the name of the csv file uploaded.

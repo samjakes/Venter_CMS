@@ -63,6 +63,11 @@ Styling for prediction_result.html
     color:white;
 }
 
+/* .content-domain ul > .nav-item.active {
+    background-color: blue;
+    color:white;
+} */
+
 /* .content-domain ul > li.active > a{
     color: white;
 } */
@@ -96,7 +101,7 @@ Styling for prediction_result.html
 
 
 
-@media (max-width: 1435px) and (max-height:846) {
+@media (max-width: 1435px) and (max-height:846px) {
     .content-domain{
         width: 1148px;
         height: 84.59px;

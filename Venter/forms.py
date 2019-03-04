@@ -1,5 +1,3 @@
-import re
-
 from django import forms
 from django.contrib.auth.models import User
 from django.core.validators import (EmailValidator, FileExtensionValidator,
@@ -63,12 +61,14 @@ class CSVForm(forms.ModelForm):
 
         return uploaded_input_file
 
+
 class ExcelForm(forms.ModelForm):
     input_file = forms.FileField(
         widget=forms.FileInput(),
         required=True,
         validators=[FileExtensionValidator(allowed_extensions=['xlsx'])],
     )
+
     class Meta:
         model = File
         fields = ('input_file',)
@@ -79,7 +79,6 @@ class ExcelForm(forms.ModelForm):
         """
         self.request = kwargs.pop("request")
         super(ExcelForm, self).__init__(*args, **kwargs)
-
 
 
 class UserForm(forms.ModelForm):
@@ -101,11 +100,17 @@ class UserForm(forms.ModelForm):
     class Meta:
         model = User
         fields = ('username', 'password', 'email', 'first_name', 'last_name')
-    username = forms.CharField(widget=forms.TextInput(attrs={'class':'form-control', 'placeholder':'Username'}))
-    password = forms.CharField(widget=forms.PasswordInput(attrs={'class':'form-control', 'placeholder':'Password'}))
-    email = forms.CharField(widget=forms.EmailInput(attrs={'class':'form-control', 'placeholder':'Email'}))
-    first_name = forms.CharField(widget=forms.TextInput(attrs={'class':'form-control', 'placeholder':'First Name'}))
-    last_name = forms.CharField(widget=forms.TextInput(attrs={'class':'form-control', 'placeholder':'Last Name'}))
+    username = forms.CharField(widget=forms.TextInput(
+        attrs={'class': 'form-control', 'placeholder': 'Username'}))
+    password = forms.CharField(widget=forms.PasswordInput(
+        attrs={'class': 'form-control', 'placeholder': 'Password'}))
+    email = forms.CharField(widget=forms.EmailInput(
+        attrs={'class': 'form-control', 'placeholder': 'Email'}))
+    first_name = forms.CharField(widget=forms.TextInput(
+        attrs={'class': 'form-control', 'placeholder': 'First Name'}))
+    last_name = forms.CharField(widget=forms.TextInput(
+        attrs={'class': 'form-control', 'placeholder': 'Last Name'}))
+
 
 class ProfileForm(forms.ModelForm):
     """
@@ -132,6 +137,7 @@ class ContactForm(forms.Form):
         attrs={'class': 'form-control', 'placeholder': 'Email'}), required=True, validators=[EmailValidator])
     contact_no = forms.CharField(widget=forms.TextInput(
         attrs={'class': 'form-control', 'placeholder': 'Contact Number'}), required=True, max_length=10,
-        validators=[RegexValidator(regex=r'^[6-9]\d{9}$', message='Please enter a valid phone number')])
+                                 validators=[RegexValidator(
+                                     regex=r'^[6-9]\d{9}$', message='Please enter a valid phone number')])
     requirement_details = forms.CharField(widget=forms.Textarea(
         attrs={'class': 'form-control', 'placeholder': 'Requirement Details'}), required=True)

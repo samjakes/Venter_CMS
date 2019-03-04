@@ -24,21 +24,19 @@
       }
       
 
-    $('.nav-tabs > li > a').click(function(event){
-      // event.preventDefault();
-      var actived_nav = $('.nav-tabs > li.active');
-      actived_nav.removeClass('active');
-            
-      $(this).parents('li').addClass('active');
-    }); 
-    
-    // $('a[data-toggle="tab"]').on('shown.bs.tab', function(e){
+    // $('.nav-tabs > li > a').click(function(event){
     //   // event.preventDefault();
     //   var actived_nav = $('.nav-tabs > li.active');
     //   actived_nav.removeClass('active');
             
     //   $(this).parents('li').addClass('active');
-	  // }); 
+    // }); 
+    
+    $(".nav-tabs .nav-item .nav-link").on("click", function(){
+      $(".nav-tabs").find(".nav-item .nav-link active").removeClass("active");
+      $(this).addClass("active");
+    });
+
   });
 </script>
 
@@ -49,7 +47,10 @@
 
       function drawStuff() {
       var stats = '{{ domain_stats|escapejs }}';
+      
       stats = jQuery.parseJSON(stats);
+      stats[stats.length-1][2] = 'color:orange';
+      console.log(stats);
       var data = new google.visualization.arrayToDataTable(stats);
 
      var options = {
@@ -91,7 +92,7 @@
         bar: {
           groupWidth: "90%" 
         },
-        colors: ['#0080ff'],
+        colors: ['blue'],
         is3D:true
       };
       var chart = new google.visualization.ColumnChart(document.getElementById('chart_div'));

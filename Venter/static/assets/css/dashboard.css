@@ -119,3 +119,7 @@ table, th, td{
     position: absolute;
     margin-top: -4%
 }
+
+@media (max-width: 1161px) and (max-height:724px) {
+    
+  }
