@@ -3,10 +3,5 @@ load-plugins=pylint_django
 ignore=.git,__pycache__,Backend,migrations,env,MEDIA,static
 
 [MESSAGES CONTROL]
-<<<<<<< Updated upstream
 max-line-length=120
 disable=C0111,C0103,R0901
-=======
-max-line-length=160
-disable=C0111,C0103,R0901, anomalous-backslash-in-string
->>>>>>> Stashed changes

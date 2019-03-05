@@ -7,30 +7,6 @@ from django.db import models
 
 from .helpers import get_file_upload_path, get_organisation_logo_path, get_user_profile_picture_path, get_result_file_path
 
-def get_file_upload_path(instance, filename):
-    """
-    Returns a custom MEDIA path for files uploaded by a user
-    Eg: /MEDIA/CSV Files/xyz/user1/2019-02-06/file1.csv
-    """
-    return os.path.join(
-        f'CSV_Files/{instance.uploaded_by.profile.organisation_name}/{instance.uploaded_by.profile.user.username}/{instance.uploaded_date.date()}/{filename}')
-
-def get_organisation_logo_path(instance, filename):
-    """
-    Returns a custom MEDIA path for organisation logo uploaded by staff member
-    Eg: /MEDIA/Organisation Logo/xyz/2019-02-06/image1.png
-    """
-    return os.path.join(
-        f'Organisation Logo/{instance.organisation_name}/{date.today()}/{filename}')
-
-
-def get_user_profile_picture_path(instance, filename):
-    """
-    Returns a custom MEDIA path for profile picture uploaded by user
-    Eg: /MEDIA/User Profile Picture/xyz/user1/2019-02-06/image2.png
-    """
-    return os.path.join(
-        f'User Profile Picture/{instance.organisation_name}/{instance.user.username}/{date.today()}/{filename}')
 
 class Organisation(models.Model):
     """
@@ -165,6 +141,8 @@ class File(models.Model):
     has_prediction = models.BooleanField(
         default=False,
     )
+    output_file_json = models.FileField()
+    output_file_xlsx = models.FileField()
 
     @property
     def filename(self):
@@ -173,9 +151,10 @@ class File(models.Model):
         Usage: dashboard_user.html template
         """
         return os.path.basename(self.input_file.name)  # pylint: disable = E1101
+    @property
+    def output_name(self):
+        return os.path.basename(self.output_file.name)
 
-    def abs_path(self):
-        return os.path(self.input_file)
 
     class Meta:
         verbose_name_plural = 'File'
