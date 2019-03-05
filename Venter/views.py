@@ -4,6 +4,8 @@ import operator
 import os
 from functools import reduce
 
+import jsonpickle
+import pandas as pd
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import (LoginRequiredMixin,
@@ -22,9 +24,7 @@ from django.views.decorators.http import require_http_methods
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
 from django.views.generic.list import ListView
 
-import jsonpickle
-from Venter import upload_to_google_drive
-from Venter.forms import ContactForm, CSVForm, ProfileForm, UserForm, ExcelForm
+from Venter.forms import ContactForm, CSVForm, ExcelForm, ProfileForm, UserForm
 from Venter.helpers import get_result_file_path
 from Venter.models import Category, File, Profile
 
@@ -350,56 +350,47 @@ class FileSearchView(FilesListView):
 def predict_result(request, pk):
     global dict_data, domain_list
 
-    # input_file = File.objects.get(pk=pk)
-    # filename_no_extension = os.path.splitext(input_file.filename)[0]
-    # output_file_name = 'result_of_' + str(filename_no_extension) + '.json'
-    # print(output_file_name)
+    filemeta = File.objects.get(pk=pk)
 
-    # if not input_file.has_prediction:
-    #     output_file_path = get_result_file_path(input_file, output_file_name)
-    #     with open(output_file_path, 'x'):
-    #         pass
-    #     print(f'Output file path is: {output_file_path}')
+    sm = SimilarityMapping(filemeta.csv_file)
+    results = sm.driver()
 
-    #     path_to_input_file = str(input_file.input_file.path)
-    #     print(f'Input file path is: {path_to_input_file}')
+    output_directory_path = os.path.join(MEDIA_ROOT, f'{filemeta.uploaded_by.organisation_name}/{filemeta.uploaded_by.user.username}/{filemeta.uploaded_date.date()}/output')
 
-    #     sm = SimilarityMapping(path_to_input_file)
-    #     output_dict = sm.driver()
-    #     print(
-    #         f'sm.driver result is output_dict. output_dict type is: {type(output_dict)}.')
+    os.makedirs(output_directory_path)
 
-    #     if not output_dict:
-    #         error_message = "Something went wrong while categorizing..."
-    #     elif output_dict:
-    #         input_file.has_prediction = True
-    #         with open(output_file_path, 'w') as temp:
-    #             json.dump(output_dict, temp)
+    output_file_path_json = os.path.join(output_directory_path, 'results.json')
+    output_file_path_xlsx = os.path.join(output_directory_path, 'results.xlsx')
 
-    # else:
-    #     if os.path.exists(output_file_name):
-    #         with open(output_file_name, 'r') as f:
-    #             dict_data = json.load(f)
-    #     else:
-    #         error_message = "Error in loading file"
+    with open(output_file_path, 'w') as temp:
+        json.dump(results, temp)
 
-    path = os.path.join(settings.MEDIA_ROOT, 'out_new.json')
-    json_data = open(path)
-    dict_data = json.load(json_data)  # deserialises it
+    print('JSON output saved.')
+    print('Done.')
 
-    print("using dictionary data")
-    print(type(dict_data))
-    dict_keys = dict_data.keys()
+    filemeta.output_file_json = output_file_path
+
+    download_output = pd.ExcelWriter(output_file_path_xlsx, engine='xlsxwriter')
+
+    for domain in results:
+        print('Writing Excel for domain %s' % domain)
+        df = pd.DataFrame({ key:pd.Series(value) for key, value in results[domain].items() })
+        df.to_excel(download_output, sheet_name=domain)
+    download_output.save()
+
+
+    dict_keys = results.keys()
     domain_list = list(dict_keys)
 
     return render(request, './Venter/prediction_result.html', {
-        'domain_list': domain_list, 'dict_data': dict_data
+        'domain_list': domain_list, 'dict_data': results
     })
 
 
 @require_http_methods(["GET"])
 def domain_contents(request):
     global domain_list
+
 
     domain_name = request.GET.get('domain')
     domain_data = dict_data[domain_name]
@@ -428,10 +419,3 @@ def domain_contents(request):
     return render(request, './Venter/prediction_result.html', {
         'domain_data': domain_data, 'domain_list': domain_list, 'domain_stats': jsonpickle.encode(domain_stats)
     })
-
-
-# def file_download(request, pk):
-#     input_file = File.objects.get(pk=pk)
-# book_instance = get_object_or_404(BookInstance, pk=pk)
-#     book_instance.status = STATUS_AVAILABLE
-#     book_instance.save()

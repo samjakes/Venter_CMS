@@ -41,3 +41,4 @@ def create_profile():
     user = User.objects.create_user('Test')
     org = create_org()
     return Profile.objects.create(user=user, organisation_name=org)
+    

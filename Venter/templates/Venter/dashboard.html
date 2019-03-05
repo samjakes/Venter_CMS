@@ -3,12 +3,8 @@
 {% block content %}
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-<<<<<<< HEAD
-<link rel="stylesheet" href="../../static/assets/css/dashboard_staff.css">
-=======
 <link rel="stylesheet" href="../../static/assets/css/dashboard.css">
 
->>>>>>> fbd5f84166af24d15d3e5dc911992d6cd3da7174
 
 <div class="outer-db">
   {% if file_list %}
@@ -20,22 +16,14 @@
                 <div class="col-sm-1">
                   <input type="submit" value="Search" class="btn btn-primary active">
                 </div>&nbsp;&nbsp;
-<<<<<<< HEAD
                 <div class="col-sm-9">
-=======
-                <div class="col-sm-9" id=>
->>>>>>> fbd5f84166af24d15d3e5dc911992d6cd3da7174
                     <input type="text" name="q" class="form-control" placeholder="Search file">
                 </div>
             </div>
         </form>
       </div>
       <div class="col-sm-1">
-<<<<<<< HEAD
-        <a href="{% url 'upload_csv' %}">
-=======
         <a href="{% url 'upload_file' %}">
->>>>>>> fbd5f84166af24d15d3e5dc911992d6cd3da7174
           <button type="button" class="btn btn-primary upload-button">
             Upload File &nbsp;<i class="fa fa-plus plus-fa" aria-hidden="true"></i>
           </button>
@@ -60,7 +48,7 @@
         {% for file in file_list %}
         <tr>
           <td>{{ file.filename }}</td>
-          <td>{{ file.uploaded_by}}</td>
+          <td>{{ file.uploaded_by  }}</td>
           <td>{{ file.uploaded_date.date }}</td>
           <td>{{ file.uploaded_date.astimezone.time }}</td>
           <td>
