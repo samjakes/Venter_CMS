@@ -387,7 +387,7 @@ def predict_result(request, pk):
     #     else:
     #         error_message = "Error in loading file"
 
-    path = os.path.join(settings.MEDIA_ROOT, 'out.json')
+    path = os.path.join(settings.MEDIA_ROOT, 'out_new.json')
     json_data = open(path)
     dict_data = json.load(json_data)  # deserialises it
 
@@ -404,12 +404,30 @@ def predict_result(request, pk):
 @require_http_methods(["GET"])
 def domain_contents(request):
     global domain_list
-    domain_stats = [['Category', 'Number of Responses', {'role':'style'}]]
+    
     domain_name = request.GET.get('domain')
     domain_data = dict_data[domain_name]
+    temp = ['Category']
+    index = 0
+    for subCat in domain_data['Novel']:
+        temp.append('Sub category ' + str(index+1))
+        index += 1
+    temp.append({'role':'style'})
+    domain_stats = []
+    domain_stats.append(temp)
 
     for category, responselist in domain_data.items():
-        domain_stats.append([category, len(responselist), ''])
+        column = [category, len(responselist), '']
+        if category == 'Novel':
+            column = ['Novel']
+            for subCat in domain_data[category]:
+                print(subCat)
+                column.append(len(domain_data[category][subCat]))
+            column.append('')
+        else:
+            for i in range(len(domain_stats[0]) - len(column)):
+                column.insert(2,0)
+        domain_stats.append(column)
 
     return render(request, './Venter/prediction_result.html', {
         'domain_data': domain_data, 'domain_list': domain_list, 'domain_stats': jsonpickle.encode(domain_stats)

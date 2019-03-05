@@ -42,20 +42,33 @@
 
 
 <script>
-    google.charts.load('current', {'packages':['corechart']});
+    function rndColor() {
+      var r = ('0' + Math.floor(Math.random() * 256).toString(16)).substr(-2), // red
+          g = ('0' + Math.floor(Math.random() * 256).toString(16)).substr(-2), // green
+          b = ('0' + Math.floor(Math.random() * 256).toString(16)).substr(-2); // blue
+      return '#' + r + g + b;
+  }
+    
+      google.charts.load('current', {'packages':['corechart']});
       google.charts.setOnLoadCallback(drawStuff);
 
       function drawStuff() {
       var stats = '{{ domain_stats|escapejs }}';
       
       stats = jQuery.parseJSON(stats);
-      stats[stats.length-1][2] = 'color:orange';
-      console.log(stats);
+      noOfNovelCats = stats[stats.length-1].length - 2
+      
+      colorseries = {}
+      for(i=0; i<noOfNovelCats; i++) {
+        colorseries[i] = rndColor()
+      }
+
       var data = new google.visualization.arrayToDataTable(stats);
 
      var options = {
         width: '1100',
         height: '600',
+        isStacked: true,
         legend: {
           position: 'none' 
         },
@@ -92,7 +105,7 @@
         bar: {
           groupWidth: "90%" 
         },
-        colors: ['blue'],
+        series : colorseries,
         is3D:true
       };
       var chart = new google.visualization.ColumnChart(document.getElementById('chart_div'));
@@ -160,10 +173,26 @@
               {% if not response %}
                 <li class="list-group-item">No response</li>
               {% else %}
-                <ul class="list-group list-group-flush">  
-                  {% for r in response %}
-                    <li class="list-group-item">{{r}}</li>
-                  {% endfor %}
+                <ul class="list-group list-group-flush">
+                  {% if category == 'Novel' %}
+                    {% for keys, item in response.items %}
+                      {% for r in item %}
+                      <li></li>
+                        <ul>
+                          <li>
+                            {{r}}
+                          </li>
+                        </ul>
+                      </li>
+                      {% endfor %}
+                      <!-- <hr style="border: 3px solid black;"> -->
+                    {% endfor %}
+                  {% else %}
+                    {% for r in response %}
+                      <li class="list-group-item">{{r}}</li>
+                    {% endfor %}
+                  {% endif %}  
+                  
                 </ul>
               {% endif %}
             </div>  
