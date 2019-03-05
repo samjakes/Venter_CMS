@@ -14,38 +14,91 @@
         $("#contactUsModal").modal('show');
     });
 </script>
-{% endif %} 
+{% endif %}
+<div class="out">
+    <div class="container-contact100">
+        <div class="outer">
+            <div class="wrap-contact100">
+                <div class="contact100-more flex-col-c-m">
+                    <div class="top-info">
+                        <div class="txt1 row">
+                            <div class="col-1">
+                                <span class="lnr lnr-map-marker"></span>
+                            </div>
+                            <div class="col-4">
+                                <label>Address</label>
+                            </div>
+                        </div>
+                        <div class="address">
+                            <span class="txt2">
+                                <label class="label-address"> New CSE Building, IIT Bombay, Powai, Mumbai,
+                                    Maharashtra</label>
+                            </span>
+                        </div>
+                        <br><br><br>
+                        <div class="txt1 row">
+                            <div class="col-1">
+                                <span class="lnr lnr-envelope"></span>
+                            </div>
+                            <div class="col-4">
+                                <label>General Support</label>
+                            </div>
+                        </div>
+                        <div class="address">
+                            <span class="txt2">
+                                <label class="label-address"> venterproject@gmail.com</label>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <form class="contact100-form validate-form" method="post" action="{% url 'contact_us' %}">
+                    {% csrf_token %}
+                    <span class="contact100-form-title">
+                        Send Us A Message
+                    </span>
 
-<form method="post"  action="{% url 'contact_us' %}">
-    {% csrf_token %}
-        <div class="form-holder">
-            <span class="lnr lnr-apartment"></span>
-            {{ contact_form.company_name }}
-        </div>
-        <div class="form-holder">
-                <span class="lnr lnr-envelope"></span>
-                {{ contact_form.email_address }}
-        </div>
-        <div class="form-holder">
-            <span class="lnr lnr-phone-handset"></span>
-            {{ contact_form.contact_no }}
-        </div>
-        <div class="form-holder">
-            <span class="lnr lnr-pencil"></span>
-            {{ contact_form.requirement_details }}
-        </div>
-        <input type="submit" value="Submit" class="submit-contact">
-</form>
+                    <label class="label-input100" for="first-name">Company Name</label>
+                    <div class="wrap-input100">
+                        {{ contact_form.company_name }}
+                    </div>
 
-{% if contact_form.errors %}
-    <!-- {% for field in contact_form %} -->
-        {% for error in field.errors %}
-        <br>
-        <div class="alert alert-danger">
-            <strong>{{ error|escape }}</strong>
+                    <label class="label-input100" for="email">Enter your email</label>
+                    <div class="wrap-input100">
+                        {{ contact_form.email_address }}
+                    </div>
+
+                    <label class="label-input100" for="phone">Enter phone number</label>
+                    <div class="wrap-input100">
+                        {{ contact_form.contact_no }}
+                    </div>
+
+                    <label class="label-input100" for="message">Message</label>
+                    <div class="wrap-input100">
+                        {{ contact_form.requirement_details }}
+                    </div>
+
+                    <div class="container-contact100-form-btn">
+                        <button class="contact100-form-btn">
+                            Send Message
+                        </button>
+                    {% if contact_form.errors %}
+                    {% for field in contact_form %}
+                    {% for error in field.errors %}
+                    <br>
+                    <div class="alert alert-danger">
+                        <strong>{{ error|escape }}</strong>
+                    </div>
+                    {% endfor %}
+                    {% endfor %}
+                    </div>
+
+                </form>
+
+            </div>
         </div>
-        {% endfor %}
-    <!-- {% endfor %} -->
+    </div>
+</div>
+
 {% endif %}
 
 <!--Modal -->
@@ -64,7 +117,8 @@
             <div class="modal-footer">
                 <div class="footer-center">
                     <p class="p1-contact">Thank you for contacting us!</p>
-                        <p class="p2-contact">Your inquiry was submitted and will be responded to as soon as possible.</p><br>
+                    <p class="p2-contact">Your inquiry was submitted and will be responded to as soon as possible.</p>
+                    <br>
                     <a href="{% url 'home' %}">
                         <button type="button" class="btn btn-warning rounded-4">
                             Explore more &nbsp;&nbsp; <span class="lnr lnr-home"></span>

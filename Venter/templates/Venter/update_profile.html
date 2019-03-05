@@ -17,17 +17,38 @@
 </script>
 {% endif %} 
 
-    <form method="post" name="form" enctype="multipart/form-data">
-        {% csrf_token %}
-        <label>Organization: </label>&nbsp;&nbsp;{{ request.user.profile.organisation_name }}<br>
-        <label>Username: </label>&nbsp;&nbsp;{{ request.user.username}}<br>
-        {% for field in profile_form %}
-            <label>{{ field.label }}: </label>&nbsp;
-            {{ field }}
-            <br>
-        {% endfor %}
-        <input type="submit" value="Update">
-    </form>
+<div class="outer-profile">
+    <div class="wrap-profile">
+        <form method="post" name="form" enctype="multipart/form-data" class="profile-form">
+            {% csrf_token %}
+            <img src="../../static/assets/img/default-avatar.png" alt="Avatar" class="profile-avatar"><br><br>
+            <div class="wrap-field">
+				<label class="org-label">Organisation Name: {{ request.user.profile.organisation_name }}</label>
+			</div>
+
+            <div class="wrap-field">
+                <label class="username-label">Username: </label> &nbsp; {{ request.user.username}}
+            </div>
+
+            <div class="wrap-field">
+                    <label class="phone-number-label">Phone Number: </label> &nbsp; {{ profile_form.phone_number}}
+            </div>
+
+            <div class="wrap-field-profile-picture">
+                <label class="profile-picture-label">Profile Picture: </label> &nbsp; {{ profile_form.profile_picture }}
+            </div>
+
+            <!-- {% for field in profile_form %}
+                <div class="wrap-field">
+                    <label class="field-label">{{ field.label }}: </label>&nbsp;{{ field }}
+                    <br>
+                </div>
+            {% endfor %} -->
+
+            <input type="submit" value="Update" class="update_profile_btn">
+        </form>
+    </div>   
+</div>    
 
 {% if profile_form.errors %}
     {% for field in profile_form %}

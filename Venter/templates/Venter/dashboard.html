@@ -3,7 +3,12 @@
 {% block content %}
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<<<<<<< HEAD
 <link rel="stylesheet" href="../../static/assets/css/dashboard_staff.css">
+=======
+<link rel="stylesheet" href="../../static/assets/css/dashboard.css">
+
+>>>>>>> fbd5f84166af24d15d3e5dc911992d6cd3da7174
 
 <div class="outer-db">
   {% if file_list %}
@@ -15,14 +20,22 @@
                 <div class="col-sm-1">
                   <input type="submit" value="Search" class="btn btn-primary active">
                 </div>&nbsp;&nbsp;
+<<<<<<< HEAD
                 <div class="col-sm-9">
+=======
+                <div class="col-sm-9" id=>
+>>>>>>> fbd5f84166af24d15d3e5dc911992d6cd3da7174
                     <input type="text" name="q" class="form-control" placeholder="Search file">
                 </div>
             </div>
         </form>
       </div>
       <div class="col-sm-1">
+<<<<<<< HEAD
         <a href="{% url 'upload_csv' %}">
+=======
+        <a href="{% url 'upload_file' %}">
+>>>>>>> fbd5f84166af24d15d3e5dc911992d6cd3da7174
           <button type="button" class="btn btn-primary upload-button">
             Upload File &nbsp;<i class="fa fa-plus plus-fa" aria-hidden="true"></i>
           </button>
@@ -52,11 +65,11 @@
           <td>{{ file.uploaded_date.astimezone.time }}</td>
           <td>
             <a href="{% url 'predict_result' file.pk %}">
-              <button class="btn btn-success predict-button">Predict</button>
+              <button class="btn btn-success predict-button">Categorize</button>
             </a>
           </td>
           <td>
-              <a download='dummy' href="https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf">
+              <a href="https://www.google.com/url?q=https://drive.google.com/file/d/1MxKVU-SoYRAQ69ZAscLnfIruBDY2OZeq/view?usp%3Ddrivesdk&sa=D&source=hangouts&ust=1551784106292000&usg=AFQjCNHkYlm1NKsZbuSoc113nrCq_ElreQ", download="results.xlsx">
                   <i class="fa fa-download download-fa" aria-hidden="true"></i>
               </a>
           </td>
@@ -111,13 +124,12 @@
         {% endif %}
         {% endblock %}
       </div>
-
   </div>
   {% else %}
   <div class="inner-db-no-file">
     <div class="uploadtext">Upload File</div>
     <div class="file-upload">
-      <a href="{% url 'upload_csv' %}">
+      <a href="{% url 'upload_file' %}">
         <i class="fa fa-arrow-up"></i>
       </a>
     </div>

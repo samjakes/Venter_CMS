@@ -6,7 +6,6 @@ Created on Mon Feb 25 17:15:22 2019
 """
 
 import pandas as pd
-from autocorrect import spell
 import re
 
 def parse(filepath):

@@ -22,8 +22,10 @@ from django.views.decorators.http import require_http_methods
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
 from django.views.generic.list import ListView
 
+import jsonpickle
 from Venter import upload_to_google_drive
-from Venter.forms import ContactForm, CSVForm, ExcelForm, ProfileForm, UserForm
+from Venter.forms import ContactForm, CSVForm, ProfileForm, UserForm, ExcelForm
+from Venter.helpers import get_result_file_path
 from Venter.models import Category, File, Profile
 
 from .manipulate_csv import EditCsv
@@ -33,132 +35,119 @@ from .ML_model.Civis.modeldriver import SimilarityMapping
 @login_required
 @never_cache
 @require_http_methods(["GET", "POST"])
-def upload_csv_file(request):
+def upload_file(request):
     """
     View logic for uploading CSV file by a logged in user.
 
     For POST request-------
         1) The POST data, uploaded csv file and a request parameter are being sent to CSVForm as arguments
         2) If form.is_valid() returns true, the user is assigned to the uploaded_by field
-        3) csv_form is saved and Form instance is initialized again (csv_form = CSVForm(request=request)),
+        3) file_form is saved and Form instance is initialized again (file_form = CSVForm(request=request)),
            for user to upload another file after successfully uploading the previous file
     For GET request-------
-        The csv_form is rendered in the template
+        The file_form is rendered in the template
     """
+
     if str(request.user.profile.organisation_name) == 'CIVIS':
         excel_form = ExcelForm(request=request)
         if request.method == 'POST':
-            excel_form = ExcelForm(request.POST, request.FILES, request=request)
+            excel_form = ExcelForm(
+                request.POST, request.FILES, request=request)
             if excel_form.is_valid():
                 file_uploaded = excel_form.save(commit=False)
                 file_uploaded.uploaded_by = request.user.profile
                 file_uploaded.save()
                 excel_form = ExcelForm(request=request)
                 return render(request, './Venter/upload_file.html', {
-                    'csv_form': excel_form, 'successful_submit': True})
+                    'file_form': excel_form, 'successful_submit': True})
         return render(request, './Venter/upload_file.html', {
-            'csv_form': excel_form})
+            'file_form': excel_form})
     else:
-        csv_form = CSVForm(request=request)
+        file_form = CSVForm(request=request)
         if request.method == 'POST':
-            csv_form = CSVForm(request.POST, request.FILES, request=request)
-            if csv_form.is_valid():
-                file_uploaded = csv_form.save(commit=False)
+            file_form = CSVForm(request.POST, request.FILES, request=request)
+            if file_form.is_valid():
+                file_uploaded = file_form.save(commit=False)
                 file_uploaded.uploaded_by = request.user.profile
                 file_uploaded.save()
-                csv_form = CSVForm(request=request)
+                file_form = CSVForm(request=request)
                 return render(request, './Venter/upload_file.html', {
-                    'csv_form': csv_form, 'successful_submit': True})
+                    'file_form': file_form, 'successful_submit': True})
 
         return render(request, './Venter/upload_file.html', {
-            'csv_form': csv_form})
-
-# def handle_user_selected_data(request):
-#     """This function is used to handle the selected categories by the user"""
-#     if not request.user.is_authenticated:
-#         # Authentication security check
-#         return redirect(settings.LOGIN_REDIRECT_URL)
-#     else:
-#         rows = request.session['Rows']
-#         correct_category = []
-#         company = request.session['company']
-#         if request.method == 'POST':
-#             file_name = request.session['filename']
-#             user_name = request.user.username
-#             for i in range(rows):
-#                 # We are getting a list of values because the select tag was multiple select
-#                 selected_category = request.POST.getlist(
-#                     'select_category' + str(i) + '[]')
-#                 if request.POST['other_category' + str(i)]:
-#                     # To get a better picture of what we are getting try to print "request.POST.['other_category' + str(i)]", request.POST['other_category' + str(i)
-#                     # others_list=request.POST['other_category' + str(i)]
-#                     # for element in others_list:
-#                     #     print(element)
-#                     #     tuple = (selected_category,element)
-#                     tuple = (selected_category,
-#                              request.POST['other_category' + str(i)])
-#                     # print(request.POST['other_category' + str(i)])
-#                     # print(tuple)
-#                     # So here the correct_category will be needing a touple so the data will be like:
-#                     # [(selected_category1, selected_category2), (other_category1, other_category2)] This will be the output of the multi select
-#                     correct_category.append(tuple)
-#                 else:
-#                     # So here the correct_category will be needing a touple so the data will be like:
-#                     # [(selected_category1, selected_category2)] This will be the output of the multi select
-#                     correct_category.append(selected_category)
-#         csv = EditCsv(file_name, user_name, company)
-#         csv.write_file(correct_category)
-#         if request.POST['radio'] != "no":
-#             # If the user want to send the file to Google Drive
-#             path_folder = request.user.username + "/CSV/output/"
-#             path_file = 'MEDIA/' + request.user.username + \
-#                 "/CSV/output/" + request.session['filename']
-#             path_file_diff = 'MEDIA/' + request.user.username + "/CSV/output/Difference of " + request.session[
-#                 'filename']
-#             upload_to_google_drive.upload_to_drive(path_folder,
-#                                                    'results of ' +
-#                                                    request.session['filename'],
-#                                                    "Difference of " +
-#                                                    request.session['filename'],
-#                                                    path_file,
-#                                                    path_file_diff)
-#     return redirect("/download")
+            'file_form': file_form})
 
 
-# def file_download(request):
-#     if not request.user.is_authenticated:
-#         return redirect(settings.LOGIN_REDIRECT_URL)
-#     else:
-#         # Refer to the source: https://stackoverflow.com/questions/36392510/django-download-a-file/36394206
-#         path = os.path.join(settings.MEDIA_ROOT, request.user.username,
-#                             "CSV", "output", request.session['filename'])
-#         with open(path, 'rb') as csv:
-#             response = HttpResponse(
-#                 csv.read())  # Try using HttpStream instead of this. This method will create problem with large numbers of rows like 25k+
-#             response['Content-Type'] = 'application/force-download'
-#             response['Content-Disposition'] = 'attachment;filename=results of ' + \
-#                 request.session['filename']
-#         return response
+def handle_user_selected_data(request):
+    """This function is used to handle the selected categories by the user"""
+    if not request.user.is_authenticated:
+        # Authentication security check
+        return redirect(settings.LOGIN_REDIRECT_URL)
+    else:
+        rows = request.session['Rows']
+        correct_category = []
+        company = request.session['company']
+        if request.method == 'POST':
+            file_name = request.session['filename']
+            user_name = request.user.username
+            for i in range(rows):
+                # We are getting a list of values because the select tag was multiple select
+                selected_category = request.POST.getlist(
+                    'select_category' + str(i) + '[]')
+                if request.POST['other_category' + str(i)]:
+                    # To get a better picture of what we are getting try to print "request.POST.['other_category' + str(i)]", request.POST['other_category' + str(i)
+                    # others_list=request.POST['other_category' + str(i)]
+                    # for element in others_list:
+                    #     print(element)
+                    #     tuple = (selected_category,element)
+                    tuple = (selected_category,
+                             request.POST['other_category' + str(i)])
+                    # print(request.POST['other_category' + str(i)])
+                    # print(tuple)
+                    # So here the correct_category will be needing a touple so the data will be like:
+                    # [(selected_category1, selected_category2), (other_category1, other_category2)] This will be the output of the multi select
+                    correct_category.append(tuple)
+                else:
+                    # So here the correct_category will be needing a touple so the data will be like:
+                    # [(selected_category1, selected_category2)] This will be the output of the multi select
+                    correct_category.append(selected_category)
+        csv = EditCsv(file_name, user_name, company)
+        csv.write_file(correct_category)
+        if request.POST['radio'] != "no":
+            # If the user want to send the file to Google Drive
+            path_folder = request.user.username + "/CSV/output/"
+            path_file = 'MEDIA/' + request.user.username + \
+                "/CSV/output/" + request.session['filename']
+            path_file_diff = 'MEDIA/' + request.user.username + "/CSV/output/Difference of " + request.session[
+                'filename']
+            upload_to_google_drive.upload_to_drive(path_folder,
+                                                   'results of ' +
+                                                   request.session['filename'],
+                                                   "Difference of " +
+                                                   request.session['filename'],
+                                                   path_file,
+                                                   path_file_diff)
+    return redirect("/download")
 
 
-# def handle_uploaded_file(f, username, filename):
-#     """Just a precautionary step if signals.py doesn't work for any reason."""
+def handle_uploaded_file(f, username, filename):
+    """Just a precautionary step if signals.py doesn't work for any reason."""
 
-#     data_directory_root = settings.MEDIA_ROOT
-#     path = os.path.join(data_directory_root, username,
-#                         "CSV", "input", filename)
-#     path_input = os.path.join(data_directory_root, username, "CSV", "input")
-#     path_output = os.path.join(data_directory_root, username, "CSV", "output")
+    data_directory_root = settings.MEDIA_ROOT
+    path = os.path.join(data_directory_root, username,
+                        "CSV", "input", filename)
+    path_input = os.path.join(data_directory_root, username, "CSV", "input")
+    path_output = os.path.join(data_directory_root, username, "CSV", "output")
 
-#     if not os.path.exists(path_input):
-#         os.makedirs(path_input)
+    if not os.path.exists(path_input):
+        os.makedirs(path_input)
 
-#     if not os.path.exists(path_output):
-#         os.makedirs(path_output)
+    if not os.path.exists(path_output):
+        os.makedirs(path_output)
 
-#     with open(path, 'wb+') as destination:
-#         for chunk in f.chunks():
-#             destination.write(chunk)
+    with open(path, 'wb+') as destination:
+        for chunk in f.chunks():
+            destination.write(chunk)
 
 
 class CategoryListView(LoginRequiredMixin, ListView):
@@ -216,7 +205,7 @@ class RegisterEmployeeView(LoginRequiredMixin, CreateView):
         2) The profile.save() returns an instance of Profile that has been saved to the database.
             This occurs only after the profile is created for a new user with the 'profile.user = user'
         3) The validate_password() is an in-built password validator in Django
-            #module-django.contrib.auth.password_validation
+            # module-django.contrib.auth.password_validation
         Ref: https://docs.djangoproject.com/en/2.1/topics/auth/passwords/
         4) The user_form instance is initialized again (user_form = UserForm()), for staff member
             to register another employee after successful submission of previous form
@@ -251,65 +240,6 @@ class RegisterEmployeeView(LoginRequiredMixin, CreateView):
         user_form = UserForm()
         return render(request, './Venter/registration.html', {'user_form': user_form})
 
-
-class FilesByUserListView(LoginRequiredMixin, PermissionRequiredMixin, generic.ListView):
-    """
-    Arguments------
-        1) LoginRequiredMixin: View to redirect non-authenticated users to show HTTP 403 error
-        2) PermissionRequiredMixin: View to check whether the user has permission to access files uploaded by self
-        3) ListView: View to display the files uploaded by the logged-in user
-
-    Functions------
-        1) get_queryset(): Returns a new QuerySet filtering files uploaded by the logged-in user
-    """
-    model = File
-    template_name = './Venter/dashboard_user.html'
-    context_object_name = 'file_list'
-    permission_required = 'Venter.view_self_files'
-
-    def get_queryset(self):
-        return File.objects.filter(uploaded_by=self.request.user)
-
-
-class FilesByOrganisationListView(LoginRequiredMixin, PermissionRequiredMixin, generic.ListView):
-    """
-    Arguments------
-        1) LoginRequiredMixin: View to redirect non-authenticated users to show HTTP 403 error
-        2) PermissionRequiredMixin: View to check whether the user is a staff
-        having permission to access organisation files
-        3) ListView: View to display the files uploaded by all the users of an organisation
-
-    Functions------
-        1) get_queryset(): Returns a new QuerySet filtering files uploaded by all the users of a particular organisation
-    """
-    model = File
-    template_name = './Venter/dashboard_staff.html'
-    context_object_name = 'file_list'
-    permission_required = 'Venter.view_organisation_files'
-    paginate_by = 5
-
-    def get_queryset(self):
-        """
-        This function performs the following tasks in sequence:
-            1) get the organisation name of the logged-in staff member
-            2) get the profiles of all the users belonging to that organisation
-            3) get the csv files of all those users in a list[]
-        """
-        org_name = self.request.user.profile.organisation_name
-        org_profiles = Profile.objects.filter(organisation_name=org_name)
-
-        return File.objects.filter(uploaded_by__organisation_name=org_name)
-
-class FilesListView(LoginRequiredMixin, ListView):
-    model = File
-    template_name = './Venter/dashboard.html'
-    context_object_name='file_list'
-
-    def get_queryset(self):
-        if self.request.user.is_staff:
-            return File.objects.filter(uploaded_by__organisation_name=self.request.user.profile.organisation_name)
-        elif not self.request.user.is_staff and self.request.user.is_active:
-            return File.objects.filter(uploaded_by=self.request.user.profile)
 
 def contact_us(request):
     """
@@ -352,7 +282,7 @@ def contact_us(request):
     })
 
 
-class FileDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
+class FileDeleteView(LoginRequiredMixin, DeleteView):
     """
     Arguments------
         1) LoginRequiredMixin: View to redirect non-authenticated users to show HTTP 403 error
@@ -363,7 +293,6 @@ class FileDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
     Functions------
         1) get_queryset(): Returns a new QuerySet filtering files uploaded by the logged-in user
     """
-    permission_required = 'Venter.delete_organisation_files'
     model = File
     success_url = reverse_lazy('dashboard')
 
@@ -387,46 +316,122 @@ class CategorySearchView(CategoryListView):
         return result
 
 
-class FileSearchView(FilesListView):
-    paginate_by = 3
+class FilesListView(LoginRequiredMixin, ListView):
+    model = File
+    template_name = './Venter/dashboard.html'
+    context_object_name = 'file_list'
+    paginate_by = 8
 
     def get_queryset(self):
         if self.request.user.is_staff:
-            result = File.objects.filter(uploaded_by__organisation_name=self.request.user.profile.organisation_name)
+            return File.objects.filter(
+                uploaded_by__organisation_name=self.request.user.profile.organisation_name)
+        elif not self.request.user.is_staff and self.request.user.is_active:
+            return File.objects.filter(uploaded_by=self.request.user.profile)
+
+
+class FileSearchView(FilesListView):
+    paginate_by = 5
+
+    def get_queryset(self):
+        if self.request.user.is_staff:
+            result = File.objects.filter(
+                uploaded_by__organisation_name=self.request.user.profile.organisation_name)
         elif not self.request.user.is_staff and self.request.user.is_active:
             result = File.objects.filter(uploaded_by=self.request.user.profile)
 
         query = self.request.GET.get('q')
-
-        search_result = [file_obj for file_obj in result if query in file_obj.filename]
+        search_result = [
+            file_obj for file_obj in result if query in file_obj.filename]
         return search_result
 
 
-@require_http_methods(["GET",])
+@require_http_methods(["GET"])
 def predict_result(request, pk):
-        # pass xlsx file instance to SimilarityMapping instead of the file path
+    global dict_data, domain_list
 
-        path_to_file = os.path.join(settings.MEDIA_ROOT, 'Responses_All About the RMP2031.xlsx')
-        sm = SimilarityMapping(path_to_file)
-        sm.driver()
+    # input_file = File.objects.get(pk=pk)
+    # filename_no_extension = os.path.splitext(input_file.filename)[0]
+    # output_file_name = 'result_of_' + str(filename_no_extension) + '.json'
+    # print(output_file_name)
 
-        path = os.path.join(settings.MEDIA_ROOT, 'out_test1.json')
-        # path = os.path.join(settings.MEDIA_ROOT, 'Output Result Files', 'SpeakUp', 'test_admin_speakup', '2019-02-26', 'result.json')
-        json_data = open(path)
-        dict_data = json.load(json_data)  # deserialises it
+    # if not input_file.has_prediction:
+    #     output_file_path = get_result_file_path(input_file, output_file_name)
+    #     with open(output_file_path, 'x'):
+    #         pass
+    #     print(f'Output file path is: {output_file_path}')
 
-        dict_keys = dict_data.keys()  # retrieve keys
-        domain_list = list(dict_keys)
+    #     path_to_input_file = str(input_file.input_file.path)
+    #     print(f'Input file path is: {path_to_input_file}')
 
-        traffic_data = dict_data['Traffic']
+    #     sm = SimilarityMapping(path_to_input_file)
+    #     output_dict = sm.driver()
+    #     print(
+    #         f'sm.driver result is output_dict. output_dict type is: {type(output_dict)}.')
 
-        for category in traffic_data.keys():
-            print("-----CAT-----")
-            print(category)
-            for response in traffic_data[category]:
-                print("======RES=======")
-                print (response)
+    #     if not output_dict:
+    #         error_message = "Something went wrong while categorizing..."
+    #     elif output_dict:
+    #         input_file.has_prediction = True
+    #         with open(output_file_path, 'w') as temp:
+    #             json.dump(output_dict, temp)
 
-        return render(request, './Venter/prediction_result.html', {
-            'domain_list': domain_list, 'dict_data': dict_data
-        })
+    # else:
+    #     if os.path.exists(output_file_name):
+    #         with open(output_file_name, 'r') as f:
+    #             dict_data = json.load(f)
+    #     else:
+    #         error_message = "Error in loading file"
+
+    path = os.path.join(settings.MEDIA_ROOT, 'out_new.json')
+    json_data = open(path)
+    dict_data = json.load(json_data)  # deserialises it
+
+    print("using dictionary data")
+    print(type(dict_data))
+    dict_keys = dict_data.keys()
+    domain_list = list(dict_keys)
+
+    return render(request, './Venter/prediction_result.html', {
+        'domain_list': domain_list, 'dict_data': dict_data
+    })
+
+
+@require_http_methods(["GET"])
+def domain_contents(request):
+    global domain_list
+
+    domain_name = request.GET.get('domain')
+    domain_data = dict_data[domain_name]
+    temp = ['Category']
+    index = 0
+    for subCat in domain_data['Novel']:
+        temp.append('Sub category ' + str(index+1))
+        index += 1
+    temp.append({'role':'style'})
+    domain_stats = []
+    domain_stats.append(temp)
+
+    for category, responselist in domain_data.items():
+        column = [category, len(responselist), '']
+        if category == 'Novel':
+            column = ['Novel']
+            for subCat in domain_data[category]:
+                print(subCat)
+                column.append(len(domain_data[category][subCat]))
+            column.append('')
+        else:
+            for i in range(len(domain_stats[0]) - len(column)):
+                column.insert(2,0)
+        domain_stats.append(column)
+
+    return render(request, './Venter/prediction_result.html', {
+        'domain_data': domain_data, 'domain_list': domain_list, 'domain_stats': jsonpickle.encode(domain_stats)
+    })
+
+
+# def file_download(request, pk):
+#     input_file = File.objects.get(pk=pk)
+# book_instance = get_object_or_404(BookInstance, pk=pk)
+#     book_instance.status = STATUS_AVAILABLE
+#     book_instance.save()

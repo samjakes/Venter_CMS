@@ -33,12 +33,16 @@
     <div class="wrapper">
         <div class="container">
             {% if user.is_authenticated %}
+            <script>
+                console.log("----")
+                console.log('{{user.profile.organisation_name}}')
+            </script>
             <!--Side Nav Bar--->
             <div class="sidebar" data-image="../../static/assets/img/sidebar-5.jpg" data-color="blue">
                 <div class="sidebar-wrapper">
                     <div class="logo-nav">
                         <a href="{% url 'home' %}" class="simple-text">
-                            <img src="../../static/assets/img/logo_2.png" alt="logo" class="imagelogo-base">
+                            <img src="../../static/assets/img/logo_3.png" alt="logo" class="imagelogo-base">
                         </a>
                     </div>
 
@@ -58,36 +62,33 @@
                             </a>
                         </li>
                         {% endif %}
-                        <!-- <li class="dashboard-item">
-                            <a class="nav-link" href="{% url 'dashboard' %}">
-                                <i class="nc-icon nc-grid-45"></i>
-                                <p>Dashboard</p>
-                            </a>
-                        </li> -->
-
 
                         <li class="upload-file-item">
-                            <a class="nav-link" href="{% url 'upload_csv' %}">
+                            <a class="nav-link" href="{% url 'upload_file' %}">
                                 <i class="nc-icon nc-simple-add"></i>
                                 <p>Upload File</p>
                             </a>
                         </li>
+
                         <li class="user-profile-item">
                             <a class="nav-link" href="{% url 'update_profile' request.user.pk %}">
                                 <i class="nc-icon nc-circle-09"></i>
                                 <p>User Profile</p>
                             </a>
                         </li>
+
+                        <!-- {% if request.user.profile.organisation_name != "CIVIS" %}
                         <li class="category-list-item">
                             <a class="nav-link" href="{% url 'category_list' request.user %}">
                                 <i class="nc-icon nc-bullet-list-67"></i>
                                 <p>Category List</p>
                             </a>
                         </li>
+                        {% endif %} -->
+
                         <li class="nav-item active active-pro">
                             <a class="nav-link active" href="{% url 'logout' %}">
                                 <i class="nc-icon nc-button-power"></i>
-                                <!-- <span class="lnr lnr-exit"></span> -->
                                 <p>Log out</p>
                             </a>
                         </li>

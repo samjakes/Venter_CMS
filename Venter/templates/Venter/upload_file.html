@@ -18,21 +18,21 @@
 
 <div class="outer-upload-file">
     <div class="inner-upload-file">
-        <form method="post" action="{% url 'upload_csv' %}" enctype="multipart/form-data">
+        <form method="post" action="{% url 'upload_file' %}" enctype="multipart/form-data">
             {% csrf_token %}
             <h3>Upload File</h3>
             <br><br>
             <div class="test">
                 <div class="container-file">
-                    <label for="{{ form.csv_file.id_for_label }}"></label>
-                    {{ csv_form.csv_file }}
+                    <label for="{{ form.input_file.id_for_label }}"></label>
+                    {{ file_form.input_file }}
                 </div>
             </div>
             <input type="submit" value="Upload" class="submit-upload">
         </form>
 
-        {% if csv_form.errors %}
-            {% for field in csv_form %}
+        {% if file_form.errors %}
+            {% for field in file_form %}
                 {% for error in field.errors %}
                     <div class="alert alert-danger">
                         <strong>{{ error|escape }}</strong>
@@ -63,7 +63,7 @@
                             </button>
                         </a>
 
-                        <a href="{% url 'upload_csv' %}">
+                        <a href="{% url 'upload_file' %}">
                             <button type="button" class="btn btn-info rounded-4">
                                 Upload new file &nbsp;&nbsp; <span class="lnr lnr-plus-circle"></span>
                             </button>

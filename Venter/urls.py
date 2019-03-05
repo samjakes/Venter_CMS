@@ -18,26 +18,25 @@ urlpatterns = [
     path('register_employee/', views.RegisterEmployeeView.as_view(), name='register_employee'),
     # ex: /venter/login/
     path('login/', auth.views.LoginView.as_view(template_name="Venter/login.html"), name='login'),
-    # ex: /venter/upload_csv/
-    path('upload_csv/', views.upload_csv_file, name='upload_csv'),
+    # ex: /venter/upload_file/
+    path('upload_file/', views.upload_file, name='upload_file'),
     # ex: /venter/delete_file/5/
     path('delete_file/<int:pk>', views.FileDeleteView.as_view(), name='delete_file'),
-    # ex: /venter/download/
-    # path('download/', views.file_download, name='download_file'),
     # ex: /venter/category_list/civis/
     path('category_list/<organisation_name>', views.CategoryListView.as_view(), name='category_list'),
-    # ex: /venter/dashboard_user/5/
+    # ex: /venter/dashboard/
     path('dashboard/', views.FilesListView.as_view(), name='dashboard'),
-    path('dashboard_user/<int:pk>', views.FilesByUserListView.as_view(), name='dashboard_user'),
-    # ex: /venter/dashboard_staff/
-    path('dashboard_staff/', views.FilesByOrganisationListView.as_view(), name='dashboard_staff'),
     # ex: /venter/contact_us/
     path('contact_us/', views.contact_us, name='contact_us'),
     # ex: /venter/search_category/
     path('search_category/', views.CategorySearchView.as_view(), name='search_category'),
     # ex: /venter/search_file/
     path('search_file/', views.FileSearchView.as_view(), name='search_file'),
-    # ex: /venter/predict_result/
+    # ex: /venter/predict_result/5/
     path('predict_result/<int:pk>', views.predict_result, name='predict_result'),
+    # ex: /venter/domain_contents/
+    path('domain_contents/', views.domain_contents, name='domain_contents'),
     # path('predict/checkOutput/', views.handle_user_selected_data, name='checkOutput'),
+    # ex: /venter/download_file/5/
+    # path('download_file/<int:pk>', views.file_download, name='download_file'),
 ]
