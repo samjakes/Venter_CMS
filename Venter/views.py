@@ -4,6 +4,7 @@ import operator
 import os
 from functools import reduce
 
+import jsonpickle
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import (LoginRequiredMixin,
@@ -13,22 +14,16 @@ from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 from django.core.mail import mail_admins
 from django.db.models import Q
-from django.http import HttpResponse
-from django.shortcuts import redirect, render
+from django.shortcuts import render
 from django.urls import reverse_lazy
-from django.views import generic
 from django.views.decorators.cache import never_cache
 from django.views.decorators.http import require_http_methods
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
 from django.views.generic.list import ListView
 
-import jsonpickle
-from Venter import upload_to_google_drive
-from Venter.forms import ContactForm, CSVForm, ProfileForm, UserForm, ExcelForm
-from Venter.helpers import get_result_file_path
+from Venter.forms import ContactForm, CSVForm, ExcelForm, ProfileForm, UserForm
 from Venter.models import Category, File, Profile
 
-from .manipulate_csv import EditCsv
 from .ML_model.Civis.modeldriver import SimilarityMapping
 
 
@@ -76,79 +71,6 @@ def upload_file(request):
 
         return render(request, './Venter/upload_file.html', {
             'file_form': file_form})
-
-
-def handle_user_selected_data(request):
-    """This function is used to handle the selected categories by the user"""
-    if not request.user.is_authenticated:
-        # Authentication security check
-        return redirect(settings.LOGIN_REDIRECT_URL)
-    else:
-        rows = request.session['Rows']
-        correct_category = []
-        company = request.session['company']
-        if request.method == 'POST':
-            file_name = request.session['filename']
-            user_name = request.user.username
-            for i in range(rows):
-                # We are getting a list of values because the select tag was multiple select
-                selected_category = request.POST.getlist(
-                    'select_category' + str(i) + '[]')
-                if request.POST['other_category' + str(i)]:
-                    # To get a better picture of what we are getting try to print "request.POST.['other_category' + str(i)]", request.POST['other_category' + str(i)
-                    # others_list=request.POST['other_category' + str(i)]
-                    # for element in others_list:
-                    #     print(element)
-                    #     tuple = (selected_category,element)
-                    tuple = (selected_category,
-                             request.POST['other_category' + str(i)])
-                    # print(request.POST['other_category' + str(i)])
-                    # print(tuple)
-                    # So here the correct_category will be needing a touple so the data will be like:
-                    # [(selected_category1, selected_category2), (other_category1, other_category2)] This will be the output of the multi select
-                    correct_category.append(tuple)
-                else:
-                    # So here the correct_category will be needing a touple so the data will be like:
-                    # [(selected_category1, selected_category2)] This will be the output of the multi select
-                    correct_category.append(selected_category)
-        csv = EditCsv(file_name, user_name, company)
-        csv.write_file(correct_category)
-        if request.POST['radio'] != "no":
-            # If the user want to send the file to Google Drive
-            path_folder = request.user.username + "/CSV/output/"
-            path_file = 'MEDIA/' + request.user.username + \
-                "/CSV/output/" + request.session['filename']
-            path_file_diff = 'MEDIA/' + request.user.username + "/CSV/output/Difference of " + request.session[
-                'filename']
-            upload_to_google_drive.upload_to_drive(path_folder,
-                                                   'results of ' +
-                                                   request.session['filename'],
-                                                   "Difference of " +
-                                                   request.session['filename'],
-                                                   path_file,
-                                                   path_file_diff)
-    return redirect("/download")
-
-
-def handle_uploaded_file(f, username, filename):
-    """Just a precautionary step if signals.py doesn't work for any reason."""
-
-    data_directory_root = settings.MEDIA_ROOT
-    path = os.path.join(data_directory_root, username,
-                        "CSV", "input", filename)
-    path_input = os.path.join(data_directory_root, username, "CSV", "input")
-    path_output = os.path.join(data_directory_root, username, "CSV", "output")
-
-    if not os.path.exists(path_input):
-        os.makedirs(path_input)
-
-    if not os.path.exists(path_output):
-        os.makedirs(path_output)
-
-    with open(path, 'wb+') as destination:
-        for chunk in f.chunks():
-            destination.write(chunk)
-
 
 class CategoryListView(LoginRequiredMixin, ListView):
     """
@@ -229,7 +151,8 @@ class RegisterEmployeeView(LoginRequiredMixin, CreateView):
                     user=user_obj, organisation_name=org_name)
                 profile.save()
                 user_form = UserForm()
-                return render(request, './Venter/registration.html', {'user_form': user_form, 'successful_submit': True})
+                return render(request, './Venter/registration.html',
+                              {'user_form': user_form, 'successful_submit': True})
             except ValidationError as e:
                 user_form.add_error('password', e)
                 return render(request, './Venter/registration.html', {'user_form': user_form})
@@ -349,50 +272,13 @@ class FileSearchView(FilesListView):
 dict_data = {}
 domain_list = []
 
-
 @require_http_methods(["GET"])
 def predict_result(request, pk):
     global dict_data, domain_list
 
-    # input_file = File.objects.get(pk=pk)
-    # filename_no_extension = os.path.splitext(input_file.filename)[0]
-    # output_file_name = 'result_of_' + str(filename_no_extension) + '.json'
-    # print(output_file_name)
-
-    # if not input_file.has_prediction:
-    #     output_file_path = get_result_file_path(input_file, output_file_name)
-    #     with open(output_file_path, 'x'):
-    #         pass
-    #     print(f'Output file path is: {output_file_path}')
-
-    #     path_to_input_file = str(input_file.input_file.path)
-    #     print(f'Input file path is: {path_to_input_file}')
-
-    #     sm = SimilarityMapping(path_to_input_file)
-    #     output_dict = sm.driver()
-    #     print(
-    #         f'sm.driver result is output_dict. output_dict type is: {type(output_dict)}.')
-
-    #     if not output_dict:
-    #         error_message = "Something went wrong while categorizing..."
-    #     elif output_dict:
-    #         input_file.has_prediction = True
-    #         with open(output_file_path, 'w') as temp:
-    #             json.dump(output_dict, temp)
-
-    # else:
-    #     if os.path.exists(output_file_name):
-    #         with open(output_file_name, 'r') as f:
-    #             dict_data = json.load(f)
-    #     else:
-    #         error_message = "Error in loading file"
-
     path = os.path.join(settings.MEDIA_ROOT, 'out_new.json')
     json_data = open(path)
     dict_data = json.load(json_data)  # deserialises it
-
-    print("using dictionary data")
-    print(type(dict_data))
     dict_keys = dict_data.keys()
     domain_list = list(dict_keys)
 
@@ -404,7 +290,6 @@ def predict_result(request, pk):
 @require_http_methods(["GET"])
 def domain_contents(request):
     global domain_list
-    
     domain_name = request.GET.get('domain')
     domain_data = dict_data[domain_name]
     temp = ['Category']
@@ -412,7 +297,7 @@ def domain_contents(request):
     for subCat in domain_data['Novel']:
         temp.append('Sub category ' + str(index+1))
         index += 1
-    temp.append({'role':'style'})
+    temp.append({'role': 'style'})
     domain_stats = []
     domain_stats.append(temp)
 
@@ -421,21 +306,14 @@ def domain_contents(request):
         if category == 'Novel':
             column = ['Novel']
             for subCat in domain_data[category]:
-                print(subCat)
                 column.append(len(domain_data[category][subCat]))
             column.append('')
         else:
             for i in range(len(domain_stats[0]) - len(column)):
-                column.insert(2,0)
+                column.insert(2, 0)
         domain_stats.append(column)
 
     return render(request, './Venter/prediction_result.html', {
-        'domain_data': domain_data, 'domain_list': domain_list, 'domain_stats': jsonpickle.encode(domain_stats)
+        'domain_data': domain_data, 'domain_list': domain_list,
+        'domain_stats': jsonpickle.encode(domain_stats), 'chart_domain': domain_name
     })
-
-
-# def file_download(request, pk):
-#     input_file = File.objects.get(pk=pk)
-# book_instance = get_object_or_404(BookInstance, pk=pk)
-#     book_instance.status = STATUS_AVAILABLE
-#     book_instance.save()

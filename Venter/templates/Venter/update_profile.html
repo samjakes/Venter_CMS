@@ -15,13 +15,17 @@
         $("#updateProfileModal").modal('show');
     });
 </script>
+<!-- ../../static/assets/img/demo_profile_2.jpg -->
 {% endif %} 
 
 <div class="outer-profile">
     <div class="wrap-profile">
         <form method="post" name="form" enctype="multipart/form-data" class="profile-form">
             {% csrf_token %}
-            <img src="../../static/assets/img/default-avatar.png" alt="Avatar" class="profile-avatar"><br><br>
+            <img src="{{profile_form.profile_picture.url}}" alt="Avatar" class="profile-avatar"><br><br>
+            <script>
+                console.log('{{profile_form}}');
+            </script>    
             <div class="wrap-field">
 				<label class="org-label">Organisation Name: {{ request.user.profile.organisation_name }}</label>
 			</div>

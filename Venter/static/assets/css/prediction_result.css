@@ -77,8 +77,7 @@ Styling for prediction_result.html
     color:white;
 } */
 
-.content-navigator > .nav-pills > li > a,   
-.content-navigator > .nav-pills > li > a:focus{
+.content-navigator > .nav-pills > li > a{
   background-color: white;
   color: black;
   border: 1px solid black;
@@ -88,11 +87,6 @@ Styling for prediction_result.html
     color: blue;
     border: 1px solid black;
 }
-
-/* .content-navigator .nav-pills .nav-link.active{
-    background-color: blue;
-    color:white;
-} */
 
 .content-navigator ul > li.active > a{
     background-color: blue;
@@ -137,8 +131,9 @@ Styling for prediction_result.html
 
 .graph-container{
     width: 1150px;
-    height: 75vh;
+    height: 70vh;
     overflow-x: scroll;
+    overflow-y: scroll;
     background-color: white;
 }
 
@@ -158,4 +153,22 @@ Styling for prediction_result.html
     margin-bottom: 10px;
     overflow-y:scroll;
     -webkit-overflow-scrolling: touch;
+}
+
+.card-hr{
+    border: 3px solid black;
+}
+
+.download-fa{
+    font-size: 20px;
+}
+
+.chart-download-container{
+    position: relative;
+}
+
+.download_graph-btn{
+    float: right;
+    margin-top: 2%;
+    margin-right: 2%;
 }

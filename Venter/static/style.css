@@ -29,16 +29,18 @@ Styling for index.html
 /*
 Styling for base.html
 */
+
 .imagelogo-base {
     width: 140px;
+    height: 125px;
     display: block;
     margin-left: auto;
     margin-right: auto;
-    border-radius: 50%;
+    padding-top: 10px;
 }
 .content-base{
     height: 100vh;
     width:83vw;
-    margin-left: 6%;
+    margin-left: 7%;
 }
   
