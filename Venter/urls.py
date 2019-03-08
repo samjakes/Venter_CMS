@@ -25,13 +25,13 @@ urlpatterns = [
     # ex: /venter/category_list/civis/
     path('category_list/<organisation_name>', views.CategoryListView.as_view(), name='category_list'),
     # ex: /venter/dashboard/
-    path('dashboard/', views.FilesListView.as_view(), name='dashboard'),
+    path('dashboard/', views.FileListView.as_view(), name='dashboard'),
     # ex: /venter/contact_us/
     path('contact_us/', views.contact_us, name='contact_us'),
     # ex: /venter/search_category/
-    path('search_category/', views.CategorySearchView.as_view(), name='search_category'),
+    # path('search_category/', views.CategorySearchView.as_view(), name='search_category'),
     # ex: /venter/search_file/
-    path('search_file/', views.FileSearchView.as_view(), name='search_file'),
+    # path('search_file/', views.FileSearchView.as_view(), name='search_file'),
     # ex: /venter/predict_result/5/
     path('predict_result/<int:pk>', views.predict_result, name='predict_result'),
     # ex: /venter/domain_contents/

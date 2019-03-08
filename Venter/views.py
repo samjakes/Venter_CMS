@@ -24,6 +24,8 @@ from django.views.decorators.http import require_http_methods
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
 from django.views.generic.list import ListView
 
+from Backend.settings import MEDIA_ROOT
+
 from Venter.forms import ContactForm, CSVForm, ExcelForm, ProfileForm, UserForm
 from Venter.helpers import get_result_file_path
 from Venter.models import Category, File, Profile
@@ -162,10 +164,18 @@ class CategoryListView(LoginRequiredMixin, ListView):
         based on the organisation name passed in the parameter.
     """
     model = Category
-    paginate_by = 12
+    paginate_by = 10
 
     def get_queryset(self):
-        return Category.objects.filter(organisation_name=self.request.user.profile.organisation_name)
+
+        result = Category.objects.filter(organisation_name=self.request.user.profile.organisation_name)
+
+        query = self.request.GET.get('q','')
+
+        if query:
+            result = Category.objects.filter(category__icontains=query)
+
+        return result
 
 
 class UpdateProfileView(LoginRequiredMixin, UpdateView):
@@ -300,23 +310,7 @@ class FileDeleteView(LoginRequiredMixin, DeleteView):
         return self.post(request, *args, **kwargs)
 
 
-class CategorySearchView(CategoryListView):
-    paginate_by = 3
-
-    def get_queryset(self):
-        result = super(CategorySearchView, self).get_queryset()
-
-        query = self.request.GET.get('q')
-        if query:
-            query_list = query.split()
-            result = query.filter(
-                reduce(operator.and_,
-                       (Q(category__icontains=q) for q in query_list))
-            )
-        return result
-
-
-class FilesListView(LoginRequiredMixin, ListView):
+class FileListView(LoginRequiredMixin, ListView):
     model = File
     template_name = './Venter/dashboard.html'
     context_object_name = 'file_list'
@@ -324,26 +318,15 @@ class FilesListView(LoginRequiredMixin, ListView):
 
     def get_queryset(self):
         if self.request.user.is_staff:
-            return File.objects.filter(
-                uploaded_by__organisation_name=self.request.user.profile.organisation_name)
-        elif not self.request.user.is_staff and self.request.user.is_active:
-            return File.objects.filter(uploaded_by=self.request.user.profile)
-
-
-class FileSearchView(FilesListView):
-    paginate_by = 5
-
-    def get_queryset(self):
-        if self.request.user.is_staff:
             result = File.objects.filter(
                 uploaded_by__organisation_name=self.request.user.profile.organisation_name)
         elif not self.request.user.is_staff and self.request.user.is_active:
-            result = File.objects.filter(uploaded_by=self.request.user.profile)
+            result =  File.objects.filter(uploaded_by=self.request.user.profile)
 
-        query = self.request.GET.get('q')
-        search_result = [
-            file_obj for file_obj in result if query in file_obj.filename]
-        return search_result
+        query = self.request.GET.get('q','')
+        if query:
+            result = [file_obj for file_obj in result if query in file_obj.filename.lower()]
+        return result
 
 
 @require_http_methods(["GET"])
@@ -351,45 +334,52 @@ def predict_result(request, pk):
     global dict_data, domain_list
 
     filemeta = File.objects.get(pk=pk)
+    if not filemeta.has_prediction:
+        output_directory_path = os.path.join(MEDIA_ROOT, f'{filemeta.uploaded_by.organisation_name}/{filemeta.uploaded_by.user.username}/{filemeta.uploaded_date.date()}/output')
 
-    sm = SimilarityMapping(filemeta.csv_file)
-    results = sm.driver()
+        if not output_directory_path:
+            os.makedirs(output_directory_path)
 
-    output_directory_path = os.path.join(MEDIA_ROOT, f'{filemeta.uploaded_by.organisation_name}/{filemeta.uploaded_by.user.username}/{filemeta.uploaded_date.date()}/output')
+        output_file_path_json = os.path.join(output_directory_path, 'results.json')
+        output_file_path_xlsx = os.path.join(output_directory_path, 'results.xlsx')
 
-    os.makedirs(output_directory_path)
+        sm = SimilarityMapping(filemeta.input_file.path)
+        dict_data = sm.driver()
 
-    output_file_path_json = os.path.join(output_directory_path, 'results.json')
-    output_file_path_xlsx = os.path.join(output_directory_path, 'results.xlsx')
+        if dict_data:
+            filemeta.has_prediction = True
 
-    with open(output_file_path, 'w') as temp:
-        json.dump(results, temp)
+        with open(output_file_path_json, 'w') as temp:
+            json.dump(dict_data, temp)
 
-    print('JSON output saved.')
-    print('Done.')
+        print('JSON output saved.')
+        print('Done.')
 
-    filemeta.output_file_json = output_file_path
+        filemeta.output_file_json = output_file_path_json
 
-    download_output = pd.ExcelWriter(output_file_path_xlsx, engine='xlsxwriter')
+        download_output = pd.ExcelWriter(output_file_path_xlsx, engine='xlsxwriter')
 
-    for domain in results:
-        print('Writing Excel for domain %s' % domain)
-        df = pd.DataFrame({ key:pd.Series(value) for key, value in results[domain].items() })
-        df.to_excel(download_output, sheet_name=domain)
-    download_output.save()
+        for domain in dict_data:
+            print('Writing Excel for domain %s' % domain)
+            df = pd.DataFrame({ key:pd.Series(value) for key, value in dict_data[domain].items() })
+            df.to_excel(download_output, sheet_name=domain)
+        download_output.save()
 
-
-    dict_keys = results.keys()
+        filemeta.output_file_xlsx = output_file_path_xlsx
+        filemeta.save()
+    else:
+        dict_data = json.load(filemeta.output_file_json)
+    dict_keys = dict_data.keys()
     domain_list = list(dict_keys)
 
     return render(request, './Venter/prediction_result.html', {
-        'domain_list': domain_list, 'dict_data': results
+        'domain_list': domain_list, 'dict_data': dict_data
     })
 
 
 @require_http_methods(["GET"])
 def domain_contents(request):
-    global domain_list
+    global dict_data, domain_list
 
 
     domain_name = request.GET.get('domain')
@@ -408,7 +398,6 @@ def domain_contents(request):
         if category == 'Novel':
             column = ['Novel']
             for subCat in domain_data[category]:
-                print(subCat)
                 column.append(len(domain_data[category][subCat]))
             column.append('')
         else:

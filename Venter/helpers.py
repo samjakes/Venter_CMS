@@ -1,12 +1,14 @@
 """Helper functions for Venter modules."""
 
+import os
+
 def get_file_upload_path(instance, filename):
     """
     Returns a custom MEDIA path for files uploaded by a user
     Eg: /MEDIA/CSV Files/xyz/user1/2019-02-06/file1.csv
     """
     return os.path.join(
-        f'CSV_Files/{instance.uploaded_by.profile.organisation_name}/{instance.uploaded_by.profile.user.username}/{instance.uploaded_date.date()}/{filename}')
+        f'{instance.uploaded_by.organisation_name}/{instance.uploaded_by.user.username}/{instance.uploaded_date.date()}/input/{filename}')
 
 def get_organisation_logo_path(instance, filename):
     """
@@ -31,14 +33,3 @@ def get_result_file_path(instance, filename):
     """
     return os.path.join(
         f'Output Result Files/{instance.uploaded_by.organisation_name}/{instance.uploaded_by.user.username}/{instance.uploaded_date.date()}/{filename}')
-
-def create_org():
-    """Helper function for creating organisations during tests."""
-    return Organisation.objects.create(organisation_name="Test Org")
-
-def create_profile():
-    """Helper function for creating test user and test profile."""
-    user = User.objects.create_user('Test')
-    org = create_org()
-    return Profile.objects.create(user=user, organisation_name=org)
-    

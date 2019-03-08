@@ -2,6 +2,7 @@ import os
 from datetime import date, datetime
 
 from django.contrib.auth.models import User
+from django.core.files.storage import default_storage
 from django.core.validators import RegexValidator
 from django.db import models
 
@@ -141,8 +142,8 @@ class File(models.Model):
     has_prediction = models.BooleanField(
         default=False,
     )
-    output_file_json = models.FileField()
-    output_file_xlsx = models.FileField()
+    output_file_json = models.FileField(blank=True)
+    output_file_xlsx = models.FileField(blank=True)
 
     @property
     def filename(self):
@@ -155,6 +156,15 @@ class File(models.Model):
     def output_name(self):
         return os.path.basename(self.output_file.name)
 
+    def delete(self):
+        if self.output_file_json:
+            default_storage.delete(self.output_file_json)
+        if self.output_file_xlsx:
+            default_storage.delete(self.output_file_xlsx)
+        default_storage.delete(self.input_file)
+        print("\n\nInput file should be gone\n\n")
+        super().delete()
 
     class Meta:
         verbose_name_plural = 'File'
+        ordering=["-uploaded_date"]
