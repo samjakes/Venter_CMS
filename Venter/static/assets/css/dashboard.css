@@ -17,8 +17,12 @@ Styling for dashboard_staff.html
 }
 
 .inner-db-file{
-    height: 90vh;
-    width: 80vw;
+    padding-top: 2vh;
+    padding: 1vw; 
+    max-height: 100vh;
+    max-width: 100vw;
+    align-items: center;
+    justify-content: center;
 }
 
 .inner-db-no-file {
@@ -68,8 +72,7 @@ Styling for dashboard_staff.html
 .fa{
   font-size:160px;
   text-align: center;
-  vertical-align: bottom;
-  padding-right: 130px;
+  vertical-align: center;
 }
 
 .plus-fa{
@@ -81,6 +84,7 @@ Styling for dashboard_staff.html
     font-size: 30px;
     display: block;
     margin: auto;
+    text-align: center;
 }
 
 .trash-fa{
@@ -88,16 +92,23 @@ Styling for dashboard_staff.html
     font-size: 30px;
     display: block;
     margin: auto;
+    text-align: center;
 }
 
 .download-fa{
     font-size: 30px;
-    display: block;
-    margin: auto;
+    display: inline;
+    text-align: center;
 }
 
 table, th, td{
     font-family: 'Times New Roman', Times, serif;
+    text-align: center !important;
+}
+
+/* Refer to light-bootstrap-dashboard.css for the property given below.*/
+.table>thead>tr>th {
+    text-align: center !important;
 }
 
 .table .thead-dark th {
