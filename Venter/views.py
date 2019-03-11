@@ -1,25 +1,23 @@
 import datetime
 import json
-import operator
 import os
-from functools import reduce
 
 import jsonpickle
-from django.conf import settings
+import pandas as pd
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.mixins import (LoginRequiredMixin,
-                                        PermissionRequiredMixin)
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import Permission, User
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 from django.core.mail import mail_admins
-from django.db.models import Q
 from django.shortcuts import render
 from django.urls import reverse_lazy
 from django.views.decorators.cache import never_cache
 from django.views.decorators.http import require_http_methods
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
 from django.views.generic.list import ListView
+
+from Backend.settings import MEDIA_ROOT
 
 from Venter.forms import ContactForm, CSVForm, ExcelForm, ProfileForm, UserForm
 from Venter.models import Category, File, Profile
@@ -84,10 +82,18 @@ class CategoryListView(LoginRequiredMixin, ListView):
         based on the organisation name passed in the parameter.
     """
     model = Category
-    paginate_by = 12
+    paginate_by = 10
 
     def get_queryset(self):
-        return Category.objects.filter(organisation_name=self.request.user.profile.organisation_name)
+
+        result = Category.objects.filter(organisation_name=self.request.user.profile.organisation_name)
+
+        query = self.request.GET.get('q', '')
+
+        if query:
+            result = Category.objects.filter(category__icontains=query)
+
+        return result
 
 
 class UpdateProfileView(LoginRequiredMixin, UpdateView):
@@ -223,38 +229,11 @@ class FileDeleteView(LoginRequiredMixin, DeleteView):
         return self.post(request, *args, **kwargs)
 
 
-class CategorySearchView(CategoryListView):
-    paginate_by = 3
-
-    def get_queryset(self):
-        result = super(CategorySearchView, self).get_queryset()
-
-        query = self.request.GET.get('q')
-        if query:
-            query_list = query.split()
-            result = query.filter(
-                reduce(operator.and_,
-                       (Q(category__icontains=q) for q in query_list))
-            )
-        return result
-
-
-class FilesListView(LoginRequiredMixin, ListView):
+class FileListView(LoginRequiredMixin, ListView):
     model = File
     template_name = './Venter/dashboard.html'
     context_object_name = 'file_list'
     paginate_by = 8
-
-    def get_queryset(self):
-        if self.request.user.is_staff:
-            return File.objects.filter(
-                uploaded_by__organisation_name=self.request.user.profile.organisation_name)
-        elif not self.request.user.is_staff and self.request.user.is_active:
-            return File.objects.filter(uploaded_by=self.request.user.profile)
-
-
-class FileSearchView(FilesListView):
-    paginate_by = 5
 
     def get_queryset(self):
         if self.request.user.is_staff:
@@ -263,11 +242,10 @@ class FileSearchView(FilesListView):
         elif not self.request.user.is_staff and self.request.user.is_active:
             result = File.objects.filter(uploaded_by=self.request.user.profile)
 
-        query = self.request.GET.get('q')
-        search_result = [
-            file_obj for file_obj in result if query in file_obj.filename]
-        return search_result
-
+        query = self.request.GET.get('q', '')
+        if query:
+            result = [file_obj for file_obj in result if query in file_obj.filename.lower()]
+        return result
 
 dict_data = {}
 domain_list = []
@@ -276,9 +254,42 @@ domain_list = []
 def predict_result(request, pk):
     global dict_data, domain_list
 
-    path = os.path.join(settings.MEDIA_ROOT, 'out_new.json')
-    json_data = open(path)
-    dict_data = json.load(json_data)  # deserialises it
+    filemeta = File.objects.get(pk=pk)
+    if not filemeta.has_prediction:
+        output_directory_path = os.path.join(MEDIA_ROOT, f'{filemeta.uploaded_by.organisation_name}/{filemeta.uploaded_by.user.username}/{filemeta.uploaded_date.date()}/output')
+
+        if not output_directory_path:
+            os.makedirs(output_directory_path)
+
+        output_file_path_json = os.path.join(output_directory_path, 'results.json')
+        output_file_path_xlsx = os.path.join(output_directory_path, 'results.xlsx')
+
+        sm = SimilarityMapping(filemeta.input_file.path)
+        dict_data = sm.driver()
+
+        if dict_data:
+            filemeta.has_prediction = True
+
+        with open(output_file_path_json, 'w') as temp:
+            json.dump(dict_data, temp)
+
+        print('JSON output saved.')
+        print('Done.')
+
+        filemeta.output_file_json = output_file_path_json
+
+        download_output = pd.ExcelWriter(output_file_path_xlsx, engine='xlsxwriter')
+
+        for domain in dict_data:
+            print('Writing Excel for domain %s' % domain)
+            df = pd.DataFrame({key:pd.Series(value) for key, value in dict_data[domain].items()})
+            df.to_excel(download_output, sheet_name=domain)
+        download_output.save()
+
+        filemeta.output_file_xlsx = output_file_path_xlsx
+        filemeta.save()
+    else:
+        dict_data = json.load(filemeta.output_file_json)
     dict_keys = dict_data.keys()
     domain_list = list(dict_keys)
 
@@ -289,7 +300,9 @@ def predict_result(request, pk):
 
 @require_http_methods(["GET"])
 def domain_contents(request):
-    global domain_list
+    global dict_data, domain_list
+
+
     domain_name = request.GET.get('domain')
     domain_data = dict_data[domain_name]
     temp = ['Category']

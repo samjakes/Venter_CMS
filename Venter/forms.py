@@ -4,7 +4,7 @@ from django.core.validators import (EmailValidator, FileExtensionValidator,
                                     RegexValidator)
 
 from Backend import settings
-from Venter.models import File, Profile
+from Venter.models import File, Header, Profile
 
 from .validate import input_file_header_validation
 
@@ -80,9 +80,24 @@ class ExcelForm(forms.ModelForm):
         self.request = kwargs.pop("request")
         super(ExcelForm, self).__init__(*args, **kwargs)
 
+class ExcelForm(forms.ModelForm):
+    csv_file = forms.FileField(
+        widget=forms.FileInput(),
+        required=True,
+        validators=[FileExtensionValidator(allowed_extensions=['xlsx'])],
+    )
+    class Meta:
+        model = File
+        fields = ('csv_file',)
+
+    def __init__(self, *args, **kwargs):
+        """
+        It accepts the self.request argument, here for the purpose of accessing the logged-in user's organisation name
+        """
+        self.request = kwargs.pop("request")
+        super(ExcelForm, self).__init__(*args, **kwargs)
 
 class UserForm(forms.ModelForm):
-
     """
     Modelform, generated from Django's user model.
 
@@ -137,7 +152,6 @@ class ContactForm(forms.Form):
         attrs={'class': 'form-control', 'placeholder': 'Email'}), required=True, validators=[EmailValidator])
     contact_no = forms.CharField(widget=forms.TextInput(
         attrs={'class': 'form-control', 'placeholder': 'Contact Number'}), required=True, max_length=10,
-                                 validators=[RegexValidator(
-                                     regex=r'^[6-9]\d{9}$', message='Please enter a valid phone number')])
+        validators=[RegexValidator(regex=r'^[6-9]\d{9}$', message='Please enter a valid phone number')])
     requirement_details = forms.CharField(widget=forms.Textarea(
-        attrs={'class': 'form-control', 'placeholder': 'Requirement Details'}), required=True)
+        attrs={'class': 'form-control', 'placeholder': 'Requirement'}), required=True)

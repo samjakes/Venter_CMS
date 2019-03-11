@@ -50,7 +50,6 @@ gensim==3.4.0
 google-api-python-client==1.7.3
 google-auth==1.5.0
 google-auth-httplib2==0.0.3
-greenlet==0.4.13
 grpcio==1.15.0
 gspread==3.0.1
 gunicorn==19.8.1

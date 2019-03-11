@@ -11,7 +11,7 @@
   <div class="inner-db-file">
     <div class="row">
       <div class="col-sm-9">
-        <form action="{% url 'search_file' %}" method="get">
+        <form action="{% url 'dashboard' %}" method="get">
             <div class="form-group row">
                 <div class="col-sm-1">
                   <input type="submit" value="Search" class="btn btn-primary active">
@@ -32,7 +32,7 @@
     </div><br>
     <table class="table table-hover">
       <thead class="thead-dark">
-        <tr> 
+        <tr>
           <th>File</th>
           <th>Uploaded By</th>
           <th>Upload Date</th>
@@ -48,7 +48,7 @@
         {% for file in file_list %}
         <tr>
           <td>{{ file.filename }}</td>
-          <td>{{ file.uploaded_by}}</td>
+          <td>{{ file.uploaded_by  }}</td>
           <td>{{ file.uploaded_date.date }}</td>
           <td>{{ file.uploaded_date.astimezone.time }}</td>
           <td>
@@ -57,21 +57,23 @@
             </a>
           </td>
           <td>
-              <a href="https://www.google.com/url?q=https://drive.google.com/file/d/1MxKVU-SoYRAQ69ZAscLnfIruBDY2OZeq/view?usp%3Ddrivesdk&sa=D&source=hangouts&ust=1551784106292000&usg=AFQjCNHkYlm1NKsZbuSoc113nrCq_ElreQ", download="results.xlsx">
-                  <i class="fa fa-download download-fa" aria-hidden="true"></i>
+                <a href="{{file.output_file_xlsx}}", download="results.xlsx">
+                    <i class="fa fa-download download-fa" aria-hidden="true"></i>
+                </a>
+            </td>
+            {% if user.is_staff == True %}
+            <td>
+              <a href="{% url 'delete_file' file.pk %}">
+                  <i class="fa fa-trash-o trash-fa" aria-hidden="true"></i>
               </a>
-          </td>
-          {% if user.is_staff == True %}
-          <td>
-            <a href="{% url 'delete_file' file.pk %}">
-                <i class="fa fa-trash-o trash-fa" aria-hidden="true"></i>
-            </a>
-          </td>
-          {% endif %}
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
+            </td>
+            {% endif %}
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
 
     <div class="div-pagination">
         {% block pagination %}
@@ -79,14 +81,14 @@
         <ul class="pagination justify-content-center">
           {% if page_obj.has_previous %}
           <li class="page-item">
-            <a class="page-link" href="{{ request.path }}?page={{ page_obj.previous_page_number }}">Previous</a>
+            <a class="page-link" href="{{ request.path }}?page={{ page_obj.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">Previous</a>
           </li>
           {% else %}
           <li class="page-item" disabled="">
             <a class="page-link">Previous</a>
           </li>
           {% endif %}
-  
+
           {% for i in paginator.page_range %}
           {% if page_obj.number == i %}
           <li class="page-item active">
@@ -94,14 +96,14 @@
           </li>
           {% else %}
           <li class="page-item">
-            <a class="page-link" href="?page={{ i }}">{{ i }}</a>
+            <a class="page-link" href="?page={{ i }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">{{ i }}</a>
           </li>
           {% endif %}
           {% endfor %}
-  
+
           {% if page_obj.has_next %}
           <li class="page-item">
-            <a class="page-link" href="{{ request.path }}?page={{ page_obj.next_page_number }}">Next</a>
+            <a class="page-link" href="{{ request.path }}?page={{ page_obj.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">Next</a>
           </li>
           {% else %}
           <li class="page-item" disabled="">
