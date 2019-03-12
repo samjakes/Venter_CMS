@@ -144,7 +144,7 @@
     google.visualization.events.addListener(chart, 'ready', function () {
         var imgUri = chart.getImageURI();
         $('#download_graph-btn').click(function() {
-          download(imgUri, "domain_chart.png", "image/png");
+          download(imgUri, "{{chart_domain}}.png", "image/png");
         });
     });
     chart.draw(data, options);
