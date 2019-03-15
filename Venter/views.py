@@ -1,7 +1,7 @@
 import datetime
 import json
 import os
-
+import operator
 import jsonpickle
 import pandas as pd
 from django.contrib.auth.decorators import login_required
@@ -17,13 +17,13 @@ from django.views.decorators.http import require_http_methods
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
 from django.views.generic.list import ListView
 
+# import Venter.upload_to_google_drive
 from Backend.settings import MEDIA_ROOT
-
 from Venter.forms import ContactForm, CSVForm, ExcelForm, ProfileForm, UserForm
 from Venter.models import Category, File, Profile
 
 from .ML_model.Civis.modeldriver import SimilarityMapping
-
+from .ML_model.ICMC.model.ClassificationService import ClassificationService
 
 @login_required
 @never_cache
@@ -258,9 +258,10 @@ def predict_result(request, pk):
     if not filemeta.has_prediction:
         output_directory_path = os.path.join(MEDIA_ROOT, f'{filemeta.uploaded_by.organisation_name}/{filemeta.uploaded_by.user.username}/{filemeta.uploaded_date.date()}/output')
 
-        if not output_directory_path:
+        if not os.path.exists(output_directory_path):
             os.makedirs(output_directory_path)
 
+        print(output_directory_path)
         output_file_path_json = os.path.join(output_directory_path, 'results.json')
         output_file_path_xlsx = os.path.join(output_directory_path, 'results.xlsx')
 
@@ -302,7 +303,6 @@ def predict_result(request, pk):
 def domain_contents(request):
     global dict_data, domain_list
 
-
     domain_name = request.GET.get('domain')
     domain_data = dict_data[domain_name]
     temp = ['Category']
@@ -330,3 +330,53 @@ def domain_contents(request):
         'domain_data': domain_data, 'domain_list': domain_list,
         'domain_stats': jsonpickle.encode(domain_stats), 'chart_domain': domain_name
     })
+
+@require_http_methods(["POST", "GET"])
+def predict_csv(request, pk):
+    """This function is used to handle the selected categories by the user"""
+
+    file_object = File.objects.get(pk=pk)
+    file_name = file_object.filename
+    print(file_name)
+
+    input_file_path = os.path.join(MEDIA_ROOT, f'{file_object.uploaded_by.organisation_name}/{file_object.uploaded_by.user.username}/{file_object.uploaded_date.date()}/input/{file_name}')
+
+    csvfile = pd.read_csv(input_file_path, sep=',', header=0, encoding='utf-8')
+    complaint_description = []
+
+    dict_list = []
+    rows = csvfile.shape[0]
+
+    if str(request.user.profile.organisation_name) == 'ICMC':
+        model = ClassificationService()
+        category_list = Category.objects.filter(organisation_name='ICMC').values_list('category', flat=True)
+
+    elif str(request.user.profile.organisation_name) == "SpeakUp":
+        pass
+
+    for row in csvfile.iterrows():
+        row_dict = {} 
+        index, data = row 
+        row_dict['index'] = index
+
+        if str(request.user.profile.organisation_name) == "ICMC":
+            complaint_description.append(data['complaint_description'])
+            row_dict['problem_description'] = complaint_description
+            row_dict['category'] = dict()
+
+        else:
+            continue
+            data = data.dropna(subset=["text"])
+            complaint_description = data['text']
+            cats = model.get_top_3_cats_with_prob(complaint_description)
+
+        dict_list.append(row_dict)
+        print("--------------------ROW OVER-----------")
+    try:
+        cats = model.get_top_3_cats_with_prob(complaint_description)
+        print('*************PREDICTION RESULTS********************')
+        print(cats)
+    except Exception as e:
+        pass
+    
+    return render(request, './Venter/predict_categories.html', {'dict_list': dict_list, 'category_list': category_list, 'rows':rows})

@@ -1,5 +1,4 @@
 """Helper functions for Venter modules."""
-
 import os
 from datetime import date
 def get_file_upload_path(instance, filename):

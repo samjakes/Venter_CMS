@@ -7,3 +7,4 @@ media/**
 htmlcov/
 Venter/ML_model/Civis/GoogleNews-vectors-negative300.bin
 stats.txt
+Venter/ML_model/Civis/data/**

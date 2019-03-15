@@ -113,7 +113,7 @@ STATICFILES_DIRS = [
 ]
 MEDIA_URL = '/media/'
 
-MEDIA_ROOT = os.path.join(BASE_DIR, "MEDIA/")
+MEDIA_ROOT = os.path.join(BASE_DIR, "MEDIA")
 
 LOGIN_REDIRECT_URL = 'upload_file'
 LOGIN_URL = 'login'

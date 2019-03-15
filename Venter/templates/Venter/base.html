@@ -31,14 +31,9 @@
 <body>
     <!---lightboard template-->
     <div class="wrapper">
-        <div class="container">
-            {% if user.is_authenticated %}
-            <script>
-                console.log("----")
-                console.log('{{user.profile.organisation_name}}')
-            </script>
+        {% if user.is_authenticated %}
             <!--Side Nav Bar--->
-            <div class="sidebar" data-image="../../static/assets/img/sidebar-5.jpg" data-color="blue">
+        <div class="sidebar" data-image="../../static/assets/img/sidebar-5.jpg" data-color="blue">
                 <div class="sidebar-wrapper">
                     <div class="logo-nav">
                         <a href="{% url 'home' %}" class="simple-text">
@@ -94,15 +89,12 @@
                         </li>
                     </ul>
                 </div>
-            </div>
-            <div class="content-base">
-                <div class="container-fluid">
-                    {% block content %}
-                    {% endblock %}
-                </div>
-            </div>
-            {% endif %}
         </div>
+        <div class="main-panel">
+            {% block content %}
+            {% endblock %}                
+        </div>
+        {% endif %}
     </div>
 </body>
 <!--   Core JS Files   -->
