@@ -80,22 +80,6 @@ class ExcelForm(forms.ModelForm):
         self.request = kwargs.pop("request")
         super(ExcelForm, self).__init__(*args, **kwargs)
 
-class ExcelForm(forms.ModelForm):
-    csv_file = forms.FileField(
-        widget=forms.FileInput(),
-        required=True,
-        validators=[FileExtensionValidator(allowed_extensions=['xlsx'])],
-    )
-    class Meta:
-        model = File
-        fields = ('csv_file',)
-
-    def __init__(self, *args, **kwargs):
-        """
-        It accepts the self.request argument, here for the purpose of accessing the logged-in user's organisation name
-        """
-        self.request = kwargs.pop("request")
-        super(ExcelForm, self).__init__(*args, **kwargs)
 
 class UserForm(forms.ModelForm):
     """

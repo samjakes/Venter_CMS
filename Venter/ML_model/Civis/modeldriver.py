@@ -16,10 +16,4 @@ class SimilarityMapping:
         csvparser.parse(self.filepath)
         results = sentencemodel.categorizer()
 
-        downloadOutput = pd.ExcelWriter('results.xlsx', engine='xlsxwriter')
-
-        for domain in results:
-            print('Writing Excel for domain %s' % domain)
-            df = pd.DataFrame({ key:pd.Series(value) for key, value in results[domain].items() })
-            df.to_excel(downloadOutput, sheet_name=domain)
-        downloadOutput.save()
+        return results

@@ -337,7 +337,7 @@ def predict_result(request, pk):
     if not filemeta.has_prediction:
         output_directory_path = os.path.join(MEDIA_ROOT, f'{filemeta.uploaded_by.organisation_name}/{filemeta.uploaded_by.user.username}/{filemeta.uploaded_date.date()}/output')
 
-        if not output_directory_path:
+        if not os.path.exists(output_directory_path):
             os.makedirs(output_directory_path)
 
         output_file_path_json = os.path.join(output_directory_path, 'results.json')

@@ -162,7 +162,6 @@ class File(models.Model):
         if self.output_file_xlsx:
             default_storage.delete(self.output_file_xlsx)
         default_storage.delete(self.input_file)
-        print("\n\nInput file should be gone\n\n")
         super().delete()
 
     class Meta:
