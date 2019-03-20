@@ -72,14 +72,14 @@
                             </a>
                         </li>
 
-                        <!-- {% if request.user.profile.organisation_name != "CIVIS" %}
+                        {% if request.user.profile.organisation_name|stringformat:"s" != "CIVIS" %}
                         <li class="category-list-item">
-                            <a class="nav-link" href="{% url 'category_list' request.user %}">
+                            <a class="nav-link" href="{% url 'category_list' %}">
                                 <i class="nc-icon nc-bullet-list-67"></i>
                                 <p>Category List</p>
                             </a>
                         </li>
-                        {% endif %} -->
+                        {% endif %}
 
                         <li class="nav-item active active-pro">
                             <a class="nav-link active" href="{% url 'logout' %}">

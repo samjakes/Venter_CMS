@@ -1,7 +1,6 @@
 import datetime
 import json
 import os
-import operator
 import jsonpickle
 import pandas as pd
 from django.contrib.auth.decorators import login_required
@@ -82,7 +81,7 @@ class CategoryListView(LoginRequiredMixin, ListView):
         based on the organisation name passed in the parameter.
     """
     model = Category
-    paginate_by = 10
+    paginate_by = 13
 
     def get_queryset(self):
 
@@ -92,7 +91,6 @@ class CategoryListView(LoginRequiredMixin, ListView):
 
         if query:
             result = Category.objects.filter(category__icontains=query)
-
         return result
 
 
@@ -337,46 +335,48 @@ def predict_csv(request, pk):
 
     file_object = File.objects.get(pk=pk)
     file_name = file_object.filename
-    print(file_name)
 
     input_file_path = os.path.join(MEDIA_ROOT, f'{file_object.uploaded_by.organisation_name}/{file_object.uploaded_by.user.username}/{file_object.uploaded_date.date()}/input/{file_name}')
 
     csvfile = pd.read_csv(input_file_path, sep=',', header=0, encoding='utf-8')
-    complaint_description = []
+    complaint_description = list(csvfile['complaint_description'])
+
+    print("----type of complaint_description---")
+    print(type(complaint_description))
+    print(csvfile['complaint_description'].shape)
+    # print(complaint_description)
 
     dict_list = []
     rows = csvfile.shape[0]
 
     if str(request.user.profile.organisation_name) == 'ICMC':
         model = ClassificationService()
-        category_list = Category.objects.filter(organisation_name='ICMC').values_list('category', flat=True)
+        category_queryset = Category.objects.filter(organisation_name='ICMC').values_list('category', flat=True)
+        category_list = list(category_queryset)
 
     elif str(request.user.profile.organisation_name) == "SpeakUp":
         pass
+        #do stuff
+        # model = SpeakupClassificationService()
+        # category_list = Category.objects.filter(organisation_name='SpeakUp').values_list('category', flat=True)
 
-    for row in csvfile.iterrows():
-        row_dict = {} 
-        index, data = row 
+    cats = model.get_top_3_cats_with_prob(complaint_description)
+
+    for row, complaint, scores in zip(csvfile.iterrows(), complaint_description, cats):
+        row_dict = {}
+        index, data = row
         row_dict['index'] = index
 
         if str(request.user.profile.organisation_name) == "ICMC":
-            complaint_description.append(data['complaint_description'])
-            row_dict['problem_description'] = complaint_description
-            row_dict['category'] = dict()
-
+            row_dict['problem_description'] = complaint
+            row_dict['category'] = scores
+            row_dict['highest_confidence'] = list(row_dict['category'].values())[0]
         else:
             continue
             data = data.dropna(subset=["text"])
             complaint_description = data['text']
             cats = model.get_top_3_cats_with_prob(complaint_description)
-
         dict_list.append(row_dict)
-        print("--------------------ROW OVER-----------")
-    try:
-        cats = model.get_top_3_cats_with_prob(complaint_description)
-        print('*************PREDICTION RESULTS********************')
-        print(cats)
-    except Exception as e:
-        pass
-    
-    return render(request, './Venter/predict_categories.html', {'dict_list': dict_list, 'category_list': category_list, 'rows':rows})
+    dict_list = sorted(dict_list, key=lambda k: k['highest_confidence'], reverse=True)
+
+    return render(request, './Venter/prediction_table.html', {'dict_list': dict_list, 'category_list': category_list, 'rows':rows})

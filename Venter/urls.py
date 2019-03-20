@@ -22,7 +22,7 @@ urlpatterns = [
     # ex: /venter/delete_file/5/
     path('delete_file/<int:pk>', views.FileDeleteView.as_view(), name='delete_file'),
     # ex: /venter/category_list/civis/
-    path('category_list/<organisation_name>', views.CategoryListView.as_view(), name='category_list'),
+    path('category_list/', views.CategoryListView.as_view(), name='category_list'),
     # ex: /venter/dashboard/
     path('dashboard/', views.FileListView.as_view(), name='dashboard'),
     # ex: /venter/contact_us/

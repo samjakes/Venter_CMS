@@ -5,16 +5,11 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 <link rel="stylesheet" href="../../static/assets/css/dashboard.css">
 <script>
-  // $( "#predict-button" ).on( "click", function() {
-
-  // });
   function showloading(){
     document.getElementById('loader').style.display="block";
     document.getElementById('predict-button').style.display="none";
-    // document.getElementById('predict-button').disabled = true;
   }
 </script>  
- 
 
   {% if file_list %}
   <div class="inner-db-file">
@@ -55,12 +50,6 @@
         </tr>
       </thead>
       <tbody>
-          <script>
-              console.log("***inside dashboard*****");
-              console.log(user.profile.organisation_name);
-              console.log(typeof(user.profile.organisation_name));
-          </script> 
-
         {% for file in file_list %}
         <tr>
           <td>{{ file.filename }}</td>
@@ -68,25 +57,28 @@
           <td>{{ file.uploaded_date.date }}</td>
           <td>{{ file.uploaded_date.astimezone.time }}</td>
           <td>
-           
-            {% if request.user.profile.organisation_name == 'Civis' %}
+            <script>
+              console.log('{{file.uploaded_by.organisation_name}}');
+              console.log(typeof('{{file.uploaded_by.organisation_name}}'));
+              console.log('{{file.uploaded_by.organisation_name}}'=='CIVIS');
+            </script>
+            {% if file.uploaded_by.organisation_name|stringformat:"s" == 'CIVIS' %}
                 {% if not file.has_prediction %}
-                <a href="{% url 'predict_result' file.pk %}">
-                  <button class="btn btn-primary predict-button" onclick="showloading();" id="predict-button">Categorize</button>
-                </a>
-                <div class="loader" id="loader"></div>
+                  <a href="{% url 'predict_result' file.pk %}">
+                    <button class="btn btn-primary predict-button" onclick="showloading();" id="predict-button">Categorize</button>
+                  </a>
+                  <div class="loader" id="loader"></div>
                 {% else %}
-                <a href="{% url 'predict_result' file.pk %}">
-                    <button class="btn btn-success view-button">View</button>
-                </a>
+                  <a href="{% url 'predict_result' file.pk %}">
+                      <button class="btn btn-success view-button">View</button>
+                  </a>
                 {% endif %}
             {% else %}
                 <a href="{% url 'predict_csv' file.pk %}">
                   <button class="btn btn-primary predict-button">Predict CSV</button>
                 </a>
-            {% endif %}    
+            {% endif %}
           </td>
-
           <td>
             <a href="{{file.output_file_xlsx}}", download="results.xlsx">
               <i class="fa fa-download download-fa" aria-hidden="true"></i>

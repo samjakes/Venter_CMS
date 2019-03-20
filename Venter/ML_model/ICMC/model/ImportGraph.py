@@ -167,6 +167,8 @@ class ImportGraph:
     def run(self, data):
         """ Running the activation operation previously imported """
         # The 'x' corresponds to name of input placeholder
+        print(')()()()()()()()()()()()()(')
+        print({self.X: data.shape})
         return self.sess.run(self.probs, feed_dict={self.X: data})
 
     def process_query(self, data, flag):

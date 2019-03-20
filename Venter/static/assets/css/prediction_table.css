@@ -1,0 +1,85 @@
+/*
+Styling for prediction_table.html
+*/
+
+.outer-pt{
+    background-color: whitesmoke;
+    height: 100vh;
+    justify-content: center;
+    padding-top: 2vh;
+}
+
+.inner-pt{
+    padding-top: 2vh;
+    padding: 1vw; 
+    max-height: 100vh;
+    max-width: 100vw;
+    align-items: center;
+    justify-content: center;
+}
+
+.table-cell-cat{
+    width: 40%;
+}
+
+.table>thead>tr>th {
+    text-align: center !important;
+}
+
+.table td{
+    font-family: 'Times New Roman', Times, serif;
+}
+
+.table{
+    background-color: white;
+}
+
+.added-category{
+    border-radius:5px;
+    -moz-border-radius:5px;
+    -webkit-border-radius:5px;
+  }
+
+.plus-fa{
+    color:#ffffff;
+}
+
+.table-cell-conf-score{
+    text-align: center !important;
+    font-weight: bold;
+}
+
+.category_list{
+    height: 148px;
+    overflow-x: scroll;
+    overflow-y: scroll;
+}
+
+.delete-fa{
+    color: white;
+    font-size: 15px;
+}
+
+.delete-category-btn{
+    background-color: #ff9999;
+    border-radius: 50%;
+    border: none;
+    width: 25px;
+    height: 25px;
+    vertical-align: middle;
+    margin: 0 auto;
+    padding: 0;
+    display: table-cell;
+}
+.delete-category-btn:hover{
+    background-color: #c52323;
+}
+
+.add-category-btn{
+    background-color: #4f92c9;
+    border-radius: 5px;
+    border: none;
+}
+.add-category-btn:hover{
+    background-color: #295C87;
+}
