@@ -338,13 +338,12 @@ def predict_csv(request, pk):
 
     input_file_path = os.path.join(MEDIA_ROOT, f'{file_object.uploaded_by.organisation_name}/{file_object.uploaded_by.user.username}/{file_object.uploaded_date.date()}/input/{file_name}')
 
-    csvfile = pd.read_csv(input_file_path, sep=',', header=0, encoding='utf-8')
+    csvfile = pd.read_csv(input_file_path, sep=',', header=0, encoding='latin1')
     complaint_description = list(csvfile['complaint_description'])
 
     print("----type of complaint_description---")
     print(type(complaint_description))
     print(csvfile['complaint_description'].shape)
-    # print(complaint_description)
 
     dict_list = []
     rows = csvfile.shape[0]

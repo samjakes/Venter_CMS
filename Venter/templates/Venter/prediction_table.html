@@ -31,25 +31,16 @@
             }
         }
 
-        function remove_category(au){
-            // console.log("category ul");
-            // console.log(au);
-            // console.log("category li");
-            // console.log(bl);
-            // console.log("---------possible ID----");
-            // console.log($(bl));
-            // console.log("---------type of it----");
-            // console.log(typeof($(bl)));
-            console.log("category li");
-            console.log(au);
-            console.log("---------possible ID----");
-            console.log($(au));
-            console.log("---------type of it----");
-            console.log(typeof($(au)));
-            $(au).remove;
-            // $("#"+cat_ul_id+"#"+cat_li_id).remove();
-                // .remove('<li id="'+$("#"+cat_li_id)+'"><li>');
-            // $(cat_li_id).remove();        
+        function remove_category(ul_tag, list_tag){
+            console.log("ul_tag");
+            console.log(ul_tag);
+            console.log("list_tag");
+            console.log(list_tag);
+            console.log("ul_id");
+            console.log($("#"+ul_tag));
+            console.log("list_id");
+            console.log($("#"+list_tag));
+            (ul_tag).remove;     
         }
         function add_category(ul_id, input_id){
             var ul = $("#"+ul_id);
@@ -58,7 +49,7 @@
                 alert("Please enter a valid input");
             else
                 $(ul)
-                    .append('<li class="list-group-item" id="'+ul+'li'+added_category+'">'+added_category+'&nbsp;&nbsp;<button type="button" id="delete-category-btn" class="delete-category-btn" onclick="remove_category('+ul+'li'+added_category+');"><i class="fa fa-times delete-fa" aria-hidden="true"></i></button></li>')
+                    .append('<li class="list-group-item" id="'+added_category+'">'+added_category+'&nbsp;&nbsp;<button type="button" id="delete-category-btn" class="delete-category-btn" onclick="remove_category('+ul_id+','+added_category+');"><i class="fa fa-times delete-fa" aria-hidden="true"></i></button></li>')
                     $("#"+input_id).val("");
         }
     </script>
@@ -89,7 +80,7 @@
         </div><br>
 
         <div id="container-table">
-            <table class="table table-bordered table-hover">
+            <table class="table table-bordered table-striped">
                 <thead class="thead-dark">
                     <tr>
                         <th>Highest Confidence</th>
