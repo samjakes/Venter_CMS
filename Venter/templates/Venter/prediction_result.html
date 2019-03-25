@@ -10,42 +10,10 @@
 
 <script>
   $(document).ready(function () {
-    // if($('.nav-tabs li:eq(0)').hasClass('active')){
-    //   var link = $('.nav-tabs li.active a').prop('href');
-    //   console.log(link);
-    //   if($('.nav-pills li:eq(0)').hasClass('active')){
-    //     $('.nav-pills li:eq(0) a').tab('show');
-    //     console.log("graph pill is active")
-    //   }
-    // }
-
     if ($('.nav-pills li:eq(0)').hasClass('active')) {
       $('.nav-pills li:eq(0) a').tab('show');
     }
-
     $("#chart-download-container").hide();
-
-    // $(document).on("click", "#graph", function () {
-    //  var domain_name = $(this).data('id');
-    //  console.log("DOMAIN NAME SELECTED: ");
-    //  console.log(domain_name);
-    //  $("#chart-download-container #domain_title").val( domain_name );
-    // });
-
-    // if ($('.nav-pills li').click(function(event) {
-    //   $('.nav-pills li').removeClass('active');
-    //   $(this).addClass('active');
-    //   $(this).tab('show');
-    // });
-
-
-    // $('.nav-tabs > li > a').click(function(event){
-    //   // event.preventDefault();
-    //   var actived_nav = $('.nav-tabs > li.active');
-    //   actived_nav.removeClass('active');
-
-    //   $(this).parents('li').addClass('active');
-    // }); 
   });
 </script>
 

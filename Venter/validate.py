@@ -25,8 +25,8 @@ def input_file_header_validation(uploaded_input_file, request):
     # strip() function executes over each item of csv_list to remove all the leading and trailing whitespaces
     # this should normalise all the header categories with whitespaces in them
     # then we cast the list to a set to allow us to validate it with the organisation's header list
-    csv_striped_list = [item.strip() for item in csv_list]
-    csv_set = set(csv_striped_list)
+    csv_stripped_list = [item.strip() for item in csv_list]
+    csv_set = set(csv_stripped_list)
 
     # obtaining the organisation name of the logged-in user
     org_name = request.user.profile.organisation_name

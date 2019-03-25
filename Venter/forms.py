@@ -82,7 +82,6 @@ class ExcelForm(forms.ModelForm):
 
 
 class UserForm(forms.ModelForm):
-
     """
     Modelform, generated from Django's user model.
 
@@ -137,7 +136,7 @@ class ContactForm(forms.Form):
         attrs={'class': 'form-control', 'placeholder': 'Email'}), required=True, validators=[EmailValidator])
     contact_no = forms.CharField(widget=forms.TextInput(
         attrs={'class': 'form-control', 'placeholder': 'Contact Number'}), required=True, max_length=10,
-                                 validators=[RegexValidator(
-                                     regex=r'^[6-9]\d{9}$', message='Please enter a valid phone number')])
+                                 validators=[RegexValidator(regex=r'^[6-9]\d{9}$',
+                                                            message='Please enter a valid phone number')])
     requirement_details = forms.CharField(widget=forms.Textarea(
-        attrs={'class': 'form-control', 'placeholder': 'Requirement Details'}), required=True)
+        attrs={'class': 'form-control', 'placeholder': 'Requirement'}), required=True)

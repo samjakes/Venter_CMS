@@ -22,7 +22,7 @@
     <div class="wrap-profile">
         <form method="post" name="form" enctype="multipart/form-data" class="profile-form">
             {% csrf_token %}
-            <img src="{{profile_form.profile_picture.url}}" alt="Avatar" class="profile-avatar"><br><br>
+            <img src="../../static/assets/img/default-avatar.png" alt="Avatar" class="profile-avatar"><br><br>
             <script>
                 console.log('{{profile_form}}');
             </script>    

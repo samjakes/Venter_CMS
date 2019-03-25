@@ -10,7 +10,6 @@ urlpatterns = [
     # ex: /venter/home/
     path('home/', TemplateView.as_view(template_name='Venter/home.html'), name='home'),
     # ex: /venter/logout/
-    # path('logout/', views.user_logout, name='logout'),
     path('logout/', auth.views.LogoutView.as_view(template_name="Venter/login.html"), name='logout'),
     # ex: /venter/update_profile/5/
     path('update_profile/<int:pk>', views.UpdateProfileView.as_view(), name='update_profile'),
@@ -23,17 +22,15 @@ urlpatterns = [
     # ex: /venter/delete_file/5/
     path('delete_file/<int:pk>', views.FileDeleteView.as_view(), name='delete_file'),
     # ex: /venter/category_list/civis/
-    path('category_list/<organisation_name>', views.CategoryListView.as_view(), name='category_list'),
+    path('category_list/', views.CategoryListView.as_view(), name='category_list'),
     # ex: /venter/dashboard/
-    path('dashboard/', views.FilesListView.as_view(), name='dashboard'),
+    path('dashboard/', views.FileListView.as_view(), name='dashboard'),
     # ex: /venter/contact_us/
     path('contact_us/', views.contact_us, name='contact_us'),
-    # ex: /venter/search_category/
-    path('search_category/', views.CategorySearchView.as_view(), name='search_category'),
-    # ex: /venter/search_file/
-    path('search_file/', views.FileSearchView.as_view(), name='search_file'),
     # ex: /venter/predict_result/5/
     path('predict_result/<int:pk>', views.predict_result, name='predict_result'),
     # ex: /venter/domain_contents/
     path('domain_contents/', views.domain_contents, name='domain_contents'),
+
+    path('predict_csv/<int:pk>', views.predict_csv, name='predict_csv'),
 ]

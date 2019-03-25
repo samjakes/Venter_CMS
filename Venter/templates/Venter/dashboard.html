@@ -4,14 +4,18 @@
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 <link rel="stylesheet" href="../../static/assets/css/dashboard.css">
+<script>
+  function showloading(){
+    document.getElementById('loader').style.display="block";
+    document.getElementById('predict-button').style.display="none";
+  }
+</script>  
 
-
-<div class="outer-db">
   {% if file_list %}
   <div class="inner-db-file">
     <div class="row">
       <div class="col-sm-9">
-        <form action="{% url 'search_file' %}" method="get">
+        <form action="{% url 'dashboard' %}" method="get">
             <div class="form-group row">
                 <div class="col-sm-1">
                   <input type="submit" value="Search" class="btn btn-primary active">
@@ -30,10 +34,11 @@
         </a>
       </div>
     </div><br>
+
     <table class="table table-hover">
       <thead class="thead-dark">
-        <tr> 
-          <th>File</th>
+        <tr>
+          <th>Input File</th>
           <th>Uploaded By</th>
           <th>Upload Date</th>
           <th>Upload Time</th>
@@ -48,10 +53,11 @@
         {% for file in file_list %}
         <tr>
           <td>{{ file.filename }}</td>
-          <td>{{ file.uploaded_by}}</td>
+          <td>{{ file.uploaded_by  }}</td>
           <td>{{ file.uploaded_date.date }}</td>
           <td>{{ file.uploaded_date.astimezone.time }}</td>
           <td>
+<<<<<<< HEAD
             <a href="{% url 'predict_result' file.pk %}">
               <button class="btn btn-success predict-button">Categorize</button>
             </a>
@@ -60,18 +66,48 @@
               <a href="https://drive.google.com/file/d/121VxnLokckaTi2qnyzYumbDoRhAQVmn8/view?usp=sharing", download="results.xlsx">
                   <i class="fa fa-download download-fa" aria-hidden="true"></i>
               </a>
+=======
+            <script>
+              console.log('{{file.uploaded_by.organisation_name}}');
+              console.log(typeof('{{file.uploaded_by.organisation_name}}'));
+              console.log('{{file.uploaded_by.organisation_name}}'=='CIVIS');
+            </script>
+            {% if file.uploaded_by.organisation_name|stringformat:"s" == 'CIVIS' %}
+                {% if not file.has_prediction %}
+                  <a href="{% url 'predict_result' file.pk %}">
+                    <button class="btn btn-primary predict-button" onclick="showloading();" id="predict-button">Categorize</button>
+                  </a>
+                  <div class="loader" id="loader"></div>
+                {% else %}
+                  <a href="{% url 'predict_result' file.pk %}">
+                      <button class="btn btn-success view-button">View</button>
+                  </a>
+                {% endif %}
+            {% else %}
+                <a href="{% url 'predict_csv' file.pk %}">
+                  <button class="btn btn-primary predict-button">Predict CSV</button>
+                </a>
+            {% endif %}
+>>>>>>> main_branch
           </td>
-          {% if user.is_staff == True %}
           <td>
-            <a href="{% url 'delete_file' file.pk %}">
-                <i class="fa fa-trash-o trash-fa" aria-hidden="true"></i>
+            <a href="{{file.output_file_xlsx}}", download="results.xlsx">
+              <i class="fa fa-download download-fa" aria-hidden="true"></i>
             </a>
           </td>
-          {% endif %}
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
+            {% if user.is_staff == True %}
+            <td>
+              <a href="{% url 'delete_file' file.pk %}">
+                  <i class="fa fa-trash-o trash-fa" aria-hidden="true"></i>
+              </a>
+            </td>
+            {% endif %}
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
 
     <div class="div-pagination">
         {% block pagination %}
@@ -79,14 +115,14 @@
         <ul class="pagination justify-content-center">
           {% if page_obj.has_previous %}
           <li class="page-item">
-            <a class="page-link" href="{{ request.path }}?page={{ page_obj.previous_page_number }}">Previous</a>
+            <a class="page-link" href="{{ request.path }}?page={{ page_obj.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">Previous</a>
           </li>
           {% else %}
           <li class="page-item" disabled="">
             <a class="page-link">Previous</a>
           </li>
           {% endif %}
-  
+
           {% for i in paginator.page_range %}
           {% if page_obj.number == i %}
           <li class="page-item active">
@@ -94,14 +130,14 @@
           </li>
           {% else %}
           <li class="page-item">
-            <a class="page-link" href="?page={{ i }}">{{ i }}</a>
+            <a class="page-link" href="?page={{ i }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">{{ i }}</a>
           </li>
           {% endif %}
           {% endfor %}
-  
+
           {% if page_obj.has_next %}
           <li class="page-item">
-            <a class="page-link" href="{{ request.path }}?page={{ page_obj.next_page_number }}">Next</a>
+            <a class="page-link" href="{{ request.path }}?page={{ page_obj.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">Next</a>
           </li>
           {% else %}
           <li class="page-item" disabled="">
@@ -123,7 +159,7 @@
     </div>
   </div>
   {% endif %}
-</div>
+
 
 
 

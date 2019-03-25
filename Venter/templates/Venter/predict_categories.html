@@ -1,13 +1,8 @@
-<!--
-Author: Shivam Sharma
-Learn Jinja Templating in Django before going to this code
--->
-
-{% extends 'Login/header.html' %}
-{% block title %}Category Prediction{% endblock %}
-{% block link %}{% url 'home' %} {% endblock %}
-{% block verified %}
+{% extends 'Venter/base.html' %}
+{% block title %}Prediction CSV{% endblock %}
+{% block content %}
     <script>
+        console.log("inside predict categories html");
         var con;
         var sim;
         function progressBarSim(al) {
@@ -33,7 +28,7 @@ Learn Jinja Templating in Django before going to this code
 
         function hideLoading() {
             $("#tableDiv").attr('style', 'display:block');
-            $("#preload").attr('style', 'display:none');
+            // $("#preload").attr('style', 'display:none');
         }
 
         function colorcode(num, index) {
@@ -168,22 +163,6 @@ Learn Jinja Templating in Django before going to this code
             });
         });
     </script>
-    <div id="preload" align="center">
-        <div class="font">Predicting your results
-        <div class="loader"></div>
-        <h3>Please Wait...</h3>
-        </div>
-    </div>
-            <style>
-                .font{
-                    font-family: 'Montserrat', sans-serif;
-                    text-shadow:
-                    -1px -1px 0 #000,
-                    1px -1px 0 #000,
-                    -1px 1px 0 #000,
-                    1px 1px 0 #000;
-                }
-            </style>
 <div class="background">
     <div align="center" id="tableDiv" style="display: none">
         <div align="center" style=" width : 98%">
@@ -197,7 +176,6 @@ Learn Jinja Templating in Django before going to this code
                 </thead>
                 <tbody>
                 {% for dict in dict_list %}
-{#                    See the structure of dict_list in manipulate_csv.py#}
                     <tr>
                         <td style="width: 15%">
                             {{ dict.category.0.1 }}%
@@ -206,7 +184,6 @@ Learn Jinja Templating in Django before going to this code
                             <td id="td{{ dict.index }}" style="width: 25%">
                                 <select id="select_category{{ dict.index }}" name="select{{ dict.index }}"
                                         style="width: auto" multiple>
-{#                                Select element is multiple so the value of it will be multilist#}
                                     {% for each in dict.category %}
 {#                                        Showing the categories as options in select tag#}
                                         {% if each == dict.category.0 %}

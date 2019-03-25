@@ -2,10 +2,11 @@ import os
 from datetime import datetime
 
 from django.contrib.auth.models import User
+from django.core.files.storage import default_storage
 from django.core.validators import RegexValidator
 from django.db import models
 
-from .helpers import get_file_upload_path, get_organisation_logo_path, get_user_profile_picture_path, get_result_file_path
+from .helpers import get_file_upload_path, get_organisation_logo_path, get_user_profile_picture_path
 
 
 class Organisation(models.Model):
@@ -141,7 +142,9 @@ class File(models.Model):
     has_prediction = models.BooleanField(
         default=False,
     )
-    
+    output_file_json = models.FileField(blank=True)
+    output_file_xlsx = models.FileField(blank=True)
+
     @property
     def filename(self):
         """
@@ -149,9 +152,19 @@ class File(models.Model):
         Usage: dashboard_user.html template
         """
         return os.path.basename(self.input_file.name)  # pylint: disable = E1101
+    @property
+    def output_name(self):
+        return os.path.basename(self.output_file.name)
 
-    def abs_path(self):
-        return os.path(self.input_file)
+    def delete(self):
+        if self.output_file_json:
+            default_storage.delete(self.output_file_json)
+        if self.output_file_xlsx:
+            default_storage.delete(self.output_file_xlsx)
+        default_storage.delete(self.input_file)
+        print("\n\nInput file should be gone\n\n")
+        super().delete()
 
     class Meta:
         verbose_name_plural = 'File'
+        ordering = ["-uploaded_date"]
