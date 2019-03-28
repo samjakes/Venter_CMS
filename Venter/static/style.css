@@ -41,3 +41,9 @@ Styling for base.html
     width:83vw;
     margin-left: 6%;
 }
+.sidebar{
+    width: 20vw;
+}
+.main-panel{
+    width: 80vw;
+}

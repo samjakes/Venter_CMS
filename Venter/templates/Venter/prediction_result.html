@@ -1,131 +1,101 @@
 {% extends 'Venter/base.html' %}
 {% block title %}Prediction Results{% endblock %}
 {% block content %}
-
+{% load predict_results_custom_tags %}
 <link rel="stylesheet" href="../../static/assets/css/prediction_result.css">
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
 <link src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js">
 <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 
-<!-- <script>
-  $(document).ready(function (){
-    // if($('.nav-tabs li:eq(0)').hasClass('active')){
-    //   var link = $('.nav-tabs li.active a').prop('href');
-    //   console.log(link);
-    //   if($('.nav-pills li:eq(0)').hasClass('active')){
-    //     $('.nav-pills li:eq(0) a').tab('show');
-    //     console.log("graph pill is active")
-    //   }
-    // }
-
-    // if($('.nav-pills li:eq(0)').hasClass('active')){
-    //     $('.nav-pills li:eq(0) a').tab('show');
-    //     // console.log("graph pill is active")
-    //   }
-
-
-    // $('.nav-tabs > li > a').click(function(event){
-    //   // event.preventDefault();
-    //   var actived_nav = $('.nav-tabs > li.active');
-    //   actived_nav.removeClass('active');
-
-    //   $(this).parents('li').addClass('active');
-    // });
-
-    $(".nav-tabs .nav-item .nav-link").on("click", function(){
-      $(".nav-tabs").find(".nav-item .nav-link active").removeClass("active");
-      $(this).addClass("active");
-    });
-
-  });
-</script> -->
-
-
+{% for domain in domain_list %}
+{% with domain_stats=dict_data|get_domain_stats:domain %}
 <script>
-    function rndColor() {
-      var r = ('0' + Math.floor(Math.random() * 256).toString(16)).substr(-2), // red
-          g = ('0' + Math.floor(Math.random() * 256).toString(16)).substr(-2), // green
-          b = ('0' + Math.floor(Math.random() * 256).toString(16)).substr(-2); // blue
-      return '#' + r + g + b;
+  function rndColor() {
+  var r = ('0' + Math.floor(Math.random() * 256).toString(16)).substr(-2), // red
+      g = ('0' + Math.floor(Math.random() * 256).toString(16)).substr(-2), // green
+      b = ('0' + Math.floor(Math.random() * 256).toString(16)).substr(-2); // blue
+  return '#' + r + g + b;
   }
 
-      google.charts.load('current', {'packages':['corechart']});
-      google.charts.setOnLoadCallback(drawStuff);
+  google.charts.load('current', {'packages':['corechart']});
+  google.charts.setOnLoadCallback(drawStuff);
 
-      function drawStuff() {
-      var stats = '{{ domain_stats|escapejs }}';
+  function drawStuff() {
+  var stats = '{{ domain_stats|escapejs }}';
 
-      stats = jQuery.parseJSON(stats);
-      noOfNovelCats = stats[stats.length-1].length - 2
+  stats = jQuery.parseJSON(stats);
+  noOfNovelCats = stats[stats.length-1].length - 2
 
-      colorseries = {}
-      for(i=0; i<noOfNovelCats; i++) {
-        colorseries[i] = rndColor()
-      }
+  colorseries = {}
+  for(i=0; i<noOfNovelCats; i++) {
+    colorseries[i] = rndColor()
+  }
 
-      var data = new google.visualization.arrayToDataTable(stats);
+  var data = new google.visualization.arrayToDataTable(stats);
 
-     var options = {
-        width: '1100',
-        height: '600',
-        isStacked: true,
-        legend: {
-          position: 'none'
-        },
-        hAxis: {
-          title: 'Category',
-          titleTextStyle: {
-            'fontSize': 23,
-            color: 'black',
-            bold: true,
-            italic: false,
-          },
-          'textStyle': {
-            'fontSize': 15,
-            color: 'black',
-          },
-          gridlines: 3,
-          slantedText:true,
-          slantedTextAngle:45,
-        },
-        vAxis: {
-          title: 'Number of responses',
-          titleTextStyle: {
-            'fontSize': 23,
-            color: 'black',
-            bold: true,
-            italic: false,
-          },
-          'textStyle': {
-            'fontSize': 15,
-            color: 'black',
-            bold:true,
-          },
-        },
-        bar: {
-          groupWidth: "90%"
-        },
-        series : colorseries,
-        is3D:true
-      };
-      var chart = new google.visualization.ColumnChart(document.getElementById('chart_div'));
-      chart.draw(data, options);
-    };
+  var options = {
+    width: '900',
+    height: '450',
+    isStacked: true,
+    legend: {
+      position: 'none'
+    },
+    hAxis: {
+      title: 'Category',
+      titleTextStyle: {
+        'fontSize': 23,
+        color: 'black',
+        bold: true,
+        italic: false,
+      },
+      'textStyle': {
+        'fontSize': 15,
+        color: 'black',
+      },
+      gridlines: 3,
+      slantedText:true,
+      slantedTextAngle:45,
+    },
+    vAxis: {
+      title: 'Number of responses',
+      titleTextStyle: {
+        'fontSize': 23,
+        color: 'black',
+        bold: true,
+        italic: false,
+      },
+      'textStyle': {
+        'fontSize': 15,
+        color: 'black',
+        bold:true,
+      },
+    },
+    bar: {
+      groupWidth: "90%"
+    },
+    series : colorseries,
+    is3D:true
+  };
+  var chart = new google.visualization.ColumnChart(document.getElementById('chart_div'));
+  chart.draw(data, options);
+  };
+
 </script>
-
+{% endwith %}
+{% endfor %}
 
 <div class="content-domain">
   <ul class="nav nav-pills mb3 nav-fill" id="domain_tab" role="tablist">
     {% for domain in domain_list %}
-      {% if domain == domain_list.0 %}
+      {% if domain == domain_list.0%}
       <li class="nav-item">
-        <a href="#tab_{{domain}}" class="nav-link active" id="domain_{{domain}}_tab" data-toggle="pill" role="tab">
+        <a href="#tab_{{domain|slugify}}" class="nav-link active" id="domain_{{domain|slugify}}_tab" data-toggle="pill" role="tab">
           {{domain}}
         </a>
       </li>
       {% else %}
       <li class="nav-item">
-        <a href="#tab_{{domain}}" class="nav-link" id="domain_{{domain}}_tab" data-toggle="pill" role="tab">
+        <a href="#tab_{{domain|slugify}}" class="nav-link" id="domain_{{domain|slugify}}_tab" data-toggle="pill" role="tab">
           {{domain}}
         </a>
       </li>
@@ -134,26 +104,26 @@
   </ul>
   <div class="tab-content">
     {% for domain in domain_list %}
-    {% with %}
-    {% if domain == domain_list.0 %}
-    <div class="tab-pane fade active" id="tab_{{domain}}">
-      <ul class="nav nav-pills justify-content-center" id="navigator_tab" role="tablist">
-          <li class="nav-item" id="pill-graph">
-              <a class="nav-link active" data-toggle="pill" href="#graph_{{domain}}">
-                Graph &nbsp; <i class="fa fa-area-chart chart-fa"></i>
-              </a>
-          </li>
-          <li class="nav-item" id="pill-cardview">
-              <a class="nav-link" data-toggle="pill" href="#cardview_{{domain}}">
-                CardView &nbsp; <i class="fa fa-list-alt list-fa"></i>
-              </a>
-          </li>
-      </ul>
+    {% with domain_data=dict_data|get_domain_data:domain %}
+    {% if domain == domain_list.0%}
+    <div class="tab-pane fade active show" id="tab_{{domain|slugify}}" role="tabpanel" onclick='drawStuff()'>
+        <ul class="nav nav-tabs justify-content-center" id="navigator_tab" role="tablist">
+            <li class="nav-item">
+                <a class="nav-link active" data-toggle="tab" role="tab" href="#graph_{{domain|slugify}}">
+                  Graph
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-toggle="tab" role="tab" href="#cardview_{{domain|slugify}}">
+                  CardView
+                </a>
+            </li>
+        </ul>
       <div class="tab-content">
-          <div class="tab-pane fade show active in" id="graph_{{domain}}">
+          <div class="tab-pane fade show active" id="graph_{{domain|slugify}}" role="tabpanel">
             <div id="chart_div" class="graph-container"></div>
           </div>
-          <div class="tab-pane fade" id="cardview_{{domain}}">
+          <div class="tab-pane fade" id="cardview_{{domain|slugify}}" role="tabpanel">
             <div class="card-container">
                 {% for category,response in domain_data.items %}
                 <div class="card">
@@ -197,26 +167,27 @@
       </div>
     </div>
     {% else %}
-    <div class="tab-pane fade" id="tab_{{domain}}">
-        <ul class="nav nav-pills justify-content-center" id="navigator_tab" >
-            <li class="nav-item" id="pill-graph">
-                <a class="nav-link active" data-toggle="pill" href="#graph_{{domain}}">
-                  Graph &nbsp; <i class="fa fa-area-chart chart-fa"></i>
+    <div class="tab-pane fade" id="tab_{{domain|slugify}}" role="tabpanel", onclick="drawStuff()">
+        <ul class="nav nav-tabs justify-content-center" id="navigator_tab" role="tablist">
+            <li class="nav-item">
+                <a class="nav-link active" data-toggle="tab" role="pill" href="#graph_{{domain|slugify}}">
+                  Graph
                 </a>
             </li>
-            <li class="nav-item" id="pill-cardview">
-                <a class="nav-link" data-toggle="pill" href="#cardview_{{domain}}">
-                  CardView &nbsp; <i class="fa fa-list-alt list-fa"></i>
+            <li class="nav-item">
+                <a class="nav-link" data-toggle="tab" role="tab" href="#cardview_{{domain|slugify}}">
+                  CardView
                 </a>
             </li>
         </ul>
         <div class="tab-content">
-            <div class="tab-pane fade show active" id="graph_{{domain}}">
-              <div id="chart_div" class="graph-container"></div>
+            <div class="tab-pane fade show active" id="graph_{{domain|slugify}}" role="tabpanel">
+              <div id="chart_div" class="graph-container">
+              </div>
             </div>
-            <div class="tab-pane fade" id="cardview_{{domain}}">
+            <div class="tab-pane fade" id="cardview_{{domain|slugify}}" role="tabpanel">
               <div class="card-container">
-                  {% for category,response in domain.items %}
+                  {% for category,response in domain_data.items %}
                   <div class="card">
                     <div class="card-header">
                       <label class="label-category">{{category}}</label>
@@ -239,7 +210,6 @@
                                   </ul>
                                 </li>
                                 {% endfor %}
-                                <!-- <hr style="border: 3px solid black;"> -->
                               {% endfor %}
                             {% else %}
                               {% for r in response %}
@@ -258,13 +228,10 @@
         </div>
     </div>
     {% endif %}
+    {% endwith %}
     {% endfor %}
   </div>
 </div>
-
-
-
-
 
 
 {% endblock %}

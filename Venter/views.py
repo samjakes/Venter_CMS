@@ -6,6 +6,7 @@ from functools import reduce
 
 import jsonpickle
 import pandas as pd
+from django import template
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import (LoginRequiredMixin,
@@ -377,34 +378,34 @@ def predict_result(request, pk):
     })
 
 
-@require_http_methods(["GET"])
-def domain_contents(request):
-    global dict_data, domain_list
+# @require_http_methods(["GET"])
+# def domain_contents(request):
+#     global dict_data, domain_list
 
 
-    domain_name = request.GET.get('domain')
-    domain_data = dict_data[domain_name]
-    temp = ['Category']
-    index = 0
-    for subCat in domain_data['Novel']:
-        temp.append('Sub category ' + str(index+1))
-        index += 1
-    temp.append({'role':'style'})
-    domain_stats = []
-    domain_stats.append(temp)
+#     domain_name = request.GET.get('domain')
+#     domain_data = dict_data[domain_name]
+#     temp = ['Category']
+#     index = 0
+#     for subCat in domain_data['Novel']:
+#         temp.append('Sub category ' + str(index+1))
+#         index += 1
+#     temp.append({'role':'style'})
+#     domain_stats = []
+#     domain_stats.append(temp)
 
-    for category, responselist in domain_data.items():
-        column = [category, len(responselist), '']
-        if category == 'Novel':
-            column = ['Novel']
-            for subCat in domain_data[category]:
-                column.append(len(domain_data[category][subCat]))
-            column.append('')
-        else:
-            for i in range(len(domain_stats[0]) - len(column)):
-                column.insert(2,0)
-        domain_stats.append(column)
+#     for category, responselist in domain_data.items():
+#         column = [category, len(responselist), '']
+#         if category == 'Novel':
+#             column = ['Novel']
+#             for subCat in domain_data[category]:
+#                 column.append(len(domain_data[category][subCat]))
+#             column.append('')
+#         else:
+#             for i in range(len(domain_stats[0]) - len(column)):
+#                 column.insert(2,0)
+#         domain_stats.append(column)
 
-    return render(request, './Venter/prediction_result.html', {
-        'domain_data': domain_data, 'domain_list': domain_list, 'domain_stats': jsonpickle.encode(domain_stats)
-    })
+#     return render(request, './Venter/prediction_result.html', {
+#         'domain_data': domain_data, 'domain_list': domain_list, 'domain_stats': jsonpickle.encode(domain_stats)
+#     })

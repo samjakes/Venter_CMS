@@ -35,7 +35,7 @@ urlpatterns = [
     # ex: /venter/predict_result/5/
     path('predict_result/<int:pk>', views.predict_result, name='predict_result'),
     # ex: /venter/domain_contents/
-    path('domain_contents/', views.domain_contents, name='domain_contents'),
+    # path('domain_contents/', views.domain_contents, name='domain_contents'),
     # path('predict/checkOutput/', views.handle_user_selected_data, name='checkOutput'),
     # ex: /venter/download_file/5/
     # path('download_file/<int:pk>', views.file_download, name='download_file'),
