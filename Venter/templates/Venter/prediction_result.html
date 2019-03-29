@@ -19,6 +19,42 @@
 
 
 <script>
+  function colorcode(score, li_index){
+    if(score > 90){
+      $("#" + li_index).attr("style", "background-color: #00a33b");
+    }
+    else if(score > 80){
+      $("#" + li_index).attr("style", "background-color: #06d636");
+    }
+    else if(score > 70){
+      $("#" + li_index).attr("style", "background-color: #4ee802");
+    }
+    else if(score > 60){
+      $("#" + li_index).attr("style", "background-color: #c3ff00");
+    }
+    else if(score > 50){
+      $("#" + li_index).attr("style", "background-color: #f6ff00");
+    }
+    else if(score > 40){
+      $("#" + li_index).attr("style", "background-color: #ffe100");
+    }
+    else if(score > 30){
+      $("#" + li_index).attr("style", "background-color: #ffbb00");
+    }
+    else if(score > 20){
+      $("#" + li_index).attr("style", "background-color: #ff8c00");
+    }
+    else if(score > 10){
+      $("#" + li_index).attr("style", "background-color: #ff5900");
+    }
+    else{
+      $("#" + li_index).attr("style", "background-color: #af0101");
+    }
+    
+  }
+</script>
+
+<script>
   console.log('{{test}}')
   function rndColor() {
     var r = ('0' + Math.floor(Math.random() * 256).toString(16)).substr(-2), // red
@@ -194,9 +230,15 @@
                 {% endfor %}
                 {% endfor %}
                 {% else %}
+
                 {% for r in response %}
-                <li class="list-group-item">{{r}}</li>
+                <div class="input-group">
+                  <li class="list-group-item" id="li{{r.response}}">{{r.response}}</li>
+                  <script>colorcode('{{r.score}}', "li{{r.response}}")</script>
+                  <button class="score-box">{{r.score}}</button>
+                </div>
                 {% endfor %}
+
                 {% endif %}
               </ul>
               {% endif %}

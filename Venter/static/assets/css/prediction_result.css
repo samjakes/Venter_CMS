@@ -172,3 +172,9 @@ Styling for prediction_result.html
     margin-top: 2%;
     margin-right: 2%;
 }
+
+.score-box{
+    background-color: whitesmoke;
+    border-radius: 3px;
+    border:none;
+}
