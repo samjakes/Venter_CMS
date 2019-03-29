@@ -338,7 +338,7 @@ def predict_csv(request, pk):
 
     input_file_path = os.path.join(MEDIA_ROOT, f'{file_object.uploaded_by.organisation_name}/{file_object.uploaded_by.user.username}/{file_object.uploaded_date.date()}/input/{file_name}')
 
-    csvfile = pd.read_csv(input_file_path, sep=',', header=0, encoding='utf-8')
+    csvfile = pd.read_csv(input_file_path, sep=',', header=0, encoding='latin')
     complaint_description = list(csvfile['complaint_description'])
 
     print("----type of complaint_description---")
@@ -347,7 +347,6 @@ def predict_csv(request, pk):
     # print(complaint_description)
 
     dict_list = []
-    rows = csvfile.shape[0]
 
     if str(request.user.profile.organisation_name) == 'ICMC':
         model = ClassificationService()
@@ -379,4 +378,4 @@ def predict_csv(request, pk):
         dict_list.append(row_dict)
     dict_list = sorted(dict_list, key=lambda k: k['highest_confidence'], reverse=True)
 
-    return render(request, './Venter/prediction_table.html', {'dict_list': dict_list, 'category_list': category_list, 'rows':rows})
+    return render(request, './Venter/prediction_table.html', {'dict_list': dict_list, 'category_list': category_list})

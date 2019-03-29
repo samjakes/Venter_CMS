@@ -57,16 +57,6 @@
           <td>{{ file.uploaded_date.date }}</td>
           <td>{{ file.uploaded_date.astimezone.time }}</td>
           <td>
-<<<<<<< HEAD
-            <a href="{% url 'predict_result' file.pk %}">
-              <button class="btn btn-success predict-button">Categorize</button>
-            </a>
-          </td>
-          <td>
-              <a href="https://drive.google.com/file/d/121VxnLokckaTi2qnyzYumbDoRhAQVmn8/view?usp=sharing", download="results.xlsx">
-                  <i class="fa fa-download download-fa" aria-hidden="true"></i>
-              </a>
-=======
             <script>
               console.log('{{file.uploaded_by.organisation_name}}');
               console.log(typeof('{{file.uploaded_by.organisation_name}}'));
@@ -88,7 +78,6 @@
                   <button class="btn btn-primary predict-button">Predict CSV</button>
                 </a>
             {% endif %}
->>>>>>> main_branch
           </td>
           <td>
             <a href="{{file.output_file_xlsx}}", download="results.xlsx">
