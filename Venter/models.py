@@ -59,7 +59,11 @@ class Profile(models.Model):
         upload_to=get_user_profile_picture_path,
         null=True,
         blank=True,
+<<<<<<< HEAD
         default='User Profile Picture/default-avatar.png'
+=======
+        default='Venter\static\assets\img\default-avatar.png'
+>>>>>>> 856464d7fe3c2ec45506401ff9101c7b08377db7
     )
     phone_number = models.CharField(
         blank=True,
@@ -88,6 +92,12 @@ class Header(models.Model):
     )
 
     class Meta:
+<<<<<<< HEAD
+=======
+        """
+        Declares a plural name for Header model
+        """
+>>>>>>> 856464d7fe3c2ec45506401ff9101c7b08377db7
         verbose_name_plural = 'Headers'
 
 
@@ -108,12 +118,19 @@ class Category(models.Model):
     )
 
     class Meta:
+<<<<<<< HEAD
+=======
+        """
+        Declares a plural name for Category model
+        """
+>>>>>>> 856464d7fe3c2ec45506401ff9101c7b08377db7
         verbose_name_plural = 'Category'
 
 
 class File(models.Model):
     """
     A File uploaded by the logged-in user.
+<<<<<<< HEAD
     Eg: user_1 may upload a .csv file on 12/12/12
 
     # Create a file instance
@@ -127,6 +144,12 @@ class File(models.Model):
         2) view_self_files: Grants permission only to authenticated users to access 'dashboard_user.html' template
         2) delete_organisation_files: Grants permission only to staff members to delete files
             uploaded by user(s)/staff member(s) of the organisation
+=======
+    Eg: user_1 may upload a .csv/.xlsx file on 12/12/12
+
+    # Create a file instance
+    >>> File.objects.create(uploaded_by=user_1, input_file="file1.csv", uploaded_date = "Jan. 29, 2019, 7:59 p.m.", has_prediction=False)
+>>>>>>> 856464d7fe3c2ec45506401ff9101c7b08377db7
     """
     uploaded_by = models.ForeignKey(
         Profile,
@@ -148,23 +171,52 @@ class File(models.Model):
     @property
     def filename(self):
         """
+<<<<<<< HEAD
         Returns the name of the csv file uploaded.
         Usage: dashboard_user.html template
+=======
+        Returns the name of the file uploaded.
+        Usage: dashboard.html template
+>>>>>>> 856464d7fe3c2ec45506401ff9101c7b08377db7
         """
         return os.path.basename(self.input_file.name)  # pylint: disable = E1101
     @property
     def output_name(self):
+<<<<<<< HEAD
         return os.path.basename(self.output_file.name)
 
     def delete(self):
+=======
+        """
+        Returns the file path for output file to be created
+        """
+        return os.path.basename(self.output_file.name) # pylint: disable = E1101
+
+    def delete(self):
+        """
+        Deletes json and xlsx/csv output files from file storage
+        Usage: dashboard.html template (on click trash icon by Staff member)
+        """
+>>>>>>> 856464d7fe3c2ec45506401ff9101c7b08377db7
         if self.output_file_json:
             default_storage.delete(self.output_file_json)
         if self.output_file_xlsx:
             default_storage.delete(self.output_file_xlsx)
         default_storage.delete(self.input_file)
+<<<<<<< HEAD
         print("\n\nInput file should be gone\n\n")
         super().delete()
 
     class Meta:
+=======
+        super().delete()
+
+    class Meta:
+        """
+        Displays recently uploaded files at the top of file list.
+        Declares a plural name for File model
+        Usage: dashboard.html template
+        """
+>>>>>>> 856464d7fe3c2ec45506401ff9101c7b08377db7
         verbose_name_plural = 'File'
         ordering = ["-uploaded_date"]

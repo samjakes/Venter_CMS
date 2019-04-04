@@ -18,18 +18,25 @@ Styling for prediction_table.html
     justify-content: center;
 }
 
+<<<<<<< HEAD
 .table-cell-cat{
     width: 40%;
 }
 
 .table>thead>tr>th {
     text-align: center !important;
+=======
+.table>thead>tr>th {
+    text-align: center !important;
+    font-size: 12px;
+>>>>>>> 856464d7fe3c2ec45506401ff9101c7b08377db7
 }
 
 .table td{
     font-family: 'Times New Roman', Times, serif;
 }
 
+<<<<<<< HEAD
 .table{
     background-color: white;
 }
@@ -40,10 +47,13 @@ Styling for prediction_table.html
     -webkit-border-radius:5px;
   }
 
+=======
+>>>>>>> 856464d7fe3c2ec45506401ff9101c7b08377db7
 .plus-fa{
     color:#ffffff;
 }
 
+<<<<<<< HEAD
 .table-cell-conf-score{
     text-align: center !important;
     font-weight: bold;
@@ -53,6 +63,25 @@ Styling for prediction_table.html
     height: 148px;
     overflow-x: scroll;
     overflow-y: scroll;
+=======
+td.table-cell-cat{
+    width: 420px;
+}
+
+.table-cell-conf-score{
+    text-align: center !important;
+    font-weight: bold;
+    width: 90px;
+}
+
+.category_list{
+    background-color: white;
+    overflow-x: scroll;
+    overflow-y: scroll;
+    list-style: none;
+    height: 150px;
+    width: 400px;
+>>>>>>> 856464d7fe3c2ec45506401ff9101c7b08377db7
 }
 
 .delete-fa{
@@ -60,17 +89,66 @@ Styling for prediction_table.html
     font-size: 15px;
 }
 
+<<<<<<< HEAD
 .delete-category-btn{
     background-color: #ff9999;
     border-radius: 50%;
     border: none;
     width: 25px;
     height: 25px;
+=======
+.add-cat-fa{
+    color:white;
+    font-size: 15px;
+}
+
+.filter-fa{
+    color: white;
+}
+
+.times-fa{
+    color: white;
+    font-size: 15px;
+}
+
+.cross_button{
+    background-color: rgb(135, 182, 243);
+    border-radius: 50%;
+    border: none;
+    width: 30px;
+    height: 30px;
     vertical-align: middle;
     margin: 0 auto;
     padding: 0;
     display: table-cell;
 }
+
+.cross_button:hover{
+    background-color: rgb(70, 102, 145);
+}
+
+.filter_button{
+    background-color: Transparent;
+    background-repeat:no-repeat;
+    border: none;
+    cursor:pointer;
+    overflow: hidden;
+    outline:none;
+}
+
+.delete-category-btn, .delete-custom-category-btn{
+    background-color: #ff9999;
+    border-radius: 50%;
+    border: none;
+    width: 20px;
+    height: 20px;
+>>>>>>> 856464d7fe3c2ec45506401ff9101c7b08377db7
+    vertical-align: middle;
+    margin: 0 auto;
+    padding: 0;
+    display: table-cell;
+}
+<<<<<<< HEAD
 .delete-category-btn:hover{
     background-color: #c52323;
 }
@@ -83,3 +161,72 @@ Styling for prediction_table.html
 .add-category-btn:hover{
     background-color: #295C87;
 }
+=======
+.delete-category-btn:hover, .delete-custom-category-btn:hover{
+    background-color: #c52323;
+}
+
+.add-custom-category-btn{
+    background-color: #4f92c9;
+    border-radius: 3px;
+    border: none;
+}
+.add-custom-category-btn:hover{
+    background-color: #295C87;
+}
+
+.add-category-btn{
+    background-color: #adebad;
+    border-radius: 50%;
+    border: none;
+    width: 20px;
+    height: 20px;
+    vertical-align: middle;
+    margin: 0 auto;
+    padding: 0;
+    display: table-cell;
+}
+
+.add-category-btn:hover{
+    background-color: #33cc33;
+}
+
+.select_cat{
+    width:360px;
+}
+
+.input_cat{
+    display:none;
+    width:360px;
+    height: 26px;
+}
+
+.modal-body {
+    height: 180px;
+    background-color: #32bc65;
+  }   
+  
+  .file_logo-table{
+    width:150px;
+    height:140px;
+  }
+  
+  .modal-footer{
+    height: 150px;
+    background-color: white;
+  }
+  
+  .footer-center{
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  
+  .p1-update{
+    color: grey;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    font-size: 20px;
+  }
+
+
+>>>>>>> 856464d7fe3c2ec45506401ff9101c7b08377db7

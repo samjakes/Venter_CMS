@@ -9,14 +9,14 @@ from django.contrib.auth.models import Permission, User
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 from django.core.mail import mail_admins
+from django.http import HttpResponseRedirect
 from django.shortcuts import render
-from django.urls import reverse_lazy
+from django.urls import reverse, reverse_lazy
 from django.views.decorators.cache import never_cache
 from django.views.decorators.http import require_http_methods
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
 from django.views.generic.list import ListView
 
-# import Venter.upload_to_google_drive
 from Backend.settings import MEDIA_ROOT
 from Venter.forms import ContactForm, CSVForm, ExcelForm, ProfileForm, UserForm
 from Venter.models import Category, File, Profile
@@ -29,12 +29,12 @@ from .ML_model.ICMC.model.ClassificationService import ClassificationService
 @require_http_methods(["GET", "POST"])
 def upload_file(request):
     """
-    View logic for uploading CSV file by a logged in user.
+    View logic for uploading CSV/Excel file by a logged in user.
 
     For POST request-------
-        1) The POST data, uploaded csv file and a request parameter are being sent to CSVForm as arguments
+        1) The POST data, uploaded csv/xlsx file and a request parameter are being sent to CSVForm/ExcelForm as arguments
         2) If form.is_valid() returns true, the user is assigned to the uploaded_by field
-        3) file_form is saved and Form instance is initialized again (file_form = CSVForm(request=request)),
+        3) file_form is saved and Form instance is initialized again,
            for user to upload another file after successfully uploading the previous file
     For GET request-------
         The file_form is rendered in the template
@@ -84,11 +84,8 @@ class CategoryListView(LoginRequiredMixin, ListView):
     paginate_by = 13
 
     def get_queryset(self):
-
         result = Category.objects.filter(organisation_name=self.request.user.profile.organisation_name)
-
         query = self.request.GET.get('q', '')
-
         if query:
             result = Category.objects.filter(category__icontains=query)
         return result
@@ -125,6 +122,8 @@ class RegisterEmployeeView(LoginRequiredMixin, CreateView):
     """
     Arguments------
         1) CreateView: View to register a new user(employee) of an organisation.
+        2) LoginRequiredMixin: Request to register employees by non-authenticated users,
+        will throw an HTTP 404 error
     Note------
         1) The organisation name for a newly registered employee is taken from
            the profile information of the staff member registering the employee.
@@ -213,12 +212,10 @@ class FileDeleteView(LoginRequiredMixin, DeleteView):
     """
     Arguments------
         1) LoginRequiredMixin: View to redirect non-authenticated users to show HTTP 403 error
-        2) PermissionRequiredMixin: View to check whether the user is a staff
-        having permission to delete organisation files
-        3) DeletView: View to delete the files uploaded by user(s)/staff member(s) of the organisation
+        3) DeletView: View to delete file(s) uploaded
 
     Functions------
-        1) get_queryset(): Returns a new QuerySet filtering files uploaded by the logged-in user
+        1) get: Returns a new Queryset of files uploaded by user(s)/staff member(s) of the organisation
     """
     model = File
     success_url = reverse_lazy('dashboard')
@@ -228,6 +225,16 @@ class FileDeleteView(LoginRequiredMixin, DeleteView):
 
 
 class FileListView(LoginRequiredMixin, ListView):
+    """
+    Arguments------
+        1) LoginRequiredMixin: View to redirect non-authenticated users to show HTTP 403 error
+        3) ListView: View to display file(s) uploaded
+
+    Functions------
+        1) get_queryset():
+        For a user, returns the files uploaded by the logged-in employee
+        For a staff member, returns the files uploaded by user(s)/staff member(s) of the organisation
+    """
     model = File
     template_name = './Venter/dashboard.html'
     context_object_name = 'file_list'
@@ -250,45 +257,63 @@ domain_list = []
 
 @require_http_methods(["GET"])
 def predict_result(request, pk):
+    """
+    View logic for running CIVIS Prediction Model on files uploaded by CIVIS users.
+    If the input file is being predicted for the first time:
+        1) Two output files (.json and .xlsx files are created in file storage)
+        2) Input file path is feed into the SimilarityMapping method of ML model
+        3) dict_data stores the result json response returned from the ML model
+        4) prediction_results.html template is rendered
+    If the input file has already been predicted once:
+        1) dict_data stores the result json data from the results.json file already created from the ML model
+        2) prediction_results.html template is rendered
+    """
     global dict_data, domain_list
 
-    filemeta = File.objects.get(pk=pk)
-    if not filemeta.has_prediction:
-        output_directory_path = os.path.join(MEDIA_ROOT, f'{filemeta.uploaded_by.organisation_name}/{filemeta.uploaded_by.user.username}/{filemeta.uploaded_date.date()}/output')
+    json_file_path = os.path.join(MEDIA_ROOT, 'score_json.json')
+    print("file path:", json_file_path)
 
-        if not os.path.exists(output_directory_path):
-            os.makedirs(output_directory_path)
+    with open(json_file_path) as json_file:
+        dict_data = json.load(json_file)
 
-        print(output_directory_path)
-        output_file_path_json = os.path.join(output_directory_path, 'results.json')
-        output_file_path_xlsx = os.path.join(output_directory_path, 'results.xlsx')
+    # filemeta = File.objects.get(pk=pk)
+    # if not filemeta.has_prediction:
+    #     output_directory_path = os.path.join(MEDIA_ROOT, f'{filemeta.uploaded_by.organisation_name}/{filemeta.uploaded_by.user.username}/{filemeta.uploaded_date.date()}/output')
 
-        sm = SimilarityMapping(filemeta.input_file.path)
-        dict_data = sm.driver()
+    #     if not os.path.exists(output_directory_path):
+    #         os.makedirs(output_directory_path)
 
-        if dict_data:
-            filemeta.has_prediction = True
+    #     print(output_directory_path)
+    #     output_file_path_json = os.path.join(output_directory_path, 'results.json')
+    #     output_file_path_xlsx = os.path.join(output_directory_path, 'results.xlsx')
 
-        with open(output_file_path_json, 'w') as temp:
-            json.dump(dict_data, temp)
+    #     sm = SimilarityMapping(filemeta.input_file.path)
+    #     dict_data = sm.driver()
 
-        print('JSON output saved.')
-        print('Done.')
+    #     if dict_data:
+    #         filemeta.has_prediction = True
 
-        filemeta.output_file_json = output_file_path_json
+    #     with open(output_file_path_json, 'w') as temp:
+    #         json.dump(dict_data, temp)
 
-        download_output = pd.ExcelWriter(output_file_path_xlsx, engine='xlsxwriter')
+    #     print('JSON output saved.')
+    #     print('Done.')
 
-        for domain in dict_data:
-            print('Writing Excel for domain %s' % domain)
-            df = pd.DataFrame({key:pd.Series(value) for key, value in dict_data[domain].items()})
-            df.to_excel(download_output, sheet_name=domain)
-        download_output.save()
+    #     filemeta.output_file_json = output_file_path_json
 
-        filemeta.output_file_xlsx = output_file_path_xlsx
-        filemeta.save()
-    else:
-        dict_data = json.load(filemeta.output_file_json)
+    #     download_output = pd.ExcelWriter(output_file_path_xlsx, engine='xlsxwriter')
+
+    #     for domain in dict_data:
+    #         print('Writing Excel for domain %s' % domain)
+    #         df = pd.DataFrame({key:pd.Series(value) for key, value in dict_data[domain].items()})
+    #         df.to_excel(download_output, sheet_name=domain)
+    #     download_output.save()
+
+    #     filemeta.output_file_xlsx = output_file_path_xlsx
+    #     filemeta.save()
+    # else:
+    #     dict_data = json.load(filemeta.output_file_json)
+
     dict_keys = dict_data.keys()
     domain_list = list(dict_keys)
 
@@ -299,6 +324,9 @@ def predict_result(request, pk):
 
 @require_http_methods(["GET"])
 def domain_contents(request):
+    """
+    View logic for returning response statictics based on the domain selected by the user in prediction_results.html
+    """
     global dict_data, domain_list
 
     domain_name = request.GET.get('domain')
@@ -329,53 +357,114 @@ def domain_contents(request):
         'domain_stats': jsonpickle.encode(domain_stats), 'chart_domain': domain_name
     })
 
-@require_http_methods(["POST", "GET"])
+@require_http_methods(["GET", "POST"])
 def predict_csv(request, pk):
-    """This function is used to handle the selected categories by the user"""
+    """
+    View logic for running ICMC Prediction Model on files uploaded by ICMC users.
+    If the input file is being predicted for the first time:
+        1) Two output files (.json and .csv files are created in file storage)
+        2) Input file path is feed into the get_top_3_cats_with_prob method of ML model
+        3) dict_data stores the result json response returned from the ML model
+        4) prediction_table.html template is rendered
+    If the input file has already been predicted once:
+        1) dict_data stores the result json data from the results.json file already created from the ML model
+        2) prediction_table.html template is rendered
+    """
+    filemeta = File.objects.get(pk=pk)
+    if not filemeta.has_prediction:
+        output_directory_path = os.path.join(MEDIA_ROOT, f'{filemeta.uploaded_by.organisation_name}/{filemeta.uploaded_by.user.username}/{filemeta.uploaded_date.date()}/output')
 
-    file_object = File.objects.get(pk=pk)
-    file_name = file_object.filename
+        if not os.path.exists(output_directory_path):
+            os.makedirs(output_directory_path)
 
-    input_file_path = os.path.join(MEDIA_ROOT, f'{file_object.uploaded_by.organisation_name}/{file_object.uploaded_by.user.username}/{file_object.uploaded_date.date()}/input/{file_name}')
+        print(output_directory_path)
+        output_file_path_json = os.path.join(output_directory_path, 'results.json')
+        output_file_path_csv = os.path.join(output_directory_path, 'results.csv')
 
-    csvfile = pd.read_csv(input_file_path, sep=',', header=0, encoding='latin')
-    complaint_description = list(csvfile['complaint_description'])
+        input_file_path = filemeta.input_file.path
+        csvfile = pd.read_csv(input_file_path, sep=',', header=0, encoding='latin1')
 
-    print("----type of complaint_description---")
-    print(type(complaint_description))
-    print(csvfile['complaint_description'].shape)
-    # print(complaint_description)
+        complaint_description = list(csvfile['complaint_description'])
 
-    dict_list = []
+        dict_list = []
 
+        if str(request.user.profile.organisation_name) == 'ICMC':
+            model = ClassificationService()
+
+        elif str(request.user.profile.organisation_name) == "SpeakUp":
+            pass
+
+        cats = model.get_top_3_cats_with_prob(complaint_description)
+
+        for row, complaint, scores in zip(csvfile.iterrows(), complaint_description, cats):
+            row_dict = {}
+            index, data = row
+            row_dict['index'] = index
+
+            if str(request.user.profile.organisation_name) == "ICMC":
+                row_dict['problem_description'] = complaint
+                row_dict['category'] = scores
+                row_dict['highest_confidence'] = list(row_dict['category'].values())[0]
+            else:
+                continue
+                # data = data.dropna(subset=["text"])
+                # complaint_description = data['text']
+                # cats = model.get_top_3_cats_with_prob(complaint_description)
+            dict_list.append(row_dict)
+        dict_list = sorted(dict_list, key=lambda k: k['highest_confidence'], reverse=True)
+
+        if dict_list:
+            filemeta.has_prediction = True
+
+        with open(output_file_path_json, 'w') as temp:
+            json.dump(dict_list, temp)
+
+        print('JSON output saved.')
+        print('Done.')
+
+        with open(input_file_path, 'r') as f1:
+            with open(output_file_path_csv, 'w') as f2:
+                for line in f1:
+                    f2.write(line)
+
+        filemeta.output_file_json = output_file_path_json
+        filemeta.output_file_xlsx = output_file_path_csv
+        filemeta.save()
+    else:
+        dict_list = json.load(filemeta.output_file_json)
+
+    # preparing category list based on organisation name
     if str(request.user.profile.organisation_name) == 'ICMC':
-        model = ClassificationService()
         category_queryset = Category.objects.filter(organisation_name='ICMC').values_list('category', flat=True)
         category_list = list(category_queryset)
+    elif str(request.user.profile.organisation_name) == 'SpeakUp':
+        category_queryset = Category.objects.filter(organisation_name='SpeakUp').values_list('category', flat=True)
+        category_list = list(category_queryset)
 
-    elif str(request.user.profile.organisation_name) == "SpeakUp":
-        pass
-        #do stuff
-        # model = SpeakupClassificationService()
-        # category_list = Category.objects.filter(organisation_name='SpeakUp').values_list('category', flat=True)
+    return render(request, './Venter/prediction_table.html', {'dict_list': dict_list, 'category_list': category_list, 'filemeta': filemeta})
 
-    cats = model.get_top_3_cats_with_prob(complaint_description)
+@require_http_methods(["POST"])
+def download_table(request, pk):
+    """
+    View logic to prepare a .csv output file for files uploaded by ICMC users
+        1) category_rec stores a two-dimensional list for all the custom categories selected by the user
+        2) If 'Predicted_Category' column exists in results.csv file, it is dropped
+        3) New category list is populated in the results.csv file and results.csv file is saved in the database
+        4) Predicted_table template is rendered and user downloads the results.csv file(from dashboard.html)
+    """
+    filemeta = File.objects.get(pk=pk)
+    category_rec = json.loads(request.POST['category_input'])
 
-    for row, complaint, scores in zip(csvfile.iterrows(), complaint_description, cats):
-        row_dict = {}
-        index, data = row
-        row_dict['index'] = index
+    output_csv_file_path = filemeta.output_file_xlsx.path
 
-        if str(request.user.profile.organisation_name) == "ICMC":
-            row_dict['problem_description'] = complaint
-            row_dict['category'] = scores
-            row_dict['highest_confidence'] = list(row_dict['category'].values())[0]
-        else:
-            continue
-            data = data.dropna(subset=["text"])
-            complaint_description = data['text']
-            cats = model.get_top_3_cats_with_prob(complaint_description)
-        dict_list.append(row_dict)
-    dict_list = sorted(dict_list, key=lambda k: k['highest_confidence'], reverse=True)
+    csv_file = pd.read_csv(output_csv_file_path, sep=',', header=0, encoding='latin1')
 
-    return render(request, './Venter/prediction_table.html', {'dict_list': dict_list, 'category_list': category_list})
+    if 'Predicted_Category' in csv_file.columns:
+        csv_file = csv_file.drop("Predicted_Category", axis=1)
+        
+    csv_file.insert(0, "Predicted_Category", category_rec)
+    csv_file.to_csv(output_csv_file_path, index=False)
+
+    filemeta.output_file_xlsx = output_csv_file_path
+    filemeta.save()
+    return HttpResponseRedirect(reverse('predict_csv', kwargs={"pk": filemeta.pk}))

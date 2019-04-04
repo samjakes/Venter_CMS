@@ -2,7 +2,11 @@
 .idea/*
 db.sqlite3
 __pycache__/
+<<<<<<< HEAD
 env/
+=======
+../.venv/
+>>>>>>> 856464d7fe3c2ec45506401ff9101c7b08377db7
 media/**
 htmlcov/
 Venter/ML_model/Civis/GoogleNews-vectors-negative300.bin
