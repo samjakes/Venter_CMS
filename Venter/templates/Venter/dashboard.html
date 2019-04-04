@@ -67,31 +67,6 @@
                   </a>
                 {% endif %}
             {% else %}
-<<<<<<< HEAD
-              {% if not file.has_prediction %}
-=======
-<<<<<<< HEAD
-              {% if not file.has_prediction %}
-=======
-<<<<<<< HEAD
->>>>>>> 4d90b257adffcd54847814208ee9c164582a4244
->>>>>>> 0569db49ff09d7389ea449b6a4df548bed688c24
-                <a href="{% url 'predict_csv' file.pk %}">
-                  <button class="btn btn-primary predict-button" onclick="showloading();" id="predict-button">Predict</button>
-                </a>
-                <div class="loader" id="loader"></div>
-              {% else %}
-                <a href="{% url 'predict_csv' file.pk %}">
-                    <button class="btn btn-success view-button">View</button>
-                </a>
-              {% endif %}
-            {% endif %}
-          </td>
-          <td>
-            <a href="{{file.output_file_xlsx}}", download="results.xlsx">
-              <i class="fa fa-download download-fa" aria-hidden="true"></i>
-            </a>
-=======
                 {% if not file.has_prediction %}
                   <a href="{% url 'predict_csv' file.pk %}">
                     <button class="btn btn-primary predict-button" onclick="showloading();" id="predict-button">Predict</button>
@@ -114,7 +89,6 @@
                 <i class="fa fa-download download-fa" aria-hidden="true"></i>
               </a>
             {% endif %}  
->>>>>>> 856464d7fe3c2ec45506401ff9101c7b08377db7
           </td>
             {% if user.is_staff == True %}
             <td>
@@ -133,11 +107,7 @@
     <div class="div-pagination">
         {% block pagination %}
         {% if is_paginated %}
-<<<<<<< HEAD
-        <ul class="pagination justify-content-center">
-=======
         <ul class="pagination justify-contentç" style="bottom:10px;">
->>>>>>> 856464d7fe3c2ec45506401ff9101c7b08377db7
           {% if page_obj.has_previous %}
           <li class="page-item">
             <a class="page-link" href="{{ request.path }}?page={{ page_obj.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">Previous</a>
@@ -165,11 +135,7 @@
             <a class="page-link" href="{{ request.path }}?page={{ page_obj.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">Next</a>
           </li>
           {% else %}
-<<<<<<< HEAD
-          <li class="page-item" disabled="">
-=======
           <li class="page-item disabled">
->>>>>>> 856464d7fe3c2ec45506401ff9101c7b08377db7
             <a class="page-link">Next</a>
           </li>
           {% endif %}
@@ -181,15 +147,9 @@
   {% else %}
   <div class="inner-db-no-file">
     <div class="uploadtext">Upload File</div>
-<<<<<<< HEAD
-    <div class="file-upload">
-      <a href="{% url 'upload_file' %}">
-        <i class="fa fa-arrow-up"></i>
-=======
     <div class="fileupload">
       <a href="{% url 'upload_file' %}">
         <i class="fa fa-arrow-up arrow-fa"></i>
->>>>>>> 856464d7fe3c2ec45506401ff9101c7b08377db7
       </a>
     </div>
   </div>

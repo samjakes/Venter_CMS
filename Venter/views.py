@@ -147,9 +147,7 @@ class RegisterEmployeeView(LoginRequiredMixin, CreateView):
                 user_obj.set_password(password)
                 user_obj.save()
                 org_name = request.user.profile.organisation_name
-                permission = Permission.objects.get(
-                    name='Can view files uploaded by self')
-                user_obj.user_permissions.add(permission)
+                
                 profile = Profile.objects.create(
                     user=user_obj, organisation_name=org_name)
                 profile.save()
@@ -422,8 +420,8 @@ def predict_csv(request, pk):
         print('JSON output saved.')
         print('Done.')
 
-        with open(input_file_path, 'r') as f1:
-            with open(output_file_path_csv, 'w') as f2:
+        with open(input_file_path, 'r', encoding='latin1') as f1:
+            with open(output_file_path_csv, 'w', encoding='latin1') as f2:
                 for line in f1:
                     f2.write(line)
 
