@@ -1,0 +1,25 @@
+/*
+Styling for category_list.html
+*/
+  
+.outer-category{
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+}
+
+.container-category {
+    position: relative;
+    width: 100%;
+    padding: 0% 1%;
+}
+
+.search-form-category{
+    position: relative;
+    padding: 1% 0%;
+}
+
+.pagination-container{
+    margin: auto;
+    width: 50%;
+}
