@@ -175,6 +175,7 @@ class ImportGraph:
         return self.sess.run(self.probs, feed_dict={self.X: data})
 
     def process_query(self, data, flag):
+        print('**************PROCESS QUERY START*****************')
         processes_data = []
         for line in data:
             if flag == 1:
@@ -187,13 +188,16 @@ class ImportGraph:
                 if token.strip() in self.word_index_map.keys():
                     indices.append(self.word_index_map[token.strip()])
                     clean_words.append(token.strip())
+            print(indices)
             if len(indices) < 100:
                 indices += [self.last_index] * \
                     (self.max_padded_sentence_length - len(indices))
-            else:
-                continue
+            
             if len(indices) > 35:
                 indices = indices[:35]
-            processes_data.append(np.asarray(indices))
-
+            print(indices)
+            processes_data.append(indices)
+            print(np.asarray(processes_data).shape)
+            print('***')
+        print('**************PROCESS QUERY END*****************')
         return np.array(processes_data)

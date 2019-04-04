@@ -91,8 +91,8 @@ def categorizer():
     stats.write(s + '\n')
 
     #filepaths
-    responsePath = 'Venter\ML_model\Civis\data\comments'
-    categoryPath = 'Venter\ML_model\Civis\data\sentences'
+    responsePath = 'Venter/ML_model/Civis/data/comments/'
+    categoryPath = 'Venter/ML_model/Civis/data/sentences/'
     responseDomains = os.listdir(responsePath)
     categoryDomains = os.listdir(categoryPath)
     
@@ -105,11 +105,11 @@ def categorizer():
 
         print('Categorizing %s domain...' % domain)
 
-        temp = open(os.path.join(responsePath,responseDomain), 'r', encoding='utf-8-sig')
+        temp = open(os.path.join(responsePath, responseDomain), 'r', encoding='utf-8-sig')
         responses = temp.readlines()
         rows = len(responses)
 
-        temp = open(os.path.join(categoryPath,categoryDomain), 'r', encoding='utf-8-sig')
+        temp = open(os.path.join(categoryPath, categoryDomain), 'r', encoding='utf-8-sig')
         categories = temp.readlines()
         columns = len(categories)
         categories.append('Novel')
@@ -207,6 +207,8 @@ def categorizer():
         results[domain]['Novel'] = novel_sub_categories
 
         print('***********************************************************')
-    with open('out_new.json', 'w') as temp:
-        json.dump(results, temp)
+    # with open('out_new.json', 'w') as temp:
+    #     json.dump(results, temp)
+    print("---------RESULTS----")
+    print(results)
     return results

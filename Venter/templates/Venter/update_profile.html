@@ -15,40 +15,29 @@
         $("#updateProfileModal").modal('show');
     });
 </script>
-<!-- ../../static/assets/img/demo_profile_2.jpg -->
 {% endif %} 
 
 <div class="outer-profile">
     <div class="wrap-profile">
         <form method="post" name="form" enctype="multipart/form-data" class="profile-form">
             {% csrf_token %}
-            <img src="../../static/assets/img/default-avatar.png" alt="Avatar" class="profile-avatar"><br><br>
-            <script>
-                console.log('{{profile_form}}');
-            </script>    
+            <img src="{{profile_form.profile_picture.url}}" alt="Avatar" class="profile-avatar"><br><br>
             <div class="wrap-field">
-				<label class="org-label">Organisation Name: {{ request.user.profile.organisation_name }}</label>
-			</div>
-
+                <label class="org-label">{{ request.user.username}}</label>
+            </div>
             <div class="wrap-field">
-                <label class="username-label">Username: </label> &nbsp; {{ request.user.username}}
-            </div>
-
-            <div class="wrap-field">
-                    <label class="phone-number-label">Phone Number: </label> &nbsp; {{ profile_form.phone_number}}
-            </div>
-
-            <div class="wrap-field-profile-picture">
-                <label class="profile-picture-label">Profile Picture: </label> &nbsp; {{ profile_form.profile_picture }}
-            </div>
-
-            <!-- {% for field in profile_form %}
-                <div class="wrap-field">
-                    <label class="field-label">{{ field.label }}: </label>&nbsp;{{ field }}
-                    <br>
+                <div class="center" style="margin:0 auto;">
+                        <div class="data" style="font-size:20px;font-weight: bold;display:inline;">Organisation Name:</div> &nbsp;
+                        <div class="data" style="font-size:20px;display: inline;">{{ request.user.profile.organisation_name }}</div>
                 </div>
-            {% endfor %} -->
+            </div>
 
+            <div class="wrap-field">
+                <div class="center" style="margin:0 auto;">
+                    <div class="data" style="font-size:20px;font-weight: bold;display:inline;">Phone Number: </div> &nbsp;
+                    <div class="data" style="font-size:20px;display: inline;">{{ profile_form.phone_number}}</div>
+                </div> 
+            </div>
             <input type="submit" value="Update" class="update_profile_btn">
         </form>
     </div>   

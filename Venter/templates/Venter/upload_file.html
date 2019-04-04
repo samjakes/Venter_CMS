@@ -20,15 +20,14 @@
     <div class="inner-upload-file">
         <form method="post" action="{% url 'upload_file' %}" enctype="multipart/form-data">
             {% csrf_token %}
-            <h3>Upload File</h3>
-            <br><br>
-            <div class="test">
+            <div class="data title">Upload File</div><br>
+            <div class="uploadinner data">
                 <div class="container-file">
                     <label for="{{ form.input_file.id_for_label }}"></label>
                     {{ file_form.input_file }}
                 </div>
-            </div>
-            <input type="submit" value="Upload" class="submit-upload">
+            </div><br>
+            <input type="submit" value="Upload" class="submitbtn data">
         </form>
 
         {% if file_form.errors %}
