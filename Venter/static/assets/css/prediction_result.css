@@ -155,9 +155,7 @@ Styling for prediction_result.html
     -webkit-overflow-scrolling: touch;
 }
 
-.card-hr{
-    border: 3px solid black;
-}
+
 
 .download-fa{
     font-size: 20px;
@@ -173,8 +171,13 @@ Styling for prediction_result.html
     margin-right: 2%;
 }
 
-.score-box{
-    background-color: whitesmoke;
-    border-radius: 3px;
-    border:none;
+
+
+.response_score{
+    background-color: #0906a5;
+    border-radius: 50%;
+    font-size: 15px;
+    color: white;
+    font-weight: bold;
+    padding: 2px;
 }

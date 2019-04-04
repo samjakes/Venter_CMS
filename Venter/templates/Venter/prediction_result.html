@@ -14,44 +14,49 @@
       $('.nav-pills li:eq(0) a').tab('show');
     }
     $("#chart-download-container").hide();
-  });
-</script>
-
-
-<script>
-  function colorcode(score, li_index){
-    if(score > 90){
-      $("#" + li_index).attr("style", "background-color: #00a33b");
-    }
-    else if(score > 80){
-      $("#" + li_index).attr("style", "background-color: #06d636");
-    }
-    else if(score > 70){
-      $("#" + li_index).attr("style", "background-color: #4ee802");
-    }
-    else if(score > 60){
-      $("#" + li_index).attr("style", "background-color: #c3ff00");
-    }
-    else if(score > 50){
-      $("#" + li_index).attr("style", "background-color: #f6ff00");
-    }
-    else if(score > 40){
-      $("#" + li_index).attr("style", "background-color: #ffe100");
-    }
-    else if(score > 30){
-      $("#" + li_index).attr("style", "background-color: #ffbb00");
-    }
-    else if(score > 20){
-      $("#" + li_index).attr("style", "background-color: #ff8c00");
-    }
-    else if(score > 10){
-      $("#" + li_index).attr("style", "background-color: #ff5900");
-    }
-    else{
-      $("#" + li_index).attr("style", "background-color: #af0101");
-    }
-    
-  }
+  
+  $(".response_list").each(function(){
+        $(this).children().each(function(){
+           let list_index = $(this);
+           let span_text = $(this).children().text();
+           span_text = span_text.slice(0,-1);
+           let score = parseInt(span_text);
+           colorcode(score, list_index);
+        })          
+      })
+      function colorcode(score, li_index){
+        if(score > 90){
+          li_index.attr("style", "background-color: #51cb47 !important");
+        }
+        else if(score > 80){
+          li_index.attr("style", "background-color: #45cb7d !important");
+        }
+        else if(score > 70){
+          li_index.attr("style", "background-color: #43cabf !important");
+        }
+        else if(score > 60){
+          li_index.attr("style", "background-color: #4c97cd !important");
+        }
+        else if(score > 50){
+          li_index.attr("style", "background-color: #6971d5 !important");
+        }
+        else if(score > 40){
+         li_index.attr("style", "background-color: #9466d4 !important");
+        }
+        else if(score > 30){
+          li_index.attr("style", "background-color: #ca64d3 !important");
+        }
+        else if(score > 20){
+          li_index.attr("style", "background-color: #d464a5 !important");
+        }
+        else if(score > 10){
+          li_index.attr("style", "background-color: #d46770 !important");
+        }
+        else{
+          li_index.attr("style", "background-color: #cd824c !important");
+        }
+      }
+    });
 </script>
 
 <script>
@@ -215,32 +220,32 @@
           <div class="card-body">
             <div class="card-text">
               {% if not response %}
-              <li class="list-group-item">No response</li>
+                <li class="list-group-item">No response</li>
               {% else %}
-              <ul class="list-group list-group-flush">
-                {% if category == 'Novel' %}
-                {% for keys, item in response.items %}
-                <li class="list-group-item">
-                  <b>Sub category {{forloop.counter}}</b>
-                </li>
-                {% for r in item %}
-                <li class="list-group-item">
-                  {{r}}
-                </li>
-                {% endfor %}
-                {% endfor %}
+                <ul class="list-group list-group-flush">
+                  {% if category == 'Novel' %}
+                    <ul class="list-group no_response_list">
+                      {% for keys, item in response.items %}
+                          <li class="list-group-item">
+                            <b>Sub category {{forloop.counter}}</b>
+                          </li>
+                          {% for r in item %}
+                              <li class="list-group-item">
+                                {{r}}
+                              </li>
+                          {% endfor %}
+                      {% endfor %}
+                  </ul>
                 {% else %}
-
-                {% for r in response %}
-                <div class="input-group">
-                  <li class="list-group-item" id="li{{r.response}}">{{r.response}}</li>
-                  <script>colorcode('{{r.score}}', "li{{r.response}}")</script>
-                  <button class="score-box">{{r.score}}</button>
-                </div>
-                {% endfor %}
-
+                  <ul class="list-group response_list">
+                    {% for r in response %}
+                        <li class="list-group-item">
+                            {{r.response}}
+                            <span class="response_score">{{r.score}}%</span>
+                        </li> <br>
+                    {% endfor %}
+                  </ul> 
                 {% endif %}
-              </ul>
               {% endif %}
             </div>
           </div>
