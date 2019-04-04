@@ -19,6 +19,7 @@
     <link href="../../static/assets/css/bootstrap.min.css" rel="stylesheet" />
     <link href="../../static/assets/css/light-bootstrap-dashboard.css?v=2.0.1" rel="stylesheet" />
 </head>
+<<<<<<< HEAD
 
 <body>
     <!---this is the lightboard template-->
@@ -61,6 +62,53 @@
             </div>
     </div>
 </body>
+=======
+<body>
+        <div class="topnav" id="myTopnav">
+                <a href="{% url 'home' %}">
+                        <img src="../../static/assets/img/logo_3.png" alt="logo" class="imagelogo-index">
+                </a>
+                <label class="app-label">Venter</label>
+                <div class="test"> 
+                    <a class="nav-link" href="{% url 'login' %}">
+                            <div class="test">
+                                Login
+                            </div>
+                    </a>    
+                    <a class="nav-link" href="{% url 'contact_us' %}">
+                            <div class="test">
+                                    Contact Us
+                                </div>
+                    </a>
+                    <a href="javascript:void(0);" class="icon" onclick="myFunction()">
+                            <i class="fa fa-bars"></i>
+                    </a>
+                </div>
+            </div>
+        
+          <!-- Main content -->
+          <div class="content-index">
+                  {% block content %}
+                  {% endblock %}
+          </div>
+          <div class="footer-index">
+              <p>© 2018 Venter . All Rights Reserved | Design by
+                <a href="http://www.iitb.ac.in/" target="_blank">IIT Bombay, Powai</a>
+              </p>
+          </div>
+            <script>
+                function myFunction() {
+                    var x = document.getElementById("myTopnav");
+                    if (x.className === "topnav") {
+                    x.className += " responsive";
+                    } else {
+                    x.className = "topnav";
+                    }
+                }
+            </script>
+</body>
+
+>>>>>>> 856464d7fe3c2ec45506401ff9101c7b08377db7
 <!--   Core JS Files   -->
 <script src="../../static/assets/js/core/jquery.3.2.1.min.js" type="text/javascript"></script>
 <script src="../../static/assets/js/core/popper.min.js" type="text/javascript"></script>

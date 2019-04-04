@@ -37,13 +37,21 @@ class ImportGraph:
             Dos2Unix.unixencode()
 
             with open(settings.BASE_DIR + str(
+<<<<<<< HEAD
                     "/Venter/ML_model/ICMC/dataset/dataset_mcgm_clean/word_index_map_mcgm_.pickle"), "rb") as myFile:
+=======
+                    "/Venter/ML_model/ICMC/dataset/dataset_mcgm_clean/word_index_map_mcgm.pickle"), "rb") as myFile:
+>>>>>>> 856464d7fe3c2ec45506401ff9101c7b08377db7
                 self.word_index_map = pickle.load(myFile, encoding='latin1')
 
             if not initialize_random:
 
                 # load pre-trained word embedding.
+<<<<<<< HEAD
                 with open(settings.BASE_DIR + "/Venter/ML_model/ICMC/dataset/dataset_mcgm_clean/word_vectors_mcgm_.pickle",
+=======
+                with open(settings.BASE_DIR + "/Venter/ML_model/ICMC/dataset/dataset_mcgm_clean/word_vectors_mcgm.pickle",
+>>>>>>> 856464d7fe3c2ec45506401ff9101c7b08377db7
                           "rb") as myFile:
                     word_vectors = pickle.load(myFile, encoding='latin1')
 
@@ -175,6 +183,10 @@ class ImportGraph:
         return self.sess.run(self.probs, feed_dict={self.X: data})
 
     def process_query(self, data, flag):
+<<<<<<< HEAD
+=======
+        print('**************PROCESS QUERY START*****************')
+>>>>>>> 856464d7fe3c2ec45506401ff9101c7b08377db7
         processes_data = []
         for line in data:
             if flag == 1:
@@ -187,6 +199,7 @@ class ImportGraph:
                 if token.strip() in self.word_index_map.keys():
                     indices.append(self.word_index_map[token.strip()])
                     clean_words.append(token.strip())
+<<<<<<< HEAD
             if len(indices) < 100:
                 indices += [self.last_index] * \
                     (self.max_padded_sentence_length - len(indices))
@@ -196,4 +209,18 @@ class ImportGraph:
                 indices = indices[:35]
             processes_data.append(np.asarray(indices))
 
+=======
+            print(indices)
+            if len(indices) < 100:
+                indices += [self.last_index] * \
+                    (self.max_padded_sentence_length - len(indices))
+            
+            if len(indices) > 35:
+                indices = indices[:35]
+            print(indices)
+            processes_data.append(indices)
+            print(np.asarray(processes_data).shape)
+            print('***')
+        print('**************PROCESS QUERY END*****************')
+>>>>>>> 856464d7fe3c2ec45506401ff9101c7b08377db7
         return np.array(processes_data)

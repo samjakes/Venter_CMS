@@ -63,6 +63,7 @@ Styling for prediction_result.html
     color:white;
 }
 
+<<<<<<< HEAD
 /* .content-domain ul > .nav-item.active {
     background-color: blue;
     color:white;
@@ -77,6 +78,8 @@ Styling for prediction_result.html
     color:white;
 } */
 
+=======
+>>>>>>> 856464d7fe3c2ec45506401ff9101c7b08377db7
 .content-navigator > .nav-pills > li > a{
   background-color: white;
   color: black;
@@ -155,10 +158,11 @@ Styling for prediction_result.html
     -webkit-overflow-scrolling: touch;
 }
 
-.card-hr{
-    border: 3px solid black;
-}
+<<<<<<< HEAD
 
+
+=======
+>>>>>>> 856464d7fe3c2ec45506401ff9101c7b08377db7
 .download-fa{
     font-size: 20px;
 }
@@ -173,8 +177,20 @@ Styling for prediction_result.html
     margin-right: 2%;
 }
 
-.score-box{
-    background-color: whitesmoke;
-    border-radius: 3px;
-    border:none;
+<<<<<<< HEAD
+
+
+=======
+>>>>>>> 856464d7fe3c2ec45506401ff9101c7b08377db7
+.response_score{
+    background-color: #0906a5;
+    border-radius: 50%;
+    font-size: 15px;
+    color: white;
+    font-weight: bold;
+    padding: 2px;
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> 856464d7fe3c2ec45506401ff9101c7b08377db7

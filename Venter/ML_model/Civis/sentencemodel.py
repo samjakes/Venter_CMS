@@ -83,7 +83,11 @@ def categorizer():
     stats = open('stats.txt', 'w', encoding='utf-8')
 
     st = time.time()
+<<<<<<< HEAD
     wordmodelfile = 'E:/Me/IITB/Work/CIVIS/ML Approaches/word embeddings and similarity matrix/GoogleNews-vectors-negative300.bin'
+=======
+    wordmodelfile = 'Venter/ML_model/Civis/GoogleNews-vectors-negative300.bin'
+>>>>>>> 856464d7fe3c2ec45506401ff9101c7b08377db7
     wordmodel = KeyedVectors.load_word2vec_format(wordmodelfile, binary = True, limit=200000)
     et = time.time()
     s = 'Word embedding loaded in %f secs.' % (et-st)
@@ -91,8 +95,13 @@ def categorizer():
     stats.write(s + '\n')
 
     #filepaths
+<<<<<<< HEAD
     responsePath = 'Venter\ML_model\Civis\data\comments'
     categoryPath = 'Venter\ML_model\Civis\data\sentences'
+=======
+    responsePath = 'Venter/ML_model/Civis/data/comments/'
+    categoryPath = 'Venter/ML_model/Civis/data/sentences/'
+>>>>>>> 856464d7fe3c2ec45506401ff9101c7b08377db7
     responseDomains = os.listdir(responsePath)
     categoryDomains = os.listdir(categoryPath)
     
@@ -105,11 +114,19 @@ def categorizer():
 
         print('Categorizing %s domain...' % domain)
 
+<<<<<<< HEAD
         temp = open(os.path.join(responsePath,responseDomain), 'r', encoding='utf-8-sig')
         responses = temp.readlines()
         rows = len(responses)
 
         temp = open(os.path.join(categoryPath,categoryDomain), 'r', encoding='utf-8-sig')
+=======
+        temp = open(os.path.join(responsePath, responseDomain), 'r', encoding='utf-8-sig')
+        responses = temp.readlines()
+        rows = len(responses)
+
+        temp = open(os.path.join(categoryPath, categoryDomain), 'r', encoding='utf-8-sig')
+>>>>>>> 856464d7fe3c2ec45506401ff9101c7b08377db7
         categories = temp.readlines()
         columns = len(categories)
         categories.append('Novel')
@@ -207,6 +224,13 @@ def categorizer():
         results[domain]['Novel'] = novel_sub_categories
 
         print('***********************************************************')
+<<<<<<< HEAD
     with open('out_new.json', 'w') as temp:
         json.dump(results, temp)
+=======
+    # with open('out_new.json', 'w') as temp:
+    #     json.dump(results, temp)
+    print("---------RESULTS----")
+    print(results)
+>>>>>>> 856464d7fe3c2ec45506401ff9101c7b08377db7
     return results

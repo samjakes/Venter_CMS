@@ -15,7 +15,10 @@ Styling for registration.html
   body {
     font-family: "Muli-Regular";
     font-size: 14px;
+<<<<<<< HEAD
     margin: 0;
+=======
+>>>>>>> 856464d7fe3c2ec45506401ff9101c7b08377db7
     color: #999; }
   
   input, textarea, select, .submit-register {
@@ -38,6 +41,7 @@ Styling for registration.html
     outline: none; }
   
   .wrapper-register {
+<<<<<<< HEAD
     height: 100vh;
     display: flex;
     align-items: center;
@@ -47,6 +51,18 @@ Styling for registration.html
   .inner-register {
     position: relative;
     width: 435px; }
+=======
+    height: 100%;
+    display: flex;
+    text-align: center;
+    justify-content: center;
+    overflow: scroll;
+    background: #accffe; }
+  
+  .inner-register {
+    width: 435px; 
+  }
+>>>>>>> 856464d7fe3c2ec45506401ff9101c7b08377db7
   
   form {
     width: 100%;
@@ -225,4 +241,11 @@ Styling for registration.html
     font-size: 20px;
   }
 
+<<<<<<< HEAD
   /*# sourceMappingURL=style.css.map */
+=======
+  .title {
+    font-family: Copperplate; 
+    font-size: 30px;
+  }
+>>>>>>> 856464d7fe3c2ec45506401ff9101c7b08377db7
