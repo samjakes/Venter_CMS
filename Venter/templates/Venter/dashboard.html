@@ -74,9 +74,16 @@
                   </a>
                 {% endif %}
             {% else %}
+              {% if not file.has_prediction %}
                 <a href="{% url 'predict_csv' file.pk %}">
-                  <button class="btn btn-primary predict-button">Predict CSV</button>
+                  <button class="btn btn-primary predict-button" onclick="showloading();" id="predict-button">Predict</button>
                 </a>
+                <div class="loader" id="loader"></div>
+              {% else %}
+                <a href="{% url 'predict_csv' file.pk %}">
+                    <button class="btn btn-success view-button">View</button>
+                </a>
+              {% endif %}
             {% endif %}
           </td>
           <td>
