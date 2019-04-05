@@ -373,10 +373,34 @@ def predict_result(request, pk):
     dict_keys = dict_data.keys()
     domain_list = list(dict_keys)
 
-    return render(request, './Venter/prediction_result.html', {
-        'domain_list': domain_list, 'dict_data': dict_data
-    })
+    if request.is_ajax():
+        domain = request.GET.get('domain')
+        domain_data = dict_data[domain]
+        temp = ['Category']
+        index = 0
+        for subCat in domain_data['Novel']:
+            temp.append('Sub category ' + str(index+1))
+            index += 1
+        temp.append({'role':'style'})
+        domain_stats = []
+        domain_stats.append(temp)
 
+        for category, responselist in domain_data.items():
+            column = [category, len(responselist), '']
+            if category == 'Novel':
+                column = ['Novel']
+                for subCat in domain_data[category]:
+                    column.append(len(domain_data[category][subCat]))
+                column.append('')
+            else:
+                for i in range(len(domain_stats[0]) - len(column)):
+                    column.insert(2,0)
+            domain_stats.append(column)
+
+        return HttpResponse(jsonpickle.encode(domain_stats), content_type='application/json')
+    return render(request, './Venter/prediction_result.html', {
+        'domain_list': domain_list, 'dict_data': dict_data, 'filemeta': filemeta,
+    })
 
 # @require_http_methods(["GET"])
 # def domain_contents(request):
