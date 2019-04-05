@@ -209,6 +209,5 @@ def categorizer():
         print('***********************************************************')
     # with open('out_new.json', 'w') as temp:
     #     json.dump(results, temp)
-    print("---------RESULTS----")
-    print(results)
+    
     return results
