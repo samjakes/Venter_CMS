@@ -52,7 +52,7 @@ button:hover {
 .txt2 {
   font-family: Poppins-Regular;
   font-size: 15px;
-  color: #999999;
+  color: #f0ebeb;
 }
 
 .txt3 {
@@ -110,24 +110,20 @@ button:hover {
   .contact100-more {
     width: 50%;
     background-repeat: no-repeat;
-    background-size: cover;
     background-position: center;
     position: relative;
-    z-index: 1;
     padding: 30px 15px 0px 15px;
     background-image: url('../img/contact_us_bg.jpg');
   }
   
   .contact100-more::before {
     content: "";
-    display: block;
     position: absolute;
-    z-index: -1;
     width: 100%;
     height: 100%;
     top: 0;
     left: 0;
-    background: rgba(0,0,0,0.8);
+    background: rgba(0,0,0,0.5);
   }
 
 

@@ -1,5 +1,5 @@
 import pickle
-
+from .dos2unix import Dos2Unix
 import numpy as np
 import tensorflow as tf
 from django.conf import settings
@@ -32,6 +32,9 @@ class ImportGraph:
             train_attention = True
             initialize_random = False
             train_we = True
+
+            #encode dos 2 unix for the pre-trained word embedding for cross-platform functionality
+            Dos2Unix.unixencode()
 
             with open(settings.BASE_DIR + str(
                     "/Venter/ML_model/ICMC/dataset/dataset_mcgm_clean/word_index_map_mcgm.pickle"), "rb") as myFile:

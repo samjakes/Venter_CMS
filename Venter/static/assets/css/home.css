@@ -1,7 +1,6 @@
-/* .div1 {
-    height: 450px;
-    border: 3px solid #73AD21;
-} */
+/* 
+    Styling for home.css
+ */
 img{
     display: block;
     margin-left: auto;
@@ -23,7 +22,7 @@ img{
 }
 
 #imagesize{
-    width: 300px;
+    width: 250px;
 }
 
 img.techstack{
@@ -64,22 +63,13 @@ img.move {
     padding: 10px;
     padding-left: 30px;
 }
-/* Safari 4.0 - 8.0 */
-/* @-webkit-keyframes mymove {
-from {left: 0px;}
-to {left: 100px;}
-}
-
-@keyframes mymove {
-from {left: 0px;}
-to {left: 100px;}
-} */
 
 .data{
     display: block;
     margin-left: auto;
     margin-right: auto;
     text-align: center;
+    font-family: Copperplate;
 }
 
 .title{

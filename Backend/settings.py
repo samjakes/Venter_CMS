@@ -120,12 +120,19 @@ LOGIN_URL = 'login'
 
 LOGOUT_REDIRECT_URL = 'login'
 
-EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
-
-ADMINS = [('Test A. Admin', 'admin@test.com')]
+# EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_USE_TLS = True
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST_USER = 'ventermsr@gmail.com'
+EMAIL_HOST_PASSWORD = 'Venter@123'
+EMAIL_PORT = 587
 
 # Maximum size of file uploaded by user
 # 5242880 = 5 MB
+
+ADMINS = [('Venter Admin', 'ventermsr@gmail.com')]
+
 MAX_UPLOAD_SIZE = "5242880"
 
 FILE_UPLOAD_TYPE = 'csv'
