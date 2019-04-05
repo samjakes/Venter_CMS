@@ -17,7 +17,7 @@ from django.views.decorators.http import require_http_methods
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
 from django.views.generic.list import ListView
 
-from Backend.settings import MEDIA_ROOT
+from Backend.settings import MEDIA_ROOT, ADMINS
 from Venter.forms import ContactForm, CSVForm, ExcelForm, ProfileForm, UserForm
 from Venter.models import Category, File, Profile
 
@@ -148,9 +148,9 @@ class RegisterEmployeeView(LoginRequiredMixin, CreateView):
                 user_obj.set_password(password)
                 user_obj.save()
                 org_name = request.user.profile.organisation_name
-                permission = Permission.objects.get(
-                    name='Can view files uploaded by self')
-                user_obj.user_permissions.add(permission)
+                # permission = Permission.objects.get(
+                #     name='Can view files uploaded by self')
+                # user_obj.user_permissions.add(permission)
                 profile = Profile.objects.create(
                     user=user_obj, organisation_name=org_name)
                 profile.save()
@@ -199,6 +199,12 @@ def contact_us(request):
                 "Inquiry Date and Time: "+date_time+"\n Company Name: " + \
                 company_name+"\n Contact Number: "+contact_no+"\n Email address: " + \
                 email_address+"\n Requirement Details: "+requirement_details+"\n\n"
+
+            admin_list = User.objects.filter(is_superuser=True)
+            for admin in admin_list:
+                s = (admin.username, admin.email)
+                ADMINS.append(s)
+
             mail_admins('Venter Inquiry', email_body)
             # contact_form.save()
             contact_form = ContactForm()
@@ -257,6 +263,7 @@ class FileListView(LoginRequiredMixin, ListView):
 dict_data = {}
 domain_list = []
 
+@login_required
 @require_http_methods(["GET"])
 def predict_result(request, pk):
     """
@@ -272,49 +279,49 @@ def predict_result(request, pk):
     """
     global dict_data, domain_list
 
-    json_file_path = os.path.join(MEDIA_ROOT, 'score_json.json')
-    print("file path:", json_file_path)
+    # json_file_path = os.path.join(MEDIA_ROOT, 'score_json.json')
+    # print("file path:", json_file_path)
 
-    with open(json_file_path) as json_file:
-        dict_data = json.load(json_file)
+    # with open(json_file_path) as json_file:
+    #     dict_data = json.load(json_file)
 
-    # filemeta = File.objects.get(pk=pk)
-    # if not filemeta.has_prediction:
-    #     output_directory_path = os.path.join(MEDIA_ROOT, f'{filemeta.uploaded_by.organisation_name}/{filemeta.uploaded_by.user.username}/{filemeta.uploaded_date.date()}/output')
+    filemeta = File.objects.get(pk=pk)
+    if not filemeta.has_prediction:
+        output_directory_path = os.path.join(MEDIA_ROOT, f'{filemeta.uploaded_by.organisation_name}/{filemeta.uploaded_by.user.username}/{filemeta.uploaded_date.date()}/output')
 
-    #     if not os.path.exists(output_directory_path):
-    #         os.makedirs(output_directory_path)
+        if not os.path.exists(output_directory_path):
+            os.makedirs(output_directory_path)
 
-    #     print(output_directory_path)
-    #     output_file_path_json = os.path.join(output_directory_path, 'results.json')
-    #     output_file_path_xlsx = os.path.join(output_directory_path, 'results.xlsx')
+        print(output_directory_path)
+        output_file_path_json = os.path.join(output_directory_path, 'results.json')
+        output_file_path_xlsx = os.path.join(output_directory_path, 'results.xlsx')
 
-    #     sm = SimilarityMapping(filemeta.input_file.path)
-    #     dict_data = sm.driver()
+        sm = SimilarityMapping(filemeta.input_file.path)
+        dict_data = sm.driver()
 
-    #     if dict_data:
-    #         filemeta.has_prediction = True
+        if dict_data:
+            filemeta.has_prediction = True
 
-    #     with open(output_file_path_json, 'w') as temp:
-    #         json.dump(dict_data, temp)
+        with open(output_file_path_json, 'w') as temp:
+            json.dump(dict_data, temp)
 
-    #     print('JSON output saved.')
-    #     print('Done.')
+        print('JSON output saved.')
+        print('Done.')
 
-    #     filemeta.output_file_json = output_file_path_json
+        filemeta.output_file_json = output_file_path_json
 
-    #     download_output = pd.ExcelWriter(output_file_path_xlsx, engine='xlsxwriter')
+        download_output = pd.ExcelWriter(output_file_path_xlsx, engine='xlsxwriter')
 
-    #     for domain in dict_data:
-    #         print('Writing Excel for domain %s' % domain)
-    #         df = pd.DataFrame({key:pd.Series(value) for key, value in dict_data[domain].items()})
-    #         df.to_excel(download_output, sheet_name=domain)
-    #     download_output.save()
+        for domain in dict_data:
+            print('Writing Excel for domain %s' % domain)
+            df = pd.DataFrame({key:pd.Series(value) for key, value in dict_data[domain].items()})
+            df.to_excel(download_output, sheet_name=domain)
+        download_output.save()
 
-    #     filemeta.output_file_xlsx = output_file_path_xlsx
-    #     filemeta.save()
-    # else:
-    #     dict_data = json.load(filemeta.output_file_json)
+        filemeta.output_file_xlsx = output_file_path_xlsx
+        filemeta.save()
+    else:
+        dict_data = json.load(filemeta.output_file_json)
 
     dict_keys = dict_data.keys()
     domain_list = list(dict_keys)
@@ -323,7 +330,7 @@ def predict_result(request, pk):
         'domain_list': domain_list, 'dict_data': dict_data
     })
 
-
+@login_required
 @require_http_methods(["GET"])
 def domain_contents(request):
     """
@@ -359,6 +366,7 @@ def domain_contents(request):
         'domain_stats': jsonpickle.encode(domain_stats), 'chart_domain': domain_name
     })
 
+@login_required
 @require_http_methods(["GET", "POST"])
 def predict_csv(request, pk):
     """
@@ -445,6 +453,7 @@ def predict_csv(request, pk):
 
     return render(request, './Venter/prediction_table.html', {'dict_list': dict_list, 'category_list': category_list, 'filemeta': filemeta})
 
+@login_required
 @require_http_methods(["POST"])
 def download_table(request, pk):
     """

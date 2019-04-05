@@ -92,6 +92,7 @@ def categorizer():
 
     #filepaths
     responsePath = 'Venter/ML_model/Civis/data/comments/'
+    # Venter_CMS\Venter\ML_model\Civis\data\comments\Accessibility.txt
     categoryPath = 'Venter/ML_model/Civis/data/sentences/'
     responseDomains = os.listdir(responsePath)
     categoryDomains = os.listdir(categoryPath)
