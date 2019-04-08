@@ -37,13 +37,13 @@ class ImportGraph:
             Dos2Unix.unixencode()
 
             with open(settings.BASE_DIR + str(
-                    "/Venter/ML_model/ICMC/dataset/dataset_mcgm_clean/word_index_map_mcgm.pickle"), "rb") as myFile:
+                    "/Venter/ML_model/ICMC/dataset/dataset_mcgm_clean/word_index_map_mcgm_.pickle"), "rb") as myFile:
                 self.word_index_map = pickle.load(myFile, encoding='latin1')
 
             if not initialize_random:
 
                 # load pre-trained word embedding.
-                with open(settings.BASE_DIR + "/Venter/ML_model/ICMC/dataset/dataset_mcgm_clean/word_vectors_mcgm.pickle",
+                with open(settings.BASE_DIR + "/Venter/ML_model/ICMC/dataset/dataset_mcgm_clean/word_vectors_mcgm_.pickle",
                           "rb") as myFile:
                     word_vectors = pickle.load(myFile, encoding='latin1')
 

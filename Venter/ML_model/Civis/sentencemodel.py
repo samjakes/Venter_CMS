@@ -83,7 +83,7 @@ def categorizer():
     stats = open('stats.txt', 'w', encoding='utf-8')
 
     st = time.time()
-    wordmodelfile = 'Venter/ML_model/Civis/GoogleNews-vectors-negative300.bin'
+    wordmodelfile = 'Venter/ML_model/Civis/MIN.bin'
     wordmodel = KeyedVectors.load_word2vec_format(wordmodelfile, binary = True, limit=200000)
     et = time.time()
     s = 'Word embedding loaded in %f secs.' % (et-st)
@@ -92,7 +92,6 @@ def categorizer():
 
     #filepaths
     responsePath = 'Venter/ML_model/Civis/data/comments/'
-    # Venter_CMS\Venter\ML_model\Civis\data\comments\Accessibility.txt
     categoryPath = 'Venter/ML_model/Civis/data/sentences/'
     responseDomains = os.listdir(responsePath)
     categoryDomains = os.listdir(categoryPath)

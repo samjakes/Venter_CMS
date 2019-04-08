@@ -432,8 +432,8 @@ def predict_csv(request, pk):
         print('JSON output saved.')
         print('Done.')
 
-        with open(input_file_path, 'r') as f1:
-            with open(output_file_path_csv, 'w') as f2:
+        with open(input_file_path, 'r', encoding='latin1') as f1:
+            with open(output_file_path_csv, 'w',  encoding='latin1') as f2:
                 for line in f1:
                     f2.write(line)
 
