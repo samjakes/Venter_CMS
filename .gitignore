@@ -7,5 +7,4 @@ media/**
 htmlcov/
 stats.txt
 Venter/ML_model/Civis/data/**
-Venter/ML_model/Civis/MIN.bin
-venv/
+venv/git 
