@@ -106,6 +106,7 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.0/howto/static-files/
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATIC_URL = '/static/'
 
 STATICFILES_DIRS = [
@@ -136,3 +137,4 @@ ADMINS = [('Venter Admin', 'ventermsr@gmail.com')]
 MAX_UPLOAD_SIZE = "5242880"
 
 FILE_UPLOAD_TYPE = 'csv'
+STATICFILES_STORAGE = 'whitenoise.django.GzipManifestStaticFilesStorage'
