@@ -6,5 +6,4 @@ db.sqlite3
 media/**
 htmlcov/
 stats.txt
-Venter/ML_model/Civis/data/**
 venv/git 
