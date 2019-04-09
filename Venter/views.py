@@ -279,49 +279,49 @@ def predict_result(request, pk):
     """
     global dict_data, domain_list
 
-    json_file_path = os.path.join(BASE_DIR, 'out_old.json')
-    print("file path:", json_file_path)
+    # json_file_path = os.path.join(BASE_DIR, 'out_old.json')
+    # print("file path:", json_file_path)
 
-    with open(json_file_path) as json_file:
-        dict_data = json.load(json_file)
+    # with open(json_file_path) as json_file:
+    #     dict_data = json.load(json_file)
 
-    # filemeta = File.objects.get(pk=pk)
-    # if not filemeta.has_prediction:
-    #     output_directory_path = os.path.join(MEDIA_ROOT, f'{filemeta.uploaded_by.organisation_name}/{filemeta.uploaded_by.user.username}/{filemeta.uploaded_date.date()}/output')
+    filemeta = File.objects.get(pk=pk)
+    if not filemeta.has_prediction:
+        output_directory_path = os.path.join(MEDIA_ROOT, f'{filemeta.uploaded_by.organisation_name}/{filemeta.uploaded_by.user.username}/{filemeta.uploaded_date.date()}/output')
 
-    #     if not os.path.exists(output_directory_path):
-    #         os.makedirs(output_directory_path)
+        if not os.path.exists(output_directory_path):
+            os.makedirs(output_directory_path)
 
-    #     print(output_directory_path)
-    #     output_file_path_json = os.path.join(output_directory_path, 'results.json')
-    #     output_file_path_xlsx = os.path.join(output_directory_path, 'results.xlsx')
+        print(output_directory_path)
+        output_file_path_json = os.path.join(output_directory_path, 'results.json')
+        output_file_path_xlsx = os.path.join(output_directory_path, 'results.xlsx')
 
-    #     sm = SimilarityMapping(filemeta.input_file.path)
-    #     dict_data = sm.driver()
+        sm = SimilarityMapping(filemeta.input_file.path)
+        dict_data = sm.driver()
 
-    #     if dict_data:
-    #         filemeta.has_prediction = True
+        if dict_data:
+            filemeta.has_prediction = True
 
-    #     with open(output_file_path_json, 'w') as temp:
-    #         json.dump(dict_data, temp)
+        with open(output_file_path_json, 'w') as temp:
+            json.dump(dict_data, temp)
 
-    #     print('JSON output saved.')
-    #     print('Done.')
+        print('JSON output saved.')
+        print('Done.')
 
-    #     filemeta.output_file_json = output_file_path_json
+        filemeta.output_file_json = output_file_path_json
 
-    #     download_output = pd.ExcelWriter(output_file_path_xlsx, engine='xlsxwriter')
+        download_output = pd.ExcelWriter(output_file_path_xlsx, engine='xlsxwriter')
 
-    #     for domain in dict_data:
-    #         print('Writing Excel for domain %s' % domain)
-    #         df = pd.DataFrame({key:pd.Series(value) for key, value in dict_data[domain].items()})
-    #         df.to_excel(download_output, sheet_name=domain)
-    #     download_output.save()
+        for domain in dict_data:
+            print('Writing Excel for domain %s' % domain)
+            df = pd.DataFrame({key:pd.Series(value) for key, value in dict_data[domain].items()})
+            df.to_excel(download_output, sheet_name=domain)
+        download_output.save()
 
-    #     filemeta.output_file_xlsx = output_file_path_xlsx
-    #     filemeta.save()
-    # else:
-    #     dict_data = json.load(filemeta.output_file_json)
+        filemeta.output_file_xlsx = output_file_path_xlsx
+        filemeta.save()
+    else:
+        dict_data = json.load(filemeta.output_file_json)
 
     dict_keys = dict_data.keys()
     domain_list = list(dict_keys)
