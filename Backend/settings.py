@@ -25,6 +25,10 @@ SECRET_KEY = 'p!63vi=_4)o5h8k0ep4uy2e6ou^k$9wels#e&&x=^^!=$xa21o'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
+ALLOWED_HOSTS = [
+    'venter-msr.herokuapp.com'
+]
+
 # Application definition
 
 INSTALLED_APPS = [
