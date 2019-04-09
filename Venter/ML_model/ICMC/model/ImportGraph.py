@@ -34,7 +34,7 @@ class ImportGraph:
             train_we = True
 
             #encode dos 2 unix for the pre-trained word embedding for cross-platform functionality
-            Dos2Unix.unixencode()
+            # Dos2Unix.unixencode()
 
             with open(settings.BASE_DIR + str(
                     "/Venter/ML_model/ICMC/dataset/dataset_mcgm_clean/word_index_map_mcgm_.pickle"), "rb") as myFile:
