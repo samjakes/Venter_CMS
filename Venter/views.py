@@ -17,7 +17,7 @@ from django.views.decorators.http import require_http_methods
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
 from django.views.generic.list import ListView
 
-from Backend.settings import MEDIA_ROOT, ADMINS
+from Backend.settings import MEDIA_ROOT, ADMINS, BASE_DIR
 from Venter.forms import ContactForm, CSVForm, ExcelForm, ProfileForm, UserForm
 from Venter.models import Category, File, Profile
 
@@ -279,7 +279,7 @@ def predict_result(request, pk):
     """
     global dict_data, domain_list
 
-    # json_file_path = os.path.join(MEDIA_ROOT, 'score_json.json')
+    # json_file_path = os.path.join(BASE_DIR, 'out_old.json')
     # print("file path:", json_file_path)
 
     # with open(json_file_path) as json_file:
