@@ -115,15 +115,38 @@
         document.getElementById('category_form').submit();
     }
 
+//##################################
     $(document).ready(function(){
-        $("#myInput").on("keyup", function() {
+
+         $("#myInput").on("keyup", function() {
             var value = $(this).val().toLowerCase();
             $("#tbody_table tr").filter(function() {
                 $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
             });
         });
-    });
+       
 
+        $("#but").on("click", function() {
+            var cat = $('#category').find(":selected").text();
+            // var cat = 'Municipal Land - Road Footpath Strom Water Drain';
+            var pl = $('#place').find(":selected").text();
+            var d = $('#date').find(":selected").text();
+            if(pl == 'All'){
+                pl='';
+            }
+            if(d == 'All')
+            {
+                d='';
+            }
+            if(cat == 'All')
+            {
+                cat='';
+            }
+            $("#tbody_table tr").filter(function() {
+                $(this).toggle($(this).text().indexOf(d) > -1 && $(this).text().indexOf(pl) > -1 && $(this).toggle($(this).find("ul").text().indexOf(cat) > -1))
+            });
+        });
+    });
     function sortTable(n) {
         var table, rows, switching, i, x, y, shouldSwitch, dir, switchcount = 0;
         table = document.getElementById("main_content_table");
@@ -198,7 +221,35 @@
                 </form>    
             </div>
         </div><br>
-
+        <div class="selects-container" style="display:inline-block;">
+            Category:
+            <select name="category" id="category">
+            <option>All</option>
+            {% for item in category_list %}
+            <option value='{{ item }}' >{{ item }}</option>
+            {% endfor %}
+            </select>
+        </div>
+        <div class="selects-container" style="display:inline-block;">
+            Place:
+            <select name="place" id="place">
+            <option>All</option>
+            {% for item in ward_list %}
+            <option value='{{ item }}'>{{ item }}</option>
+            {% endfor %}
+            </select>
+        </div>&nbsp;&nbsp;
+        <div class="selects-container" style="display:inline-block;">
+            Date:
+            <select name="date" id="date">
+            <option>All</option>
+            {% for item in date_list %}
+            <option value='{{ item }}'>{{ item }}</option>
+            {% endfor %}
+            </select>
+        </div>&nbsp;&nbsp;
+        <button type="button" class="btn btn-primary" id="but">Submit</button>
+        <br><br>
         <div id="container-table">
             <table class="table table-bordered table-striped" id="main_content_table">
                 <thead class="thead-dark">
@@ -251,7 +302,10 @@
                                     </button>  
                         </td>
                         <td class="table-cell-problem" id="table-cell-problem">
-                            {{ item.problem_description }}
+                            {{ item.problem_description }} 
+                            <br>
+                            <div class="ward" style="display:inline-block;color: darkblue;">{{item.ward_name}} </div>
+                            <div class="date" style="display:inline-block;color: brown;">{{item.date_created}} </div>
                         </td>
                     </tr>
                     {% endfor %}

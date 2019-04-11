@@ -395,9 +395,12 @@ def predict_csv(request, pk):
         csvfile = pd.read_csv(input_file_path, sep=',', header=0, encoding='latin1')
 
         complaint_description = list(csvfile['complaint_description'])
-
+        ward_name = list(csvfile[' ward_name'])
+        date_created = []
+        for x in list(csvfile['complaint_created']):
+            y = x.split(' ')[0]
+            date_created.append(y)
         dict_list = []
-
         if str(request.user.profile.organisation_name) == 'ICMC':
             model = ClassificationService()
 
@@ -406,7 +409,7 @@ def predict_csv(request, pk):
 
         cats = model.get_top_3_cats_with_prob(complaint_description)
 
-        for row, complaint, scores in zip(csvfile.iterrows(), complaint_description, cats):
+        for row, complaint, scores, ward, date in zip(csvfile.iterrows(), complaint_description, cats, ward_name, date_created):
             row_dict = {}
             index, data = row
             row_dict['index'] = index
@@ -415,6 +418,8 @@ def predict_csv(request, pk):
                 row_dict['problem_description'] = complaint
                 row_dict['category'] = scores
                 row_dict['highest_confidence'] = list(row_dict['category'].values())[0]
+                row_dict['ward_name'] = ward
+                row_dict['date_created'] = date
             else:
                 continue
                 # data = data.dropna(subset=["text"])
@@ -443,15 +448,25 @@ def predict_csv(request, pk):
     else:
         dict_list = json.load(filemeta.output_file_json)
 
+            
+    input_file_path = filemeta.input_file.path
+    csvfile = pd.read_csv(input_file_path, sep=',', header=0, encoding='latin1')
     # preparing category list based on organisation name
     if str(request.user.profile.organisation_name) == 'ICMC':
         category_queryset = Category.objects.filter(organisation_name='ICMC').values_list('category', flat=True)
         category_list = list(category_queryset)
+        date_created = []
+        for x in list(csvfile['complaint_created']):
+            y = x.split(' ')[0]
+            date_created.append(y)
+        date_list = list(set(date_created))
+        ward_name = list(csvfile[' ward_name']) 
+        ward_list = list(set(ward_name))
     elif str(request.user.profile.organisation_name) == 'SpeakUp':
         category_queryset = Category.objects.filter(organisation_name='SpeakUp').values_list('category', flat=True)
         category_list = list(category_queryset)
 
-    return render(request, './Venter/prediction_table.html', {'dict_list': dict_list, 'category_list': category_list, 'filemeta': filemeta})
+    return render(request, './Venter/prediction_table.html', {'dict_list': dict_list, 'category_list': category_list, 'filemeta': filemeta, 'ward_list': ward_list, 'date_list': date_list})
 
 @login_required
 @require_http_methods(["POST"])
