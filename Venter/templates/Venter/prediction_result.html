@@ -5,6 +5,7 @@
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
 <link src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js">
 <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+<script type="text/javascript" src="../../static/assets/js/download.js"></script>
 
 <script>
     $(document).ready(function () {
@@ -142,8 +143,9 @@
           }
       google.visualization.events.addListener(chart, 'select', selectHandler);    
       google.visualization.events.addListener(chart, 'ready', function () {
-          var imgUri = chart.getImageURI();
+      var imgUri = chart.getImageURI();
           $('#download_graph-btn').click(function() {
+            console.log("Download graph button is clicked");
             download(imgUri, "{{chart_domain}}.png", "image/png");
           });
       });
