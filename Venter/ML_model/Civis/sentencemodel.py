@@ -83,7 +83,7 @@ def categorizer():
     stats = open('stats.txt', 'w', encoding='utf-8')
 
     st = time.time()
-    wordmodelfile = 'E:\Me\IITB\Work\CIVIS\ML Approaches\word embeddings and similarity matrix\GoogleNews-vectors-negative300.bin'
+    wordmodelfile = 'Venter\ML_model\Civis\MIN.bin'
     wordmodel = KeyedVectors.load_word2vec_format(wordmodelfile, binary = True, limit=200000)
     et = time.time()
     s = 'Word embedding loaded in %f secs.' % (et-st)
