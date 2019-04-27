@@ -1,0 +1,232 @@
+{% extends 'Venter/base.html' %}
+{% block title %}Upload File {% endblock %}
+{% block content %}
+
+<!-- LINEARICONS -->
+<link rel="stylesheet" href="../../static/assets/fonts/linearicons/style.css">
+<!-- <script src="../../static/assets/js/jquery-3.3.1.min.js"></script>
+<script src="../../static/assets/js/main.js"></script> -->
+<link rel="stylesheet" href="../../static/assets/css/wordcloud.css">
+
+<!-- <link rel="stylesheet" type="text/css" href="../../static/assets/css/jqcloud.css" />  -->
+
+<!--
+<link rel="stylesheet" type="text/css" href="../../static/assets/css/jqcloud.min.css" />
+<script type="text/javascript" src="../../static/assets/js/jqcloud-1.0.4.js"></script>
+<script type="text/javascript" src="../../static/assets/js/jqcloud-1.0.4.min.js"></script> -->
+<!-- 
+
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.4/jquery.min.js"></script>
+<script type="text/javascript" src="../../static/assets/js/jqcloud-1.0.4.js"></script> -->
+
+<!-- <script>
+    $('#category').change(function(){
+        $('#.wordcloud-btn').attr('disabled' , false);
+    }); 
+</script> -->
+
+<script type="text/javascript">
+    // var word_array = [
+    //     {text: "Lorem", weight: 15},
+    //     {text: "Ipsum", weight: 9},
+    //     {text: "Dolor", weight: 6},
+    //     {text: "Sit", weight: 7},
+    //     {text: "Amet", weight: 5}
+    // ];
+
+    // $(function() {
+    //   $("#wordcloud").jQCloud(word_array);
+    // });
+    window.onload = function WindowLoad(event) {
+
+                /*  ======================= SETUP ======================= */
+            var config = {
+                trace: true,
+                spiralResolution: 1, //Lower = better resolution
+                spiralLimit: 360 * 5,
+                lineHeight: 0.8,
+                xWordPadding: 0,
+                yWordPadding: 3,
+                font: "sans-serif"
+            }
+
+            var words = []
+
+            '{% for i,j in words.items %}'
+                var weight = parseInt('{{j}}');
+                words.push({"freq": weight, "word": '{{i}}'});
+            '{% endfor %}'
+
+
+            words.sort(function(a, b) {
+                return -1 * (a.freq - b.freq);
+            });
+
+            var cloud = document.getElementById("word-cloud");
+            cloud.style.position = "relative";
+            cloud.style.fontFamily = config.font;
+
+            var traceCanvas = document.createElement("canvas");
+            traceCanvas.width = cloud.offsetWidth;
+            traceCanvas.height = cloud.offsetHeight;
+            var traceCanvasCtx = traceCanvas.getContext("2d");
+            cloud.appendChild(traceCanvas);
+
+            var startPoint = {
+                x: cloud.offsetWidth / 2,
+                y: cloud.offsetHeight / 2
+            };
+
+            var wordsDown = [];
+            /* ======================= END SETUP ======================= */
+
+
+
+
+
+            /* =======================  PLACEMENT FUNCTIONS =======================  */
+            function createWordObject(word, freq) {
+                var wordContainer = document.createElement("div");
+                wordContainer.style.position = "absolute";
+                wordContainer.style.fontSize = freq + "px";
+                wordContainer.style.lineHeight = config.lineHeight;
+                // wordContainer.style.transform = "translateX(-50%) translateY(-50%)";
+                wordContainer.appendChild(document.createTextNode(word));
+
+                return wordContainer;
+            }
+
+            function placeWord(word, x, y) {
+                cloud.appendChild(word);
+                word.style.left = x - word.offsetWidth/2 + "px";
+                word.style.top = y - word.offsetHeight/2 + "px";
+
+                function rndColor() {
+                    var letters = '0123456789ABCDEF';
+                    var color = '#';
+                    for (var i = 0; i < 6; i++) {
+                        color += letters[Math.floor(Math.random() * 16)];
+                    }
+                    return color;
+
+                }
+
+                word.style.color = rndColor();
+
+                wordsDown.push(word.getBoundingClientRect());
+            }
+
+            function trace(x, y) {
+            //     traceCanvasCtx.lineTo(x, y);
+            //     traceCanvasCtx.stroke();
+                traceCanvasCtx.fillRect(x, y, 1, 1);
+            }
+
+            function spiral(i, callback) {
+                angle = config.spiralResolution * i;
+                x = (1 + angle) * Math.cos(angle);
+                y = (1 + angle) * Math.sin(angle);
+                return callback ? callback() : null;
+            }
+
+            function intersect(word, x, y) {
+                cloud.appendChild(word);    
+                
+                word.style.left = x - word.offsetWidth/2 + "px";
+                word.style.top = y - word.offsetHeight/2 + "px";
+                
+                var currentWord = word.getBoundingClientRect();
+                
+                cloud.removeChild(word);
+                
+                for(var i = 0; i < wordsDown.length; i+=1){
+                    var comparisonWord = wordsDown[i];
+                    
+                    if(!(currentWord.right + config.xWordPadding < comparisonWord.left - config.xWordPadding ||
+                        currentWord.left - config.xWordPadding > comparisonWord.right + config.wXordPadding ||
+                        currentWord.bottom + config.yWordPadding < comparisonWord.top - config.yWordPadding ||
+                        currentWord.top - config.yWordPadding > comparisonWord.bottom + config.yWordPadding)){
+                        
+                        return true;
+                    }
+                }
+                
+                return false;
+            }
+            /* =======================  END PLACEMENT FUNCTIONS =======================  */
+
+
+
+
+
+            /* =======================  LETS GO! =======================  */
+            (function placeWords() {
+                for (var i = 0; i < words.length; i += 1) {
+
+                    var word = createWordObject(words[i].word, words[i].freq);
+
+                    for (var j = 0; j < config.spiralLimit; j++) {
+                        //If the spiral function returns true, we've placed the word down and can break from the j loop
+                        if (spiral(j, function() {
+                                if (!intersect(word, startPoint.x + x, startPoint.y + y)) {
+                                    placeWord(word, startPoint.x + x, startPoint.y + y);
+                                    return true;
+                                }
+                            })) {
+                            break;
+                        }
+                    }
+                }
+            })();
+            /* ======================= WHEW. THAT WAS FUN. We should do that again sometime ... ======================= */
+
+
+
+            /* =======================  Draw the placement spiral if trace lines is on ======================= */
+            (function traceSpiral() {
+                traceCanvasCtx.beginPath();
+                
+                if (config.trace) {
+                    var frame = 1;
+
+                    function animate() {
+                        spiral(frame, function() {
+                            trace(startPoint.x + x, startPoint.y + y);
+                        });
+
+                        frame += 1;
+
+                        if (frame < config.spiralLimit) {
+                            window.requestAnimationFrame(animate);
+                        }
+                    }
+
+                    animate();
+                }
+            })();
+    }        
+
+</script>
+
+
+
+<div class="outer-wc">
+    <div class="inner-wc">
+        <div class="category-container">
+            <form method="post" id="category_form" action="{% url 'wordcloud' filemeta.pk %}">
+                {% csrf_token %}
+                <select id="category">
+                    <option value="0">---select category---</option>
+                    {% for item in category_list %}
+                        <option value='{{ item }}' >{{ item }}</option>
+                    {% endfor %}
+                </select>
+                <button type="submit" class="btn btn-danger wordcloud-btn">Generate wordcloud &nbsp;<i class="fa fa-cloud cloud-fa" aria-hidden="true"></i>
+                </button>
+            </form>   
+        </div>
+        <br>
+        <div class="wordcloud-container" id="word-cloud"></div>
+    </div>    
+</div>
+{% endblock %}

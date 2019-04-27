@@ -1,0 +1,82 @@
+/*
+Styling for upload_file.html
+*/
+.outer-upload-file {
+  background-color: #b3cefa;
+  width: 100%;
+  height: 100%;
+}
+
+.inner-upload-file {
+  background-color: white;
+  width: 600px;
+  margin: 0 auto;
+  top: 35%;
+  position: relative;
+  padding: 2%;
+}
+
+.uploadinner {
+  width: 400px;
+  border-radius: 20px;
+  border: solid #3c7ee4;
+  padding: 2px;
+}
+
+.data {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
+}
+
+.title {
+  font-family: Copperplate; 
+  font-size: 30px;
+}
+
+.submitbtn {
+  background-color: #6595dd;
+  color: white;
+  padding: 10px 18px;
+  font-size: 16px;
+  cursor: pointer;
+  border-radius: 10px;
+}
+.modal-body{
+  height: 180px;
+  background-color: #32bc65;
+}   
+
+.file_logo-upload{
+  width:150px;
+  height:140px;
+}
+
+.modal-footer{
+  height: 200px;
+  background-color: white;
+}
+
+.footer-center{
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.p1-upload{
+  color: grey;
+  font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+  font-size: 20px;
+}
+
+.nav li.upload-file-item .nav-link{
+  color: #FFFFFF;
+  opacity: 1;
+  background: rgba(255, 255, 255, 0.23);
+}
+
+div.sidebar-wrapper li.wordcloud-item{
+  display: none;
+}
+

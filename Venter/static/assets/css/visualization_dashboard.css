@@ -1,0 +1,8 @@
+/*
+Styling for visualization_dashboard.html
+*/
+
+div.sidebar-wrapper li.wordcloud-item{
+    display: block;
+}
+  
