@@ -1,7 +1,7 @@
 {% extends 'Venter/base.html' %}
 {% block title %}Prediction Table {% endblock %}
 {% block content %}
-
+ 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 <link rel="stylesheet" href="../../static/assets/css/prediction_table.css">
 <script src="http://tablesorter.com/addons/pager/jquery.tablesorter.pager.js"></script>
@@ -15,6 +15,14 @@
 {% endif %}  -->
 
 <script>  
+    function toggleField(hideObj,showObj){
+        hideObj.disabled=true;		
+        hideObj.style.display='none';
+        showObj.disabled=false;	
+        showObj.style.display='inline';
+        showObj.focus();
+    }
+
     function colorcode(num, index) {
         if (num > 90) {
             $("#" + index).attr("style", "background-color: #00a33b");
@@ -145,10 +153,11 @@
                 cat='';
             }
             $("#tbody_table tr").filter(function() {
-                $(this).toggle($(this).text().indexOf(d) > -1 && $(this).text().indexOf(pl) > -1 && $(this).toggle($(this).find("ul").text().indexOf(cat) > -1))
+                $(this).toggle($(this).text().indexOf(d) > -1 && $(this).text().indexOf(pl) > -1  && $(this).toggle($(this).find("ul").text().indexOf(cat) > -1))
             });
         });
 
+        /* jquery for pagination of table rows */
         $('#main_content_table').after('<ul class="pagination justify-content-center" id="pagination_nav"></ul>');
         var rowsShown;
         var rowsTotal = $('#tbody_table tr').length;
