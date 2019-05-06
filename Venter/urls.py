@@ -29,8 +29,6 @@ urlpatterns = [
     path('contact_us/', views.contact_us, name='contact_us'),
     # ex: /venter/predict_result/5/
     path('predict_result/<int:pk>', views.predict_result, name='predict_result'),
-    # ex: /venter/domain_contents/
-    path('domain_contents/', views.domain_contents, name='domain_contents'),
     # ex: /venter/predict_csv/5/
     path('predict_csv/<int:pk>', views.predict_csv, name='predict_csv'),
     # ex: /venter/download_table/5/

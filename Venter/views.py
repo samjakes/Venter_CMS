@@ -264,9 +264,6 @@ class FileListView(LoginRequiredMixin, ListView):
         return result
 
 
-dict_data = {}
-domain_list = []
-
 @login_required
 @require_http_methods(["GET"])
 def predict_result(request, pk):
@@ -281,15 +278,15 @@ def predict_result(request, pk):
         1) dict_data stores the result json data from the results.json file already created from the ML model
         2) prediction_results.html template is rendered
     """
-    global dict_data, domain_list
 
     json_file_path = os.path.join(BASE_DIR, 'scored_results_1.json')
-    print("file path:", json_file_path)
+    dict_data = {}
+    domain_list = []
 
     with open(json_file_path) as json_file:
         dict_data = json.load(json_file)
 
-    filemeta = File.objects.get(pk=pk)    
+    filemeta = File.objects.get(pk=pk)
     output_directory_path = os.path.join(MEDIA_ROOT, f'{filemeta.uploaded_by.organisation_name}/{filemeta.uploaded_by.user.username}/{filemeta.uploaded_date.date()}/output')
 
     if not os.path.exists(output_directory_path):
@@ -305,6 +302,7 @@ def predict_result(request, pk):
     output_file_path_json = os.path.join(output_directory_path, output_json_file_name)
     output_file_path_xlsx = os.path.join(output_directory_path, output_xlsx_file_name)
 
+    filemeta.output_file_json = output_file_path_json
     filemeta.output_file_xlsx = output_file_path_xlsx
     filemeta.save()
 
@@ -321,7 +319,7 @@ def predict_result(request, pk):
         
     #     output_json_file_name = 'results__'+custom_input_file_name+'.json'
     #     output_xlsx_file_name = 'results__'+custom_input_file_name+'.xlsx'
-
+ 
     #     output_file_path_json = os.path.join(output_directory_path, output_json_file_name)
     #     output_file_path_xlsx = os.path.join(output_directory_path, output_xlsx_file_name)
 
@@ -354,45 +352,36 @@ def predict_result(request, pk):
 
     dict_keys = dict_data.keys()
     domain_list = list(dict_keys)
+    domain_data = {}
 
+    for domain_name in domain_list:
+        domain_data = dict_data[domain_name]
+        temp = ['Category']
+        index = 0
+        for subCat in domain_data['Novel']:
+            temp.append('Sub category ' + str(index+1))
+            index += 1
+        temp.append({'role': 'style'})
+        domain_stats = []
+        domain_stats.append(temp)
+
+        for category, responselist in domain_data.items():
+            column = [category, len(responselist), '']
+            if category == 'Novel':
+                column = ['Novel']
+                for subCat in domain_data[category]:
+                    column.append(len(domain_data[category][subCat]))
+                column.append('')
+            else:
+                for i in range(len(domain_stats[0]) - len(column)):
+                    column.insert(2, 0)
+            domain_stats.append(column)
+        dict_data[domain_name]['Statistics'] = jsonpickle.encode(domain_stats)
+
+    # with open('test_dict_data1.json', 'w') as temp:
+    #     json.dump(dict_data, temp)
     return render(request, './Venter/prediction_result.html', {
-        'domain_list': domain_list, 'dict_data': dict_data
-    })
-
-@login_required
-@require_http_methods(["GET"])
-def domain_contents(request):
-    """
-    View logic for returning response statictics based on the domain selected by the user in prediction_results.html
-    """
-    global dict_data, domain_list
-
-    domain_name = request.GET.get('domain')
-    domain_data = dict_data[domain_name]
-    temp = ['Category']
-    index = 0
-    for subCat in domain_data['Novel']:
-        temp.append('Sub category ' + str(index+1))
-        index += 1
-    temp.append({'role': 'style'})
-    domain_stats = []
-    domain_stats.append(temp)
-
-    for category, responselist in domain_data.items():
-        column = [category, len(responselist), '']
-        if category == 'Novel':
-            column = ['Novel']
-            for subCat in domain_data[category]:
-                column.append(len(domain_data[category][subCat]))
-            column.append('')
-        else:
-            for i in range(len(domain_stats[0]) - len(column)):
-                column.insert(2, 0)
-        domain_stats.append(column)
-
-    return render(request, './Venter/prediction_result.html', {
-        'domain_data': domain_data, 'domain_list': domain_list,
-        'domain_stats': jsonpickle.encode(domain_stats), 'chart_domain': domain_name
+        'domain_list': domain_list, 'dict_data': json.dumps(dict_data), 'domain_data': domain_data,
     })
 
 @login_required

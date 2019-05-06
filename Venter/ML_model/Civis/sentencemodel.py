@@ -140,7 +140,7 @@ def categorizer():
             results[domain][catName] = []
 
         print('Populating category files...')
-        for score_row,response in zip(similarity_matrix,responses):
+        for score_row, response in zip(similarity_matrix, responses):
             max_sim_index = len(categories)-1
             if np.array(score_row).sum() > 0:
                 max_sim_index = np.array(score_row).argmax()
@@ -154,7 +154,7 @@ def categorizer():
 
         #sorting domain wise categorised responses based on scores
         for domain in results:
-            for category in results[domain]:                                                                                                                                               
+            for category in results[domain]:                                                                                                                                        
                 temp = results[domain][category]
                 if len(temp)==0 or category=='Novel':
                     continue
@@ -206,8 +206,4 @@ def categorizer():
         results[domain]['Novel'] = novel_sub_categories
 
         print('***********************************************************')
-    # with open('out_new.json', 'w') as temp:
-    #     json.dump(results, temp)
-    print("---------RESULTS----")
-    print(results)
     return results
