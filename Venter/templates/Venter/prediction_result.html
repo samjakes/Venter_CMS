@@ -7,11 +7,85 @@
 <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 <script type="text/javascript" src="../../static/assets/js/download.js"></script>
 
+  
+
 <script>
     $(document).ready(function () {
-      if ($('.nav-pills li:eq(0)').hasClass('active')) {
-        $('.nav-pills li:eq(0) a').tab('show');
-      }
+      $('.nav-tabs > li').click(function(event){
+        $('.nav-tabs > li.active').find("a").attr("style", "background-color: rgb(255,255,255) !important; color: rgb(0,0,0) !important");
+        $('.nav-tabs li').removeClass('active');
+        $(this).addClass('active');
+        $(this).find("a").attr("style", "background-color: rgb(0,0,255) !important; color: rgb(255,255,255) !important");
+        // console.log($(this).find("a").attr("href"));
+        var domain_name = $(this).find("a").attr("href");
+        drawStuff(domain_name);
+      });
+
+      $('.nav-pills > li').on('shown.bs.tab', function(){
+        var h = $('.nav-pills .active > a').attr('href');
+        console.log(h);
+      });
+
+      $("#graph").tab('show');
+
+      // $("#graph").on('show.bs.tab', function(e) {
+      //   console.log('graph tab to be shown');
+      //   var d = $('.nav-tabs .active > a').attr('href');
+      //   console.log("just checking if active domain:", d);
+      // });
+
+      // $("#cardview").on('shown.bs.tab', function(e) {
+      //   console.log('graph tab is shown');
+      //   var d = $('.nav-tabs .active > a').attr('href');
+      //   console.log("just checking if active domain:", d);
+      // });
+
+      // $("#cardview").on('show.bs.tab', function(e) {
+      //   console.log('cardview tab to be shown');
+      //   var d = $('.nav-tabs .active > a').attr('href');
+      //   console.log("just checking if active domain:", d);
+      // });
+
+
+      // $("#cardview").on('shown.bs.tab', function(e) {
+      //   console.log('cardview tab is shown');
+      //   var d = $('.nav-tabs .active > a').attr('href');
+      //   console.log("just checking if active domain:", d);
+      //   var main_dict = jQuery.parseJSON('{{dict_data|escapejs}}');
+      //   var domain_name = 'Traffic';
+      //   var stats = main_dict[domain_name];
+      //   for(var key in stats){
+      //     if(key == 'Statistics'){
+      //       continue;
+      //     }
+      //     else{
+      //       var response_arr=stats[key];
+      //       if(key == 'Novel')
+      //       {
+      //         console.log("NOVEL CATEGORY");
+      //         var count = 1;
+      //         for(var sub in response_arr){
+      //           console.log("sub category "+ count);
+      //           for(var response in response_arr[sub]){
+      //             console.log(response_arr[sub][response]);
+      //           }
+      //           count++;
+      //         }
+      //       }
+      //       else
+      //       {
+      //         continue;
+      //         console.log("Card Category:", key);
+      //         for (var j = 0; j < response_arr.length; j++){
+      //           console.log("response: ",response_arr[j]['response']);
+      //           console.log("score: ",response_arr[j]['score']);
+      //         }
+      //       }  
+      //     }
+      //   }
+      // });
+
+
       $("#chart-download-container").hide();
    
       $(".response_list").each(function(){
@@ -59,7 +133,6 @@
   </script>
   
   <script>
-    console.log('{{test}}')
     function rndColor() {
       var r = ('0' + Math.floor(Math.random() * 256).toString(16)).substr(-2), // red
         g = ('0' + Math.floor(Math.random() * 256).toString(16)).substr(-2), // green
@@ -68,9 +141,14 @@
     }
     google.charts.load('current', { 'packages': ['corechart'] });
     google.charts.setOnLoadCallback(drawStuff);
-    function drawStuff() {
-      var stats = '{{ domain_stats|escapejs }}';
+    function drawStuff(domain_name) {
+      if (!domain_name) {
+        var domain_name = $('.nav-tabs .active > a').attr('href');
+      }
+      var main_dict = jQuery.parseJSON('{{dict_data|escapejs}}');
+      var stats = main_dict[domain_name]['Statistics'];
       stats = jQuery.parseJSON(stats);
+      
       noOfNovelCats = stats[stats.length - 1].length - 2
       colorseries = {}
       for (i = 0; i < noOfNovelCats; i++) {
@@ -84,7 +162,7 @@
         legend: {
           position: 'none'
         },
-        title: '{{chart_domain}}',
+        title: domain_name,
         titleTextStyle: {
           fontName: 'Times New Roman',
           fontSize: 30,
@@ -135,17 +213,17 @@
       function selectHandler() {
             var selectedItem = chart.getSelection()[0];
             if (selectedItem) {
-            var category = data.getValue(selectedItem.row, 0);
-            $('#graph').hide();
-            $('#cardview').tab('show');
-            document.getElementById(category).scrollIntoView();
+              var category = data.getValue(selectedItem.row, 0);
+              $('#graph').hide();
+              $('#cardview').tab('show');
+              document.getElementById(category).scrollIntoView();
             } 
           }
       google.visualization.events.addListener(chart, 'select', selectHandler);    
       google.visualization.events.addListener(chart, 'ready', function () {
           var imgUri = chart.getImageURI();
           $('#download_graph-btn').click(function() {
-            download(imgUri, "{{chart_domain}}.png", "image/png");
+            download(imgUri, "chart.png", "image/png");
           });
       });
       chart.draw(data, options);
@@ -158,28 +236,19 @@
     <div class="content-domain">
       <ul class="nav nav-tabs nav-fill" id="domain_tab" role="tablist">
         {% for domain in domain_list %}
-        <!-- {% if domain == domain_list.0 %}
-          <li class="nav-item active">
-            <a href="{% url 'domain_contents' %}?domain={{domain}}" class="nav-link" data-target="#graph" role="tab"
-              aria-selected="true">
-              {{domain}}
-            </a>
-          </li>
-          {% else %}
-          <li class="nav-item">
-            <a href="{% url 'domain_contents' %}?domain={{domain}}" class="nav-link" data-target="#graph" role="tab"
-              aria-selected="true">
-              {{domain}}
-            </a>
-          </li>
-          {% endif %} -->
-  
-        <li class="nav-item">
-          <a href="{% url 'domain_contents' %}?domain={{domain}}" class="nav-link" data-target="#graph" role="tab"
-            aria-selected="true">
-            {{domain}}
-          </a>
-        </li>
+            {% if domain == domain_list.0 %}
+              <li class="nav-item active">
+                  <a href="{{domain}}" class="nav-link" data-target="#graph" data-toggle="tab" role="tab">
+                      {{domain}}
+                  </a>
+              </li>
+            {% else %}
+              <li class="nav-item">
+                  <a href="{{domain}}" class="nav-link" data-target="#graph" data-toggle="tab" role="tab">
+                      {{domain}}
+                  </a>
+              </li>
+            {% endif %}
         {% endfor %}
       </ul>
     </div>
@@ -188,12 +257,12 @@
       <ul class="nav nav-pills justify-content-center" id="navigator_tab" role="tablist">
         <li class="nav-item active" id="pill-graph">
           <a class="nav-link" data-toggle="pill" href="#graph">
-            Graph &nbsp; <i class="fa fa-area-chart chart-fa" aria-hidden="true"></i>
+            Graph &nbsp; <i class="fa fa-area-chart chart-fa"></i>
           </a>
         </li>
         <li class="nav-item" id="pill-cardview">
           <a class="nav-link" data-toggle="pill" href="#cardview">
-            CardView &nbsp; <i class="fa fa-list-alt list-fa" aria-hidden="true"></i>
+            CardView &nbsp; <i class="fa fa-list-alt list-fa"></i>
           </a>
         </li>
       </ul>
@@ -203,43 +272,47 @@
       <div id="cardview" class="tab-pane fade content-cardview">
         <div class="card-container" id="card-container">
           {% for category,response in domain_data.items %}
-          <div class="card" id="{{category}}">
-            <div class="card-header">
-              <label class="label-category">{{category}}</label>
-              <hr>
-            </div>
-            <div class="card-body">
-              <div class="card-text">
-                {% if not response %}
-                    <li class="list-group-item">No response</li>
-                {% else %}
-                  {% if category == 'Novel' %}
-                  <ul class="list-group no_response_list">
-                      {% for keys, item in response.items %}
-                          <li class="list-group-item">
-                            <b>Sub category {{forloop.counter}}</b>
-                          </li>
-                          {% for r in item %}
-                              <li class="list-group-item">
-                                {{r}}
-                              </li>
-                          {% endfor %}
-                      {% endfor %}
-                  </ul>    
-                  {% else %}
-                  <ul class="list-group response_list">
-                      {% for r in response %}
-                          <li class="list-group-item">
-                              {{r.response}}
-                              <span class="response_score">{{r.score}}%</span>
-                          </li> <br>
-                      {% endfor %}
-                  </ul>    
-                  {% endif %}
-                {% endif %}
+            {% if category == 'Statistics' %}
+              <!--continue-->
+            {% else %}
+              <div class="card" id="{{category}}">
+                <div class="card-header">
+                  <label class="label-category">{{category}}</label>
+                  <hr>
+                </div>
+                <div class="card-body">
+                  <div class="card-text">
+                    {% if not response %}
+                        <li class="list-group-item">No response</li>
+                    {% else %}
+                      {% if category == 'Novel' %}
+                        <ul class="list-group no_response_list">
+                            {% for keys, item in response.items %}
+                                <li class="list-group-item">
+                                  <b>Sub category {{forloop.counter}}</b>
+                                </li>
+                                {% for r in item %}
+                                    <li class="list-group-item">
+                                      {{r}}
+                                    </li>
+                                {% endfor %}
+                            {% endfor %}
+                        </ul>    
+                      {% else %}
+                        <ul class="list-group response_list">
+                            {% for r in response %}
+                                <li class="list-group-item">
+                                    {{r.response}}
+                                    <span class="response_score">{{r.score}}%</span>
+                                </li> <br>
+                            {% endfor %}
+                        </ul>    
+                      {% endif %}
+                    {% endif %}
+                  </div>
+                </div>
               </div>
-            </div>
-          </div>
+            {% endif %}  
           {% endfor %}
         </div>
       </div>
