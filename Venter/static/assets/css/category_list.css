@@ -1,0 +1,36 @@
+/*
+Styling for category_list.html
+*/
+  
+.outer-category{
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+}
+
+.container-category {
+    position: relative;
+    width: 100%;
+    padding: 0% 1%;
+}
+
+.search-form-category{
+    position: relative;
+    padding: 1% 0%;
+}
+
+.pagination-container{
+    margin: auto;
+    width: 50%;
+}
+
+.nav li.category-list-item .nav-link{
+    color: #FFFFFF;
+    opacity: 1;
+    background: rgba(255, 255, 255, 0.23);
+  }
+  
+div.sidebar-wrapper li.wordcloud-item{
+    display: none;
+}
+

@@ -1,0 +1,36 @@
+/*
+Styling for wordcloud.html
+*/
+
+.outer-wc{
+    background-color: whitesmoke;
+    height: 100vh;
+    justify-content: center;
+    padding-top: 2vh;
+}
+
+.inner-wc{
+    padding-top: 2vh;
+    padding: 1vw; 
+    max-height: 100vh;
+    max-width: 100vw;
+    align-items: center;
+    justify-content: center;
+}
+
+div.sidebar-wrapper li.wordcloud-item{
+    display: block;
+}
+
+.nav li.wordcloud-item .nav-link{
+    color: #FFFFFF;
+    opacity: 1;
+    background: rgba(255, 255, 255, 0.23);
+}
+
+.wordcloud-container{
+    height: 85vh;
+    border: 1px solid darkslategray;
+}
+
+
