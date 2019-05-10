@@ -323,6 +323,9 @@ def predict_result(request, pk):
     #     output_file_path_json = os.path.join(output_directory_path, output_json_file_name)
     #     output_file_path_xlsx = os.path.join(output_directory_path, output_xlsx_file_name)
 
+    #     dict_data = {}
+    #     domain_list = []
+
     #     sm = SimilarityMapping(filemeta.input_file.path)
     #     dict_data = sm.driver()
 
@@ -380,10 +383,10 @@ def predict_result(request, pk):
 
     # with open('test_dict_data1.json', 'w') as temp:
     #     json.dump(dict_data, temp)
-    return render(request, './Venter/prediction_result.html', {
-        'domain_list': domain_list, 'dict_data': json.dumps(dict_data), 'domain_data': domain_data,
-    })
 
+    return render(request, './Venter/prediction_result.html', {
+        'domain_list': domain_list, 'dict_data': json.dumps(dict_data)
+    })
 @login_required
 @require_http_methods(["GET", "POST"])
 def predict_csv(request, pk):

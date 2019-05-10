@@ -1,6 +1,7 @@
 {% extends 'Venter/base.html' %}
 {% block title %}Prediction Results{% endblock %}
 {% block content %}
+{% load predict_results_custom_tags %}
 <link rel="stylesheet" href="../../static/assets/css/prediction_result.css">
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
 <link src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js">
@@ -16,75 +17,30 @@
         $('.nav-tabs li').removeClass('active');
         $(this).addClass('active');
         $(this).find("a").attr("style", "background-color: rgb(0,0,255) !important; color: rgb(255,255,255) !important");
-        // console.log($(this).find("a").attr("href"));
         var domain_name = $(this).find("a").attr("href");
         drawStuff(domain_name);
       });
 
-      $('.nav-pills > li').on('shown.bs.tab', function(){
-        var h = $('.nav-pills .active > a').attr('href');
-        console.log(h);
+      $('.nav-pills > li').click(function(event){
+        $('.nav-pills > li.active').find("a").attr("style", "background-color: rgb(255,255,255) !important; color: rgb(0,0,0) !important");
+        $('.nav-pills li').removeClass('active');
+        $(this).addClass('active');
+        $(this).find("a").attr("style", "background-color: rgb(0,0,255) !important; color: rgb(255,255,255) !important");
       });
-
-      $("#graph").tab('show');
-
-      // $("#graph").on('show.bs.tab', function(e) {
-      //   console.log('graph tab to be shown');
-      //   var d = $('.nav-tabs .active > a').attr('href');
-      //   console.log("just checking if active domain:", d);
+      
+      // $('#pill-cardview').click(function(event){
+      //   var domain_name = $('.nav-tabs .active > a').attr('href');
+      //   '{% with d="'+domain_name+'" %}';
+      //     console.log("DOAMIN=======: ", '{{d}}');
+      //   '{% endwith %}';
+      //   $("#cardview").tab('show');
       // });
 
-      // $("#cardview").on('shown.bs.tab', function(e) {
-      //   console.log('graph tab is shown');
-      //   var d = $('.nav-tabs .active > a').attr('href');
-      //   console.log("just checking if active domain:", d);
-      // });
-
-      // $("#cardview").on('show.bs.tab', function(e) {
-      //   console.log('cardview tab to be shown');
-      //   var d = $('.nav-tabs .active > a').attr('href');
-      //   console.log("just checking if active domain:", d);
-      // });
-
-
-      // $("#cardview").on('shown.bs.tab', function(e) {
-      //   console.log('cardview tab is shown');
-      //   var d = $('.nav-tabs .active > a').attr('href');
-      //   console.log("just checking if active domain:", d);
-      //   var main_dict = jQuery.parseJSON('{{dict_data|escapejs}}');
-      //   var domain_name = 'Traffic';
-      //   var stats = main_dict[domain_name];
-      //   for(var key in stats){
-      //     if(key == 'Statistics'){
-      //       continue;
-      //     }
-      //     else{
-      //       var response_arr=stats[key];
-      //       if(key == 'Novel')
-      //       {
-      //         console.log("NOVEL CATEGORY");
-      //         var count = 1;
-      //         for(var sub in response_arr){
-      //           console.log("sub category "+ count);
-      //           for(var response in response_arr[sub]){
-      //             console.log(response_arr[sub][response]);
-      //           }
-      //           count++;
-      //         }
-      //       }
-      //       else
-      //       {
-      //         continue;
-      //         console.log("Card Category:", key);
-      //         for (var j = 0; j < response_arr.length; j++){
-      //           console.log("response: ",response_arr[j]['response']);
-      //           console.log("score: ",response_arr[j]['score']);
-      //         }
-      //       }  
-      //     }
-      //   }
-      // });
-
+      $('#pill-graph').click(function(event){
+        var domain_name = $('.nav-tabs .active > a').attr('href');
+        $("#graph").tab('show');
+        drawStuff(domain_name);
+      });
 
       $("#chart-download-container").hide();
    
@@ -142,6 +98,12 @@
     google.charts.load('current', { 'packages': ['corechart'] });
     google.charts.setOnLoadCallback(drawStuff);
     function drawStuff(domain_name) {
+      // $("#cardview").hide();
+      $("#graph").tab('show');
+      $('.nav-pills > li.active').find("a").attr("style", "background-color: rgb(255,255,255) !important; color: rgb(0,0,0) !important");
+      $('.nav-pills li').removeClass('active');
+      $("#pill-graph").addClass('active');
+      $("#pill-graph").find("a").attr("style", "background-color: rgb(0,0,255) !important; color: rgb(255,255,255) !important");
       if (!domain_name) {
         var domain_name = $('.nav-tabs .active > a').attr('href');
       }
@@ -248,7 +210,7 @@
                       {{domain}}
                   </a>
               </li>
-            {% endif %}
+            {% endif %}  
         {% endfor %}
       </ul>
     </div>
@@ -267,14 +229,21 @@
         </li>
       </ul>
     </div>
-  
+
     <div class="tab-content">
       <div id="cardview" class="tab-pane fade content-cardview">
         <div class="card-container" id="card-container">
-          {% for category,response in domain_data.items %}
-            {% if category == 'Statistics' %}
-              <!--continue-->
-            {% else %}
+          <script>
+          $('#pill-cardview').click(function(event){
+            var domain_name = $('.nav-tabs .active > a').attr('href');
+            '{% with d="'+domain_name+'" %}';
+              console.log("DOAMIN: ", '{{d}}');
+            $("#cardview").tab('show');
+          });
+          </script>
+          {% with domain="Power" %}
+          {% with domain_data=dict_data|get_domain_data:domain %}  
+            {% for category,response in domain_data.items %}
               <div class="card" id="{{category}}">
                 <div class="card-header">
                   <label class="label-category">{{category}}</label>
@@ -286,34 +255,38 @@
                         <li class="list-group-item">No response</li>
                     {% else %}
                       {% if category == 'Novel' %}
-                        <ul class="list-group no_response_list">
-                            {% for keys, item in response.items %}
-                                <li class="list-group-item">
-                                  <b>Sub category {{forloop.counter}}</b>
-                                </li>
-                                {% for r in item %}
-                                    <li class="list-group-item">
-                                      {{r}}
-                                    </li>
-                                {% endfor %}
-                            {% endfor %}
-                        </ul>    
+                      <ul class="list-group no_response_list">
+                          {% for keys, item in response.items %}
+                              <li class="list-group-item">
+                                <b>Sub category {{forloop.counter}}</b>
+                              </li>
+                              {% for r in item %}
+                                  <li class="list-group-item">
+                                    {{r}}
+                                  </li>
+                              {% endfor %}
+                          {% endfor %}
+                      </ul>    
                       {% else %}
-                        <ul class="list-group response_list">
-                            {% for r in response %}
-                                <li class="list-group-item">
-                                    {{r.response}}
-                                    <span class="response_score">{{r.score}}%</span>
-                                </li> <br>
-                            {% endfor %}
-                        </ul>    
+                      <ul class="list-group response_list">
+                          {% for r in response %}
+                              <li class="list-group-item">
+                                  {{r.response}}
+                                  <span class="response_score">{{r.score}}%</span>
+                              </li> <br>
+                          {% endfor %}
+                      </ul>    
                       {% endif %}
                     {% endif %}
                   </div>
                 </div>
               </div>
-            {% endif %}  
-          {% endfor %}
+            {% endfor %}
+          {% endwith %}
+          {% endwith %}
+          <script>
+            '{% endwith %}';
+          </script>  
         </div>
       </div>
   
