@@ -233,60 +233,61 @@
     <div class="tab-content">
       <div id="cardview" class="tab-pane fade content-cardview">
         <div class="card-container" id="card-container">
-          <script>
-          $('#pill-cardview').click(function(event){
-            var domain_name = $('.nav-tabs .active > a').attr('href');
-            '{% with d="'+domain_name+'" %}';
-              console.log("DOAMIN: ", '{{d}}');
-            $("#cardview").tab('show');
-          });
-          </script>
-          {% with domain="Power" %}
-          {% with domain_data=dict_data|get_domain_data:domain %}  
+            <script>
+              $('#pill-cardview').click(function(event){
+                var domain_name = $('.nav-tabs .active > a').attr('href');
+                '{% with d="'+domain_name+'" %}';
+                '{% with domain_data=dict_data|get_domain_data:12345 %}'.replace(/12345/, domain_name);
+                $("#cardview").tab('show');
+              });
+            </script>
             {% for category,response in domain_data.items %}
-              <div class="card" id="{{category}}">
-                <div class="card-header">
-                  <label class="label-category">{{category}}</label>
-                  <hr>
-                </div>
-                <div class="card-body">
-                  <div class="card-text">
-                    {% if not response %}
-                        <li class="list-group-item">No response</li>
-                    {% else %}
-                      {% if category == 'Novel' %}
-                      <ul class="list-group no_response_list">
-                          {% for keys, item in response.items %}
-                              <li class="list-group-item">
-                                <b>Sub category {{forloop.counter}}</b>
-                              </li>
-                              {% for r in item %}
-                                  <li class="list-group-item">
-                                    {{r}}
-                                  </li>
-                              {% endfor %}
-                          {% endfor %}
-                      </ul>    
+              {% if category == 'Statistics' %}
+                <!--continue-->
+              {% else %}  
+                <div class="card" id="{{category}}">
+                  <div class="card-header">
+                    <label class="label-category">{{category}}</label>
+                    <hr>
+                  </div>
+                  <div class="card-body">
+                    <div class="card-text">
+                      {% if not response %}
+                          <li class="list-group-item">No response</li>
                       {% else %}
-                      <ul class="list-group response_list">
-                          {% for r in response %}
-                              <li class="list-group-item">
-                                  {{r.response}}
-                                  <span class="response_score">{{r.score}}%</span>
-                              </li> <br>
-                          {% endfor %}
-                      </ul>    
+                        {% if category == 'Novel' %}
+                        <ul class="list-group no_response_list">
+                            {% for keys, item in response.items %}
+                                <li class="list-group-item">
+                                  <b>Sub category {{forloop.counter}}</b>
+                                </li>
+                                {% for r in item %}
+                                    <li class="list-group-item">
+                                      {{r}}
+                                    </li>
+                                {% endfor %}
+                            {% endfor %}
+                        </ul>    
+                        {% else %}
+                        <ul class="list-group response_list">
+                            {% for r in response %}
+                                <li class="list-group-item">
+                                    {{r.response}}
+                                    <span class="response_score">{{r.score}}%</span>
+                                </li> <br>
+                            {% endfor %}
+                        </ul>    
+                        {% endif %}
                       {% endif %}
-                    {% endif %}
+                    </div>
                   </div>
                 </div>
-              </div>
+              {% endif %}  
             {% endfor %}
-          {% endwith %}
-          {% endwith %}
-          <script>
-            '{% endwith %}';
-          </script>  
+            <script>
+              '{% endwith %}';
+              '{% endwith %}';
+            </script>  
         </div>
       </div>
   

@@ -1,4 +1,6 @@
-from . import csvparser, sentencemodel
+# from . import csvparser, sentencemodel
+from . import csvparser
+from Venter.tasks import categorizer
 
 class SimilarityMapping:
     '''
@@ -10,5 +12,5 @@ class SimilarityMapping:
     def driver(self):
         #parsing the input file for having sampled input to the model
         csvparser.parse(self.filepath)
-        results = sentencemodel.categorizer()
+        results = categorizer().delay()
         return results
