@@ -236,8 +236,9 @@
             <script>
               $('#pill-cardview').click(function(event){
                 var domain_name = $('.nav-tabs .active > a').attr('href');
-                '{% with d="'+domain_name+'" %}';
-                '{% with domain_data=dict_data|get_domain_data:12345 %}'.replace(/12345/, domain_name);
+                // '{{ domain|get_domain:'+domain_name+' }}';
+                '{% with domain="Power" %}';
+                '{% with domain_data=dict_data|get_domain_data:domain %}';
                 $("#cardview").tab('show');
               });
             </script>
