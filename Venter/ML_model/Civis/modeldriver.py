@@ -1,7 +1,5 @@
 from . import csvparser, sentencemodel
 
-from . import csvparser
-
 
 class SimilarityMapping:
     '''
@@ -13,6 +11,5 @@ class SimilarityMapping:
     def driver(self):
         #parsing the input file for having sampled input to the model
         csvparser.parse(self.filepath)
-        # results = sentencemodel.categorizer()
         results = sentencemodel.categorizer()
         return results
