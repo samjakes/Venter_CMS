@@ -7,3 +7,5 @@ htmlcov/
 stats.txt
 venv/
 Venter/ML_model/Civis/MAX.bin
+Venter/ML_model/ICMC/dataset/dataset_mcgm_clean/word_vectors_mcgm.pickle
+Venter/ML_model/ICMC/dataset/dataset_mcgm_clean/word_vectors_mcgm_.pickle
