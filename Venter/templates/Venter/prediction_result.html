@@ -8,8 +8,6 @@
 <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 <script type="text/javascript" src="../../static/assets/js/download.js"></script>
 
-  
-
 <script>
     $(document).ready(function () {
       $('.nav-tabs > li').click(function(event){
@@ -237,7 +235,7 @@
               $('#pill-cardview').click(function(event){
                 var domain_name = $('.nav-tabs .active > a').attr('href');
                 // '{{ domain|get_domain:'+domain_name+' }}';
-                '{% with domain="Power" %}';
+                '{% with domain="Traffic" %}'; 
                 '{% with domain_data=dict_data|get_domain_data:domain %}';
                 $("#cardview").tab('show');
               });
