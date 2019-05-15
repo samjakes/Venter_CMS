@@ -10,10 +10,10 @@ class Dos2Unix:
         '''
         This function encodes the pickles for dos across unix
         '''
-        original1 =  os.path.join(BASE_DIR, "Venter\ML_model\ICMC\dataset\dataset_mcgm_clean\word_index_map_mcgm.pickle")
-        destination1 =  os.path.join(BASE_DIR, "Venter\ML_model\ICMC\dataset\dataset_mcgm_clean\word_index_map_mcgm_.pickle")
-        original2 =  os.path.join(BASE_DIR, "Venter\ML_model\ICMC\dataset\dataset_mcgm_clean\word_vectors_mcgm.pickle")
-        destination2 =  os.path.join(BASE_DIR, "Venter\ML_model\ICMC\dataset\dataset_mcgm_clean\word_vectors_mcgm_.pickle")
+        original1 =  os.path.join(BASE_DIR, "Venter/ML_model/ICMC/dataset/dataset_mcgm_clean/word_index_map_mcgm.pickle")
+        destination1 =  os.path.join(BASE_DIR, "Venter/ML_model/ICMC/dataset/dataset_mcgm_clean/word_index_map_mcgm_.pickle")
+        original2 =  os.path.join(BASE_DIR, "Venter/ML_model/ICMC/dataset/dataset_mcgm_clean/word_vectors_mcgm.pickle")
+        destination2 =  os.path.join(BASE_DIR, "Venter/ML_model/ICMC/dataset/dataset_mcgm_clean/word_vectors_mcgm_.pickle")
 
         content = ''
         outsize = 0
